@@ -1,4 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.SbtArtifactory
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "national-duty-repayment-center"
@@ -6,7 +7,13 @@ val appName = "national-duty-repayment-center"
 val silencerVersion = "1.7.0"
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .disablePlugins(JUnitXmlReportPlugin)
+  .settings(
+    scalaVersion                     := "2.12.10",
+    majorVersion                     := 0,
+    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test
+  )
   .settings(
     majorVersion                     := 0,
     scalaVersion                     := "2.12.11",
