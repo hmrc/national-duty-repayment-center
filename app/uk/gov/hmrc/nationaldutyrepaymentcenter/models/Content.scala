@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.config
+package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json._
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
+final case class Content(
+                          ClaimDetails: ClaimDetails,
+                          AgentDetails: Option[UserDetails],
+                          ImporterDetails: UserDetails,
+                          BankDetails: Option[AllBankDetails],
+                          DutyTypeTaxDetails: DutyTypeTaxDetails,
+                          DocumentList: Seq[DocumentList]
+                        )
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
-
-  lazy val internalServiceName: String  = config.get[String]("internalServiceName")
+object Content {
+  implicit val format: OFormat[Content] = Json.format[Content]
 }

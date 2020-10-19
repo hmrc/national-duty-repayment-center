@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.config
+package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+sealed trait PaymentMethod
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+object PaymentMethod extends Enumerable.Implicits {
+  case object CurrentMonthAmendment extends WithName("01") with PaymentMethod
+  case object BACS extends WithName("02") with PaymentMethod
+  case object PayableOrder extends WithName("03") with PaymentMethod
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
+  val values: Seq[PaymentMethod] = Seq(
+    CurrentMonthAmendment,
+    BACS,
+    PayableOrder
+  )
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
-
-  lazy val internalServiceName: String  = config.get[String]("internalServiceName")
+  implicit val enumerable: Enumerable[PaymentMethod] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

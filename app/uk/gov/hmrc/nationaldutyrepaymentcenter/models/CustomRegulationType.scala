@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.config
+package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+sealed trait CustomRegulationType
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+object CustomRegulationType extends Enumerable.Implicits {
+  case object UnionsCustomsCodeRegulation extends WithName("01") with CustomRegulationType
+  case object UKCustomsCodeRegulation extends WithName("02") with CustomRegulationType
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
+  val values: Seq[CustomRegulationType] = Seq(
+    UnionsCustomsCodeRegulation,
+    UKCustomsCodeRegulation
+  )
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
+  implicit val enumerable: Enumerable[CustomRegulationType] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 
-  lazy val internalServiceName: String  = config.get[String]("internalServiceName")
 }
