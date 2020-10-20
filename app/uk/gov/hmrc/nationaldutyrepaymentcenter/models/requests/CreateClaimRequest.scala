@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
-import models.{AcknowledgementReference, ApplicationType, Content, OriginatingSystem}
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AcknowledgementReference, ApplicationType, Content, OriginatingSystem}
 
 final case class CreateClaimRequest(
                                      AcknowledgementReference: AcknowledgementReference,

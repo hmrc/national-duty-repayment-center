@@ -29,4 +29,6 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
 
   lazy val internalServiceName: String  = config.get[String]("internalServiceName")
+
+  lazy val createClaimRepayment = ("microservice.services.national-duty-repayment-center")
 }
