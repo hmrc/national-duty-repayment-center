@@ -22,8 +22,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
  */
 
 import base.SpecBase
-import org.scalatest.{FreeSpec, MustMatchers}
-import org.scalatest._
+import org.scalatest.MustMatchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
