@@ -15,28 +15,26 @@
  */
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
-import uk.gov.hmrc.nationaldutyrepaymentcenter.config.AppConfig
 
-
+import app.uk.gov.hmrc.nationaldutyrepaymentcenter.config._
 import com.google.inject.Inject
 import uk.gov.hmrc.http._
-import play.api.{Configuration}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.ClientClaimSuccessResponse
-
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import play.api.Configuration
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClaimRepaymentConnector  @Inject()(
-                                    config: Configuration,
-                                    httpClient: HttpClient,
-                                    appConfig: AppConfig
-                                  )(
-                                    implicit ec: ExecutionContext
-                                  ) extends HttpErrorFunctions {
+class ClaimRepaymentConnector @Inject()(
+                                         config: Configuration,
+                                         httpClient: HttpClient
+                                       )(
+                                         implicit ec: ExecutionContext
+                                       ) extends HttpErrorFunctions {
+  private val baseUrl = config.get[Service]("microservice.services.national-duty-repayment-center-create-eis")
 
 
-  def submitClaim(request: CreateClaimRequest)(implicit hc: HeaderCarrier): Future[ClientClaimSuccessResponse] =
-    httpClient.POST[CreateClaimRequest, ClientClaimSuccessResponse](s"$appConfig.createClaimRepayment/NDRC/v1/createCaseRequest", request)
-
-
+  def submitClaim(request: CreateClaimRequest)(implicit hc: HeaderCarrier): Future[ClientClaimSuccessResponse] = {
+    httpClient.POST[CreateClaimRequest, ClientClaimSuccessResponse](s"$baseUrl/NDRC/v1/createCaseRequest", request)
+  }
 }

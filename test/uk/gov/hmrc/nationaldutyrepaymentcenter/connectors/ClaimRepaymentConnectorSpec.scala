@@ -21,9 +21,9 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
  *
  */
 
-
 import base.SpecBase
 import org.scalatest.{FreeSpec, MustMatchers}
+import org.scalatest._
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
@@ -32,28 +32,23 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.ClientClaimSucce
 import utils.WireMockHelper
 import com.github.tomakehurst.wiremock.client.WireMock._
 
-class ClaimRepaymentConnectorSpec extends FreeSpec
-
+class ClaimRepaymentConnectorSpec extends SpecBase
   with WireMockHelper
-  with MustMatchers
-  with SpecBase {
-
+  with MustMatchers {
   implicit private lazy val hc: HeaderCarrier = HeaderCarrier()
 
   private def application: Application =
     new GuiceApplicationBuilder()
       .configure(
-        "microservice.services.national-duty-repayment-center.port" -> server.port
+        "microservice.services.national-duty-repayment-center-create-eis.port" -> server.port,
+        "metrics.enabled" -> "false"
       )
       .build()
 
   "SubmitRepayment" must {
-
     "must return a repayment when the server responds with OK" in {
       val app = application
-
       running(app) {
-
         val url = s"/NDRC/v1/createCaseRequest"
         val responseBody =
           s"""{
@@ -69,22 +64,15 @@ class ClaimRepaymentConnectorSpec extends FreeSpec
         result mustEqual ClientClaimSuccessResponse("1")
       }
     }
-
     "must return None if the backend can't find a registration with case ID" in {
-
       val app = application
       val url = s"/NDRC/v1/createCaseRequest"
-
       running(app) {
         val connector = app.injector.instanceOf[ClaimRepaymentConnector]
-
         server.stubFor(post(urlEqualTo(url)).willReturn(notFound()))
-
         val result = connector.submitClaim(createClaimRequest).value
         result mustBe None
       }
     }
   }
-
-
 }

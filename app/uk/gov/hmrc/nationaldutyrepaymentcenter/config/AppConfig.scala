@@ -30,5 +30,5 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
 
   lazy val internalServiceName: String  = config.get[String]("internalServiceName")
 
-  lazy val createClaimRepayment = ("microservice.services.national-duty-repayment-center")
+  lazy val createClaimRepayment = ("microservice.services.national-duty-repayment-center-create-eis")
 }
