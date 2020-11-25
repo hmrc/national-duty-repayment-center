@@ -1,3 +1,3 @@
 # microservice specific routes
 
-#GET     /create-case                controllers
+POST     /create-case                @uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.ClaimController.submitClaim

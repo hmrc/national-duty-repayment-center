@@ -22,6 +22,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
  */
 
 import base.SpecBase
+import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.MustMatchers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -29,7 +30,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.ClientClaimSuccessResponse
 import utils.WireMockHelper
-import com.github.tomakehurst.wiremock.client.WireMock._
 
 class ClaimRepaymentConnectorSpec extends SpecBase
   with WireMockHelper

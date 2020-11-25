@@ -16,17 +16,22 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
-import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AcknowledgementReference, ApplicationType, Content, OriginatingSystem}
+import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, Validator}
 
 final case class CreateClaimRequest(
-                                     AcknowledgementReference: AcknowledgementReference,
-                                     ApplicationType: ApplicationType,
-                                     OriginatingSystem: OriginatingSystem,
+                                     AcknowledgementReference: String,
+                                     ApplicationType: String,
+                                     OriginatingSystem: String,
                                      Content: Content
                                    )
 
 object CreateClaimRequest {
-  implicit val formats: OFormat[CreateClaimRequest] = Json.format[CreateClaimRequest]
+
+  implicit val formats: Format[CreateClaimRequest] =
+    Json.format[CreateClaimRequest]
+
+  implicit val validate: Validator.Validate[CreateClaimRequest] =
+    Validator.always
 }
 

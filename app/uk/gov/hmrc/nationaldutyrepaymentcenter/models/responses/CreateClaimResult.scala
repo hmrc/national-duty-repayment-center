@@ -18,11 +18,14 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class ClientClaimSuccessResponse(
-                                             caseID: String
-                                           )
+sealed trait CreateClaimResult
 
+final case class CreateClaimSuccess(id: String) extends CreateClaimResult
 
-object ClientClaimSuccessResponse {
-  implicit val format: OFormat[ClientClaimSuccessResponse] = Json.format[ClientClaimSuccessResponse]
+object CreateClaimSuccess {
+  implicit val format: OFormat[CreateClaimSuccess] = Json.format[CreateClaimSuccess]
 }
+
+case object CreateClaimFailedUnexpected extends CreateClaimResult
+
+

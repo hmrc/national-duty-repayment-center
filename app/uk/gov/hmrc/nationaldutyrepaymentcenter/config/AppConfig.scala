@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.config
 
+import app.uk.gov.hmrc.nationaldutyrepaymentcenter.config.Service
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -28,7 +29,12 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
   val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
 
+  val createCaseBaseUrl = config.get[Service]("microservice.services.eis.createcaseapi")
+
   lazy val internalServiceName: String  = config.get[String]("internalServiceName")
 
-  lazy val createClaimRepayment = ("microservice.services.national-duty-repayment-center-create-eis")
+  val createCaseApiAuthorizationToken: String = config.get[String]("microservice.services.eis.createcaseapi.token")
+
+  val createCaseApiEnvironment: String = config.get[String]("microservice.services.eis.createcaseapi.environment")
+
 }

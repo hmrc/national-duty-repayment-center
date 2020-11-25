@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json}
 
-final case class ClientClaimSuccessResponse(
-                                             caseID: String
-                                           )
+case class ApiError(
+                     errorCode: String,
+                     errorMessage: Option[String] = None
+                   )
 
-
-object ClientClaimSuccessResponse {
-  implicit val format: OFormat[ClientClaimSuccessResponse] = Json.format[ClientClaimSuccessResponse]
+object ApiError {
+  implicit val formats: Format[ApiError] = Json.format[ApiError]
 }

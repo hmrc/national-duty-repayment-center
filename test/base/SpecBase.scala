@@ -23,11 +23,9 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice._
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.{Injector, bind}
+import play.api.inject.Injector
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
 
