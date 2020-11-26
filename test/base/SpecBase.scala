@@ -95,7 +95,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
 
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
 
-  val createClaimRequest = CreateClaimRequest(
+  /*val createClaimRequest = CreateClaimRequest(
     AcknowledgementReference("123456"),
     ApplicationType("NDRC"),
     OriginatingSystem("Digital"),
@@ -105,7 +105,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       BankDetails = Some(bankDetails),
       DutyTypeTaxDetails = dutyTypeTaxDetails,
       DocumentList = documentList)
-  )
+  )*/
 
   val json = Json.obj(
     "AcknowledgementReference" -> "123456",
