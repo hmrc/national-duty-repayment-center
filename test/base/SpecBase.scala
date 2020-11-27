@@ -27,6 +27,7 @@ import play.api.inject.Injector
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
 
   val userAnswersId = "id"
@@ -76,8 +77,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   )
 
   val bankDetails = AllBankDetails(
-    AgentBankDetails = BankDetails(AccountName("account name"), SortCode("123456"), AccountNumber("12345678")),
-    ImporterBankDetails = BankDetails(AccountName("account name"), SortCode("123456"), AccountNumber("12345678"))
+    AgentBankDetails = BankDetails("account name", "123456", "12345678"),
+    ImporterBankDetails = BankDetails("account name", "123456", "12345678")
   )
 
 
@@ -95,17 +96,17 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
 
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
 
-  /*val createClaimRequest = CreateClaimRequest(
-    AcknowledgementReference("123456"),
-    ApplicationType("NDRC"),
-    OriginatingSystem("Digital"),
+  val createClaimRequest = CreateClaimRequest(
+    "123456",
+    "NDRC",
+    "Digital",
     Content(claimDetails,
       AgentDetails = Some(userDetails),
       ImporterDetails = userDetails,
       BankDetails = Some(bankDetails),
       DutyTypeTaxDetails = dutyTypeTaxDetails,
       DocumentList = documentList)
-  )*/
+  )
 
   val json = Json.obj(
     "AcknowledgementReference" -> "123456",

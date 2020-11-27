@@ -24,5 +24,5 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.config.AppConfig
 @Singleton
 class MicroserviceAuthConnector @Inject()(appConfig: AppConfig, val http: HttpPost) extends PlayAuthConnector {
 
-  override val serviceUrl: String = appConfig.authBaseUrl
+  override val serviceUrl: String = appConfig.createCaseBaseUrl
 }

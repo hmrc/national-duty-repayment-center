@@ -17,12 +17,25 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.config
 
 import app.uk.gov.hmrc.nationaldutyrepaymentcenter.config.Service
+import com.google.inject.ImplementedBy
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+@ImplementedBy(classOf[AppConfigImpl])
+trait AppConfig {
+
+  val createCaseApiAuthorizationToken: String
+
+  val createCaseApiEnvironment: String
+
+  val graphiteHost: String
+
+  val createCaseBaseUrl: String
+
+}
+
+class AppConfigImpl @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
 
   val authBaseUrl: String = servicesConfig.baseUrl("auth")
 
@@ -30,8 +43,6 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
 
   val createCaseBaseUrl = config.get[Service]("microservice.services.eis.createcaseapi")
-
-  lazy val internalServiceName: String  = config.get[String]("internalServiceName")
 
   val createCaseApiAuthorizationToken: String = config.get[String]("microservice.services.eis.createcaseapi.token")
 

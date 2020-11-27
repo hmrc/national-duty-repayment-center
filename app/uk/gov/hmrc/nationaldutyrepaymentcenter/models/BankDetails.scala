@@ -19,9 +19,9 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 import play.api.libs.json.{Json, OFormat}
 
 final case class BankDetails(
-                              AccountName: AccountName,
-                              SortCode: SortCode,
-                              AccountNumber: AccountNumber)
+                              AccountName: String,
+                              SortCode: String,
+                              AccountNumber: String)
 
 object BankDetails {
   implicit val format: OFormat[BankDetails] = Json.format[BankDetails]
