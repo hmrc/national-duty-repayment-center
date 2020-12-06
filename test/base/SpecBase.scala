@@ -97,9 +97,6 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
 
   val createClaimRequest = CreateClaimRequest(
-    "123456",
-    "NDRC",
-    "Digital",
     Content(claimDetails,
       AgentDetails = Some(userDetails),
       ImporterDetails = userDetails,

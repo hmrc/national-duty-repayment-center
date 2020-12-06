@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
+package uk.gov.hmrc.nationaldutyrepaymentcenter.binders
 
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, Validator}
-
-final case class CreateClaimRequest(
-                                     Content: Content
-                                   )
-
-object CreateClaimRequest {
-
-  implicit val formats: Format[CreateClaimRequest] =
-    Json.format[CreateClaimRequest]
-
-  implicit val validate: Validator.Validate[CreateClaimRequest] =
-    Validator.always
-}
-
+object UrlBinders {}

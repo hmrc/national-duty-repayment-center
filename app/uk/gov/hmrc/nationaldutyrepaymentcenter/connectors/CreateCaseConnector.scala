@@ -30,11 +30,11 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{ClientClaimSucc
 import scala.concurrent.{ExecutionContext, Future}
 
 class CreateCaseConnector @Inject()(
-                                         config: AppConfig,
-                                         httpClient: HttpClient
-                                       )(
-                                         implicit ec: ExecutionContext
-                                       ) extends HttpErrorFunctions {
+                                     val config: AppConfig,
+                                     val httpClient: HttpClient
+                                   )(
+                                     implicit ec: ExecutionContext
+                                   ) extends HttpErrorFunctions {
 
   val httpDateFormat = DateTimeFormatter
     .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", ju.Locale.ENGLISH)
@@ -44,19 +44,19 @@ class CreateCaseConnector @Inject()(
 
 
   def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
-                                                                      hc: HeaderCarrier,
-                                                                      ec: ExecutionContext
+                                                                        hc: HeaderCarrier,
+                                                                        ec: ExecutionContext
   ): Future[EISCreateCaseResponse] = {
     httpClient.POST[EISCreateCaseRequest, EISCreateCaseResponse](s"$baseUrl/NDRC/v1/createCaseRequest", request)(
       implicitly,
       implicitly,
       HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.createCaseApiAuthorizationToken}")))
         .withExtraHeaders(
-          "x-correlation-id"    -> correlationId,
+          "x-correlation-id" -> correlationId,
           "CustomProcessesHost" -> "Digital", // required by PEGA API spec
-          "date"                -> httpDateFormat.format(ZonedDateTime.now),
-          "accept"              -> "application/json",
-          "environment"         -> config.createCaseApiEnvironment
+          "date" -> httpDateFormat.format(ZonedDateTime.now),
+          "accept" -> "application/json",
+          "environment" -> config.createCaseApiEnvironment
         ),
       implicitly[ExecutionContext]
     )

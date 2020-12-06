@@ -111,9 +111,6 @@ trait TestData {
 
   val testCreateCaseRequest = Json.toJson(
     CreateClaimRequest(
-      "123456",
-      "NDRC",
-      "Digital",
       Content(claimDetails,
         AgentDetails = Some(userDetails),
         ImporterDetails = userDetails,

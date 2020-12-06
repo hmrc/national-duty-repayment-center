@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
+package uk.gov.hmrc.nationaldutyrepaymentcenter.binders
 
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, Validator}
+import play.api.mvc.PathBindable
 
-final case class CreateClaimRequest(
-                                     Content: Content
-                                   )
+class SimpleObjectBinder[T](bind: String => T, unbind: T => String)(implicit m: Manifest[T]) extends PathBindable[T] {
+  override def bind(key: String, value: String): Either[String, T] =
+    try Right(bind(value))
+    catch {
+      case e: Throwable =>
+        Left(
+          s"Cannot parse parameter '$key' with value '$value' as '${m.runtimeClass.getSimpleName}'"
+        )
+    }
 
-object CreateClaimRequest {
-
-  implicit val formats: Format[CreateClaimRequest] =
-    Json.format[CreateClaimRequest]
-
-  implicit val validate: Validator.Validate[CreateClaimRequest] =
-    Validator.always
+  def unbind(key: String, value: T): String = unbind(value)
 }
-

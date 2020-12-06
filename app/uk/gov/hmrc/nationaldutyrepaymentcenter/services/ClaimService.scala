@@ -19,21 +19,18 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{CreateClaimRequest, EISCreateCaseRequest, EISCreateCaseRequestContent}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseResponse
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ClaimService @Inject()(createCaseConnector: CreateCaseConnector)(
   implicit ec: ExecutionContext
 ) {
 
-  def createClaim(request: CreateClaimRequest, correlationId: String)(implicit hc: HeaderCarrier): Unit = {
-    //TODO create the claim request to send to EIS
-
-    //createCaseConnector.submitClaim(request, correlationId) map {
-
+  def createClaim(request: EISCreateCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISCreateCaseResponse] = {
+    createCaseConnector.submitClaim(request, correlationId)
   }
-
 }
 
 

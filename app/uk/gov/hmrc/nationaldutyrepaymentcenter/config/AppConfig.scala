@@ -35,7 +35,7 @@ trait AppConfig {
 
 }
 
-class AppConfigImpl @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+class AppConfigImpl @Inject()(config: Configuration, servicesConfig: ServicesConfig) extends AppConfig {
 
   val authBaseUrl: String = servicesConfig.baseUrl("auth")
 

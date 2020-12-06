@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
+package utils
 
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, Validator}
+import java.time._
 
-final case class CreateClaimRequest(
-                                     Content: Content
-                                   )
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.guice.GuiceApplicationBuilder
 
-object CreateClaimRequest {
+class UnitSpecBase extends WordSpec with Matchers with MockitoSugar with ScalaFutures {
+  protected def applicationBuilder: GuiceApplicationBuilder =
+    new GuiceApplicationBuilder()
 
-  implicit val formats: Format[CreateClaimRequest] =
-    Json.format[CreateClaimRequest]
+  val fixedInstant: Instant = LocalDateTime.parse("2027-11-02T16:33:51.880").toInstant(ZoneOffset.UTC)
+  implicit val stubClock: Clock = Clock.fixed(fixedInstant, ZoneId.systemDefault)
 
-  implicit val validate: Validator.Validate[CreateClaimRequest] =
-    Validator.always
 }
-
