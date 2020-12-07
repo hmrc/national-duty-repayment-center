@@ -10,7 +10,6 @@ trait CreateCaseStubs {
     stubForPostWithResponse(
       200,
       """{
-        |  "AcknowledgementReference" : "123456",
         |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
         |  "Content": {
@@ -29,7 +28,7 @@ trait CreateCaseStubs {
         |      "DateReceived" : "20200805",
         |      "ClaimDate" : "20200805",
         |      "PayeeIndicator" : "01",
-        |      "PaymentMethod" : "02",
+        |      "PaymentMethod" : "02"
         |    },
         |    "AgentDetails" : {
         |      "VATNumber" : "123456789",
@@ -123,7 +122,7 @@ trait CreateCaseStubs {
     stubForPostWithResponse(
       status,
       """{
-        |  "ApplicationType" : "Route1",
+        |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
         |  "Content": {}
         |}""".stripMargin,
@@ -137,7 +136,7 @@ trait CreateCaseStubs {
 
   def stubForPostWithResponse(status: Int, payload: String, responseBody: String): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/route1/create/v1"))
+      post(urlEqualTo("/cpr/caserequest/NDRC/create/v1"))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
@@ -156,7 +155,7 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestRespondsWithHtml(): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/route1/create/v1"))
+      post(urlEqualTo("/cpr/caserequest/NDRC/create/v1"))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
@@ -176,7 +175,7 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestRespondsWith403WithoutContent(): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/route1/create/v1"))
+      post(urlEqualTo("/cpr/caserequest/NDRC/create/v1"))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))

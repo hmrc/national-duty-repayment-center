@@ -11,13 +11,13 @@ trait TestApplication {
   protected override def appBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(
-        "microservice.services.auth.port"                     -> wireMockPort,
+        "microservice.services.auth.port"               -> wireMockPort,
         "microservice.services.eis.createcaseapi.host"        -> wireMockHost,
         "microservice.services.eis.createcaseapi.port"        -> wireMockPort,
         "microservice.services.eis.createcaseapi.token"       -> "dummy-it-token",
         "microservice.services.eis.createcaseapi.environment" -> "it",
         "metrics.enabled"                                     -> true,
-        "auditing.enabled"                                    -> true,
+        "auditing.enabled"                                    -> false,
         "auditing.consumer.baseUri.host"                      -> wireMockHost,
         "auditing.consumer.baseUri.port"                      -> wireMockPort
       )

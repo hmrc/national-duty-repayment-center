@@ -21,11 +21,11 @@ import java.{util => ju}
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.config.AppConfig
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{CreateCaseConnector, MicroserviceAuthConnector}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{CreateClaimRequest, EISCreateCaseRequest, EISCreateCaseRequestContent}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{ApiError, EISCreateCaseError, EISCreateCaseSuccess, NDRCCreateCaseResponse}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.ClaimService
+import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.ExecutionContext

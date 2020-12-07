@@ -21,17 +21,17 @@ import java.time.{ZoneId, ZonedDateTime}
 import java.{util => ju}
 
 import com.google.inject.Inject
-import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.nationaldutyrepaymentcenter.config.AppConfig
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{CreateClaimRequest, EISCreateCaseRequest}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{ClientClaimSuccessResponse, EISCreateCaseResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, _}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseResponse
+import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class CreateCaseConnector @Inject()(
                                      val config: AppConfig,
-                                     val httpClient: HttpClient
+                                     val http: HttpPost
                                    )(
                                      implicit ec: ExecutionContext
                                    ) extends HttpErrorFunctions {
@@ -40,23 +40,23 @@ class CreateCaseConnector @Inject()(
     .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", ju.Locale.ENGLISH)
     .withZone(ZoneId.of("GMT"))
 
-  val baseUrl = config.createCaseBaseUrl
+  val url = config.eisBaseUrl + config.eisCreateCaseApiPath
 
 
   def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
   ): Future[EISCreateCaseResponse] = {
-    httpClient.POST[EISCreateCaseRequest, EISCreateCaseResponse](s"$baseUrl/NDRC/v1/createCaseRequest", request)(
+    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
       implicitly,
       implicitly,
-      HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.createCaseApiAuthorizationToken}")))
+      HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}")))
         .withExtraHeaders(
           "x-correlation-id" -> correlationId,
           "CustomProcessesHost" -> "Digital", // required by PEGA API spec
           "date" -> httpDateFormat.format(ZonedDateTime.now),
           "accept" -> "application/json",
-          "environment" -> config.createCaseApiEnvironment
+          "environment" -> config.eisEnvironment
         ),
       implicitly[ExecutionContext]
     )

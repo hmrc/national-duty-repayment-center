@@ -48,8 +48,6 @@ class NDRCCreateCaseISpec
             haveProperty[String]("result", be("PCE201103470D2CC8K0NH3"))
         )
       }
-
-
     }
   }
 }
