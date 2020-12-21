@@ -20,9 +20,11 @@ trait CreateCaseStubs {
         |      "Claimant" : "02",
         |      "ClaimType" : "02",
         |      "NoOfEntries" : "10",
-        |      "EPU" : "777",
-        |      "EntryNumber" : "123456A",
-        |      "EntryDate" : "20200101",
+        |      "EntryDetails" : {
+        |           "EPU" : "777",
+        |           "EntryNumber" : "123456A",
+        |           "EntryDate" : "20200101"
+        |       },
         |      "ClaimReason" : "06",
         |      "ClaimDescription" : "this is a claim description",
         |      "DateReceived" : "20200805",
@@ -31,7 +33,7 @@ trait CreateCaseStubs {
         |      "PaymentMethod" : "02"
         |    },
         |    "AgentDetails" : {
-        |      "VATNumber" : "123456789",
+        |      "VATNumber" : "12345678",
         |      "EORI" : "GB123456789123456",
         |      "Name" : "Joe Bloggs",
         |      "Address" : {
@@ -46,7 +48,7 @@ trait CreateCaseStubs {
         |      }
         |    },
         |    "ImporterDetails" : {
-        |      "VATNumber" : "123456789",
+        |      "VATNumber" : "12345678",
         |      "EORI" : "GB123456789123456",
         |      "Name" : "Joe Bloggs",
         |      "Address" : {
@@ -136,7 +138,7 @@ trait CreateCaseStubs {
 
   def stubForPostWithResponse(status: Int, payload: String, responseBody: String): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/NDRC/create/v1"))
+      post(urlEqualTo("/NDRC/v1/createCaseRequest"))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
@@ -155,7 +157,7 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestRespondsWithHtml(): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/NDRC/create/v1"))
+      post(urlEqualTo("/NDRC/v1/createCaseRequest"))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
@@ -175,7 +177,7 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestRespondsWith403WithoutContent(): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/NDRC/create/v1"))
+      post(urlEqualTo("/NDRC/v1/createCaseRequest"))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))

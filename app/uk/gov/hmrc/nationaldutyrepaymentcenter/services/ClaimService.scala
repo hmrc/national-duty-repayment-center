@@ -19,7 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{CreateClaimRequest, EISCreateCaseRequest, EISCreateCaseRequestContent}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseResponse
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -49,15 +49,13 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
-    EPU = EPU("777"),
-    EntryNumber = EntryNumber("123456A"),
-    EntryDate = LocalDate.of(2020, 1, 1),
+    EntryDetails(EPU = "777", EntryNumber = "123456A", EntryDate = LocalDate.of(2020, 1, 1)),
     ClaimReason = ClaimReason.Preference,
     ClaimDescription = ClaimDescription("this is a claim description"),
     DateReceived = LocalDate.of(2020, 8, 5),
     ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
-    PaymentMethod = PaymentMethod.BACS,
+    PaymentMethod = PaymentMethod.BACS
   )
 
   val address = Address(AddressLine1 = "line 1",
@@ -77,15 +75,15 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   )
 
   val bankDetails = AllBankDetails(
-    AgentBankDetails = BankDetails("account name", "123456", "12345678"),
-    ImporterBankDetails = BankDetails("account name", "123456", "12345678")
+    AgentBankDetails = Some(BankDetails("account name", "123456", "12345678")),
+    ImporterBankDetails = Some(BankDetails("account name", "123456", "12345678"))
   )
 
 
   val dutyTypeTaxList = Seq(
-    DutyTypeTaxList(DutyType.Customs, Some(PaidAmount("100.00")), Some(DueAmount("50.00")), Some(ClaimAmount("50.00"))),
-    DutyTypeTaxList(DutyType.Vat, Some(PaidAmount("100.00")), Some(DueAmount("50.00")), Some(ClaimAmount("50.00"))),
-    DutyTypeTaxList(DutyType.Other, Some(PaidAmount("100.00")), Some(DueAmount("50.00")), Some(ClaimAmount("50.00")))
+    DutyTypeTaxList(DutyType.Customs, "100.00", "50.00", "50.00"),
+    DutyTypeTaxList(DutyType.Vat, "100.00", "50.00", "50.00"),
+    DutyTypeTaxList(DutyType.Other, "100.00", "50.00", "50.00")
   )
 
   val documentList = Seq(
