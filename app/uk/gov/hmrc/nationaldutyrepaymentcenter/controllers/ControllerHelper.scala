@@ -47,7 +47,6 @@ trait ControllerHelper {
             f(payload)
 
           case Invalid(errs) =>
-            println("ERROR_VALIDATION " + errs)
             Future successful handleError(
               "ERROR_VALIDATION",
               s"Invalid payload: Validation failed due to ${errs.mkString(", and ")}."
@@ -55,7 +54,6 @@ trait ControllerHelper {
         }
 
       case Success(JsError(errs)) =>
-        println("ERROR_JSON " + JsError(errs) + "REQUEST BODY " + request.body)
         Future successful handleError(
           "ERROR_JSON",
           s"Invalid payload: Parsing failed due to ${errs
@@ -67,7 +65,6 @@ trait ControllerHelper {
         )
 
       case Failure(e) =>
-        println("ERROR_UNKNOWN " + e)
         Future successful handleError("ERROR_UNKNOWN", s"Could not parse payload due to ${e.getMessage}.")
     }
 
