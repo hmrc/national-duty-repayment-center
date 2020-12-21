@@ -14,61 +14,61 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class EISCreateCaseConnectorISpec extends EISCreateCaseConnectorISpecSetup {
 
- /* "EISCreateCaseConnector" when {
-    "createCase" should {
-      "return case reference id if success" in {
-        givenPegaCreateCaseRequestSucceeds()
+  /* "EISCreateCaseConnector" when {
+     "createCase" should {
+       "return case reference id if success" in {
+         givenPegaCreateCaseRequestSucceeds()
 
-        val request = testRequest
+         val request = testRequest
 
-        val result = await(connector.submitClaim(request, correlationId))
+         val result = await(connector.submitClaim(request, correlationId))
 
-        result shouldBe PegaCaseSuccess(
-          "PCE201103470D2CC8K0NH3",
-          "2020-11-03T15:29:28.601Z",
-          "Success",
-          "Case created successfully"
-        )
+         result shouldBe PegaCaseSuccess(
+           "PCE201103470D2CC8K0NH3",
+           "2020-11-03T15:29:28.601Z",
+           "Success",
+           "Case created successfully"
+         )
 
-      }
+       }
 
-      "return error code and message if 500" in {
-        givenPegaCreateCaseRequestFails(500, "500", "Foo Bar")
+       "return error code and message if 500" in {
+         givenPegaCreateCaseRequestFails(500, "500", "Foo Bar")
 
-        val request = testRequest
+         val request = testRequest
 
-        val result = await(connector.submitClaim(request, correlationId))
+         val result = await(connector.submitClaim(request, correlationId))
 
-        result shouldBe PegaCaseError(errorDetail =
-          PegaCaseError
-            .ErrorDetail(
-              correlationId = Some("123123123"),
-              timestamp = Some("2020-11-03T15:29:28.601Z"),
-              errorCode = Some("500"),
-              errorMessage = Some("Foo Bar")
-            )
-        )
-      }
+         result shouldBe PegaCaseError(errorDetail =
+           PegaCaseError
+             .ErrorDetail(
+               correlationId = Some("123123123"),
+               timestamp = Some("2020-11-03T15:29:28.601Z"),
+               errorCode = Some("500"),
+               errorMessage = Some("Foo Bar")
+             )
+         )
+       }
 
-      "return error code and message if 403" in {
-        givenPegaCreateCaseRequestFails(403, "403", "Bar Foo")
+       "return error code and message if 403" in {
+         givenPegaCreateCaseRequestFails(403, "403", "Bar Foo")
 
-        val request = testRequest
+         val request = testRequest
 
-        val result = await(connector.submitClaim(request, correlationId))
+         val result = await(connector.submitClaim(request, correlationId))
 
-        result shouldBe PegaCaseError(errorDetail =
-          PegaCaseError
-            .ErrorDetail(
-              correlationId = Some("123123123"),
-              timestamp = Some("2020-11-03T15:29:28.601Z"),
-              errorCode = Some("403"),
-              errorMessage = Some("Bar Foo")
-            )
-        )
-      }
-    }
-  }*/
+         result shouldBe PegaCaseError(errorDetail =
+           PegaCaseError
+             .ErrorDetail(
+               correlationId = Some("123123123"),
+               timestamp = Some("2020-11-03T15:29:28.601Z"),
+               errorCode = Some("403"),
+               errorMessage = Some("Bar Foo")
+             )
+         )
+       }
+     }
+   }*/
 
 }
 
@@ -102,11 +102,11 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
-    EntryDetails = EntryDetails("777", "123456A", LocalDate.of(2020,1,1)),
+    EntryDetails = EntryDetails("777", "123456A", LocalDate.of(2020, 1, 1)),
     ClaimReason = ClaimReason.Preference,
     ClaimDescription = ClaimDescription("this is a claim description"),
-    DateReceived = LocalDate.of(2020,8,5),
-    ClaimDate = LocalDate.of(2020,8,5),
+    DateReceived = LocalDate.of(2020, 8, 5),
+    ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
     PaymentMethod = PaymentMethod.BACS
   )

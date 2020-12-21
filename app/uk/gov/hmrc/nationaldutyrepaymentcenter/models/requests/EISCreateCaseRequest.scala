@@ -61,9 +61,6 @@ object EISCreateCaseRequest {
   object Content {
     implicit val formats: Format[Content] = Json.format[Content]
 
-    val dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
-    val timeFormat = DateTimeFormatter.ofPattern("HHmmss")
-
     def from(request: CreateClaimRequest): Content = {
       Content(
         ClaimDetails = request.Content.ClaimDetails,
@@ -78,4 +75,5 @@ object EISCreateCaseRequest {
       )
     }
   }
+
 }

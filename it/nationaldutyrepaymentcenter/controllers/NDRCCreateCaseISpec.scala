@@ -16,7 +16,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, Doc
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 
 class NDRCCreateCaseISpec
-    extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers {
+  extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers {
 
   this: Suite with ServerProvider =>
 
@@ -45,7 +45,7 @@ class NDRCCreateCaseISpec
         result.json.as[JsObject] should (
           haveProperty[String]("correlationId", be(correlationId)) and
             haveProperty[String]("result", be("PCE201103470D2CC8K0NH3"))
-        )
+          )
       }
     }
   }
@@ -60,11 +60,11 @@ object TestData {
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
-    EntryDetails = EntryDetails("777", "123456A", LocalDate.of(2020,1,1)),
+    EntryDetails = EntryDetails("777", "123456A", LocalDate.of(2020, 1, 1)),
     ClaimReason = ClaimReason.Preference,
     ClaimDescription = ClaimDescription("this is a claim description"),
-    DateReceived = LocalDate.of(2020,8,5),
-    ClaimDate = LocalDate.of(2020,8,5),
+    DateReceived = LocalDate.of(2020, 8, 5),
+    ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
     PaymentMethod = PaymentMethod.BACS
   )

@@ -95,7 +95,7 @@ class ClaimController @Inject()(
                 )
               )
         }
-      }{
+      } {
         // when incoming request's payload validation fails
         case (errorCode, errorMessage) =>
           BadRequest(
