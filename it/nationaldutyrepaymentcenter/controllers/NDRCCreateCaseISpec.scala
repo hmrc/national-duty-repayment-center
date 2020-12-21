@@ -7,17 +7,16 @@ import org.scalatest.Suite
 import org.scalatestplus.play.ServerProvider
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-
 import play.api.libs.json.JsObject
 import java.{util => ju}
 
 import nationaldutyrepaymentcenter.stubs.{AuthStubs, CreateCaseStubs}
 import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, DocumentList, DutyTypeTaxDetails, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 
 class NDRCCreateCaseISpec
-    extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers with TestData {
+  extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers {
 
   this: Suite with ServerProvider =>
 
@@ -39,20 +38,20 @@ class NDRCCreateCaseISpec
         val result = wsClient
           .url(s"$url/create-case")
           .withHttpHeaders("X-Correlation-ID" -> correlationId)
-          .post(testCreateCaseRequest)
+          .post(Json.toJson(TestData.testCreateCaseRequest))
           .futureValue
 
         result.status shouldBe 201
         result.json.as[JsObject] should (
           haveProperty[String]("correlationId", be(correlationId)) and
             haveProperty[String]("result", be("PCE201103470D2CC8K0NH3"))
-        )
+          )
       }
     }
   }
 }
 
-trait TestData {
+object TestData {
 
   val claimDetails = ClaimDetails(
     FormType = FormType("01"),
@@ -61,15 +60,13 @@ trait TestData {
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
-    EPU = EPU("777"),
-    EntryNumber = EntryNumber("123456A"),
-    EntryDate = LocalDate.of(2020,1,1),
+    EntryDetails = EntryDetails("777", "123456A", LocalDate.of(2020, 1, 1)),
     ClaimReason = ClaimReason.Preference,
     ClaimDescription = ClaimDescription("this is a claim description"),
-    DateReceived = LocalDate.of(2020,8,5),
-    ClaimDate = LocalDate.of(2020,8,5),
+    DateReceived = LocalDate.of(2020, 8, 5),
+    ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
-    PaymentMethod = PaymentMethod.BACS,
+    PaymentMethod = PaymentMethod.BACS
   )
 
   val address = Address(AddressLine1 = "line 1",
@@ -82,32 +79,32 @@ trait TestData {
     EmailAddress = Some("example@example.com")
   )
 
-  val userDetails = UserDetails(VATNumber = Some(VRN("123456789")),
+  val userDetails = UserDetails(VATNumber = Some(VRN("12345678")),
     EORI = EORI("GB123456789123456"),
     Name = UserName("Joe Bloggs"),
     Address = address
   )
 
   val bankDetails = AllBankDetails(
-    AgentBankDetails = BankDetails("account name", "123456", "12345678"),
-    ImporterBankDetails = BankDetails("account name", "123456", "12345678")
+    AgentBankDetails = Some(BankDetails("account name", "123456", "12345678")),
+    ImporterBankDetails = Some(BankDetails("account name", "123456", "12345678"))
   )
 
   val dutyTypeTaxList = Seq(
-    DutyTypeTaxList(DutyType.Customs, Some(PaidAmount("100.00")), Some(DueAmount("50.00")), Some(ClaimAmount("50.00"))),
-    DutyTypeTaxList(DutyType.Vat, Some(PaidAmount("100.00")), Some(DueAmount("50.00")), Some(ClaimAmount("50.00"))),
-    DutyTypeTaxList(DutyType.Other, Some(PaidAmount("100.00")), Some(DueAmount("50.00")), Some(ClaimAmount("50.00")))
+    DutyTypeTaxList(DutyType.Customs, "100.00", "50.00", "50.00"),
+    DutyTypeTaxList(DutyType.Vat, "100.00", "50.00", "50.00"),
+    DutyTypeTaxList(DutyType.Other, "100.00", "50.00", "50.00")
   )
 
   val documentList = Seq(
     DocumentList(DocumentUploadType.CopyOfC88, Some(DocumentDescription("this is a copy of c88"))),
     DocumentList(DocumentUploadType.Invoice, Some(DocumentDescription("this is an invoice"))),
-    DocumentList(DocumentUploadType.PackingList, Some(DocumentDescription("this is a packing list"))),
+    DocumentList(DocumentUploadType.PackingList, Some(DocumentDescription("this is a packing list")))
   )
 
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
 
-  val testCreateCaseRequest = Json.toJson(
+  val testCreateCaseRequest =
     CreateClaimRequest(
       Content(claimDetails,
         AgentDetails = Some(userDetails),
@@ -116,6 +113,7 @@ trait TestData {
         DutyTypeTaxDetails = dutyTypeTaxDetails,
         DocumentList = documentList)
     )
-  )
 
 }
+
+

@@ -19,28 +19,17 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-import play.api.libs.json._
+import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue, Json, OFormat}
 
 import scala.util.{Failure, Success, Try}
 
-final case class ClaimDetails(
-                               FormType: FormType,
-                               CustomRegulationType: CustomRegulationType,
-                               ClaimedUnderArticle: ClaimedUnderArticle,
-                               Claimant: Claimant,
-                               ClaimType: ClaimType,
-                               NoOfEntries: Option[NoOfEntries],
-                               EntryDetails: EntryDetails,
-                               ClaimReason: ClaimReason,
-                               ClaimDescription: ClaimDescription,
-                               DateReceived: LocalDate,
-                               ClaimDate: LocalDate,
-                               PayeeIndicator: PayeeIndicator,
-                               PaymentMethod: PaymentMethod
-                             )
+final case class EntryDetails(
+                               EPU: String,
+                               EntryNumber: String,
+                               EntryDate: LocalDate) {
+}
 
-object ClaimDetails {
-
+object EntryDetails {
   implicit val dateFormat: Format[LocalDate] = new Format[LocalDate] {
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
@@ -57,6 +46,5 @@ object ClaimDetails {
     }
   }
 
-  implicit val format: OFormat[ClaimDetails] = Json.format[ClaimDetails]
-
+  implicit val format: OFormat[EntryDetails] = Json.format[EntryDetails]
 }

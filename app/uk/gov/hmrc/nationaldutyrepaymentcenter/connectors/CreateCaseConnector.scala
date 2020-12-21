@@ -20,25 +20,29 @@ import java.time.format.DateTimeFormatter
 import java.time.{ZoneId, ZonedDateTime}
 import java.{util => ju}
 
+import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
+import com.kenshoo.play.metrics.Metrics
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseResponse
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseResponse, EISCreateCaseSuccess}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class CreateCaseConnector @Inject()(
                                      val config: AppConfig,
-                                     val http: HttpPost
+                                     val http: HttpPost,
+                                     metrics: Metrics
                                    )(
                                      implicit ec: ExecutionContext
-                                   ) extends HttpErrorFunctions {
+                                   ) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
+  EISCreateCaseError.fromStatusAndMessage
+) with PegaConnector with HttpAPIMonitor {
 
-  val httpDateFormat = DateTimeFormatter
-    .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", ju.Locale.ENGLISH)
-    .withZone(ZoneId.of("GMT"))
+  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url = config.eisBaseUrl + config.eisCreateCaseApiPath
 
@@ -48,12 +52,14 @@ class CreateCaseConnector @Inject()(
                                                                         ec: ExecutionContext
   ): Future[EISCreateCaseResponse] = {
     http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
-      implicitly,
-      implicitly,
-      HeaderCarrier(authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}")))
+      implicitly[Writes[EISCreateCaseRequest]],
+      readFromJsonSuccessOrFailure,
+      HeaderCarrier(
+        authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+      )
         .withExtraHeaders(
           "x-correlation-id" -> correlationId,
-          "CustomProcessesHost" -> "Digital", // required by PEGA API spec
+          "CustomProcessesHost" -> "Digital",
           "date" -> httpDateFormat.format(ZonedDateTime.now),
           "accept" -> "application/json",
           "environment" -> config.eisEnvironment

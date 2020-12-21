@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models
+package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
-import play.api.libs.json.{Json, OFormat}
+import scala.concurrent.{ExecutionContext, Future}
 
-final case class DutyTypeTaxList(
-                                  Type: DutyType,
-                                  PaidAmount: String,
-                                  DueAmount: String,
-                                  ClaimAmount: String
-                                )
-
-object DutyTypeTaxList {
-  implicit val format: OFormat[DutyTypeTaxList] = Json.format[DutyTypeTaxList]
+trait HttpAPIMonitor extends AverageResponseTimer with HttpErrorRateMeter {
+  def monitor[T](serviceName: String)(function: => Future[T])(implicit ec: ExecutionContext): Future[T] =
+    super.countErrors(serviceName) {
+      super.timer(serviceName) {
+        function
+      }
+    }
 }

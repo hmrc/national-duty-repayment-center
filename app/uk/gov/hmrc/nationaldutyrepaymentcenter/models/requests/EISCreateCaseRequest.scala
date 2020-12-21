@@ -19,60 +19,61 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 import java.time.format.DateTimeFormatter
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest.Content
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, UserDetails}
 
 /**
-  * Create specified case in the PEGA system.
-  * Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
-  *
-  * @param AcknowledgementReference Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data records, may be passed to Decision Service, CSG records can be searched using this field etc.
-  * @param ApplicationType Its key value to create the case for respective process.
-  * @param OriginatingSystem “Digital” for all requests originating in Digital
-  */
+ * Create specified case in the PEGA system.
+ * Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
+ *
+ * @param AcknowledgementReference Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data records, may be passed to Decision Service, CSG records can be searched using this field etc.
+ * @param ApplicationType          Its key value to create the case for respective process.
+ * @param OriginatingSystem        “Digital” for all requests originating in Digital
+ */
 case class EISCreateCaseRequest(
-  AcknowledgementReference: String,
-  ApplicationType: String,
-  OriginatingSystem: String,
-  Content: EISCreateCaseRequestContent
-)
+                                 AcknowledgementReference: String,
+                                 ApplicationType: String,
+                                 OriginatingSystem: String,
+                                 Content: EISCreateCaseRequest.Content
+                               )
 
 object EISCreateCaseRequest {
   implicit val formats: Format[EISCreateCaseRequest] = Json.format[EISCreateCaseRequest]
-}
 
-/**
-  * @param ClaimDetails see ClaimDetails structure.
-  * @param AgentDetails Agent/Representative of the importer Information (see UserDetails structure).
-  * @param ImporterDetails see UserDetails structure.
-  * @param BankDetails bank details of the payee required for BACS payments.
-  * @param DutyTypeTaxDetails XXX.
-  * @param DocumentList CHIEF entry date in YYYYMMDD format.
-  */
-case class EISCreateCaseRequestContent(
-                                        ClaimDetails: ClaimDetails,
-                                        AgentDetails: Option[UserDetails],
-                                        ImporterDetails: UserDetails,
-                                        BankDetails: Option[AllBankDetails],
-                                        DutyTypeTaxDetails: DutyTypeTaxDetails,
-                                        DocumentList: Seq[DocumentList]
-)
+  /**
+   * @param ClaimDetails       see ClaimDetails structure.
+   * @param AgentDetails       Agent/Representative of the importer Information (see UserDetails structure).
+   * @param ImporterDetails    see UserDetails structure.
+   * @param BankDetails        bank details of the payee required for BACS payments.
+   * @param DutyTypeTaxDetails XXX.
+   * @param DocumentList       CHIEF entry date in YYYYMMDD format.
+   */
 
-object EISCreateCaseRequestContent {
-  implicit val formats: Format[EISCreateCaseRequestContent] = Json.format[EISCreateCaseRequestContent]
+  case class Content(
+                      ClaimDetails: ClaimDetails,
+                      AgentDetails: Option[UserDetails],
+                      ImporterDetails: UserDetails,
+                      BankDetails: Option[AllBankDetails],
+                      DutyTypeTaxDetails: DutyTypeTaxDetails,
+                      DocumentList: Seq[DocumentList]
+                    )
 
-  val dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
-  val timeFormat = DateTimeFormatter.ofPattern("HHmmss")
+  object Content {
+    implicit val formats: Format[Content] = Json.format[Content]
 
-  def from(request: CreateClaimRequest): EISCreateCaseRequestContent =
-    EISCreateCaseRequestContent(
-      ClaimDetails = request.Content.ClaimDetails,
-      AgentDetails = request.Content.AgentDetails match {
-        case Some(result) => Some(result)
-        case _ => None
-      },
-      ImporterDetails = request.Content.ImporterDetails,
-      BankDetails = request.Content.BankDetails,
-      DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
-      DocumentList = request.Content.DocumentList
-    )
+    def from(request: CreateClaimRequest): Content = {
+      Content(
+        ClaimDetails = request.Content.ClaimDetails,
+        AgentDetails = request.Content.AgentDetails match {
+          case Some(result) => Some(result)
+          case _ => None
+        },
+        ImporterDetails = request.Content.ImporterDetails,
+        BankDetails = request.Content.BankDetails,
+        DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
+        DocumentList = request.Content.DocumentList
+      )
+    }
+  }
+
 }
