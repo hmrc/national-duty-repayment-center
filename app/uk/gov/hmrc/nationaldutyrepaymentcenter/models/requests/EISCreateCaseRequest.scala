@@ -16,10 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
-import java.time.format.DateTimeFormatter
-
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest.Content
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, UserDetails}
 
 /**

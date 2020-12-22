@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
-import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, Validator}
 
 final case class CreateClaimRequest(

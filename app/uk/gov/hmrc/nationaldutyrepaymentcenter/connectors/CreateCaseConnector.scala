@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
-import java.time.format.DateTimeFormatter
-import java.time.{ZoneId, ZonedDateTime}
-import java.{util => ju}
+import java.time.ZonedDateTime
 
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject

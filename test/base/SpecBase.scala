@@ -68,7 +68,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
     EmailAddress = Some("example@example.com")
   )
 
-  val userDetails = UserDetails(VATNumber = Some(VRN("123456789")),
+  val userDetails = UserDetails(IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
     Name = UserName("Joe Bloggs"),
     Address = address
@@ -126,7 +126,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
         "PaymentMethod" -> "02",
       ),
       "AgentDetails" -> Json.obj(
-        "VATNumber" -> "123456789",
+        "IsVATRegistered" -> "true",
         "EORI" -> "GB123456789123456",
         "Name" -> "Joe Bloggs",
         "Address" -> Json.obj(
@@ -141,7 +141,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
         )
       ),
       "ImporterDetails" -> Json.obj(
-        "VATNumber" -> "123456789",
+        "IsVATRegistered" -> "true",
         "EORI" -> "GB123456789123456",
         "Name" -> "Joe Bloggs",
         "Address" -> Json.obj(

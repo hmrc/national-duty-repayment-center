@@ -33,7 +33,7 @@ trait CreateCaseStubs {
         |      "PaymentMethod" : "02"
         |    },
         |    "AgentDetails" : {
-        |      "VATNumber" : "12345678",
+        |      "IsVATRegistered" : "true",
         |      "EORI" : "GB123456789123456",
         |      "Name" : "Joe Bloggs",
         |      "Address" : {
@@ -48,7 +48,7 @@ trait CreateCaseStubs {
         |      }
         |    },
         |    "ImporterDetails" : {
-        |      "VATNumber" : "12345678",
+        |      "IsVATRegistered" : "true",
         |      "EORI" : "GB123456789123456",
         |      "Name" : "Joe Bloggs",
         |      "Address" : {
