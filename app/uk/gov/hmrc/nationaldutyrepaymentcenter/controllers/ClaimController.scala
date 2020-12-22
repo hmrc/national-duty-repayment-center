@@ -66,21 +66,6 @@ class ClaimController @Inject()(
             )
           // when request to the upstream api returns an error
           case error: EISCreateCaseError =>
-            if (error.isDuplicateCaseError)
-              Conflict(
-                Json.toJson(
-                  NDRCCreateCaseResponse(
-                    correlationId = correlationId,
-                    error = Some(
-                      ApiError(
-                        errorCode = "409",
-                        errorMessage = error.duplicateCaseID
-                      )
-                    )
-                  )
-                )
-              )
-            else
               BadRequest(
                 Json.toJson(
                   NDRCCreateCaseResponse(
