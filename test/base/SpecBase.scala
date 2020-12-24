@@ -27,7 +27,7 @@ import play.api.inject.Injector
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
 
   val userAnswersId = "id"
@@ -102,6 +102,24 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       BankDetails = Some(bankDetails),
       DutyTypeTaxDetails = dutyTypeTaxDetails,
       DocumentList = documentList)
+  )
+
+  val amendClaimDetails = AmendClaimDetails(
+    CaseID = "Risk-2507",
+    Description = "update request for Risk-2507"
+  )
+
+  val amendClaimRequest = AmendClaimRequest(
+    AmendContent(amendClaimDetails)
+  )
+
+  val amendJson = Json.obj(
+    "Content" -> Json.obj(
+      "AmendClaimDetails" -> Json.obj(
+        "CaseID" -> "Risk-2507",
+        "Description" -> "update request for Risk-2507"
+      )
+    )
   )
 
   val json = Json.obj(

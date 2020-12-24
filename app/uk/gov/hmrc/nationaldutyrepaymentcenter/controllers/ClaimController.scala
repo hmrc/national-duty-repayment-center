@@ -96,4 +96,61 @@ class ClaimController @Inject()(
       }
     }
   }
+
+  def submitAmendClaim(): Action[String] = Action(parse.tolerantText).async { implicit request =>
+    withAuthorised {
+      val correlationId = request.headers
+        .get("x-correlation-id")
+        .getOrElse(ju.UUID.randomUUID().toString())
+
+      withPayload[AmendClaimRequest] { amendCaseRequest =>
+        val eisAmendCaseRequest = EISAmendCaseRequest(
+          AcknowledgementReference = correlationId.replace("-", ""),
+          ApplicationType = "NDRC",
+          OriginatingSystem = "Digital",
+          Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
+        )
+
+        claimService.amendClaim(eisAmendCaseRequest, correlationId).map {
+          case success: EISCreateCaseSuccess =>
+            Created(
+              Json.toJson(
+                NDRCCreateCaseResponse(
+                  correlationId = correlationId,
+                  result = Some(success.CaseID)
+                )
+              )
+            )
+          // when request to the upstream api returns an error
+          case error: EISCreateCaseError =>
+            BadRequest(
+              Json.toJson(
+                NDRCCreateCaseResponse(
+                  correlationId = correlationId,
+                  error = Some(
+                    ApiError(
+                      errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
+                      errorMessage = error.errorMessage
+                    )
+                  )
+                )
+              )
+            )
+        }
+      } {
+        // when incoming request's payload validation fails
+        case (errorCode, errorMessage) =>
+          BadRequest(
+            Json.toJson(
+              NDRCCreateCaseResponse(
+                correlationId = correlationId,
+                error = Some(
+                  ApiError(errorCode, Some(errorMessage))
+                )
+              )
+            )
+          )
+      }
+    }
+  }
 }

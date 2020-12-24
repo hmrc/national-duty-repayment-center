@@ -24,7 +24,7 @@ import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, _}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{EISAmendCaseRequest, EISCreateCaseRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseResponse, EISCreateCaseSuccess}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
@@ -66,4 +66,24 @@ class CreateCaseConnector @Inject()(
     )
   }
 
+  def submitAmendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit
+                                                                        hc: HeaderCarrier,
+                                                                        ec: ExecutionContext
+  ): Future[EISCreateCaseResponse] = {
+    http.POST[EISAmendCaseRequest, EISCreateCaseResponse](url, request)(
+      implicitly[Writes[EISAmendCaseRequest]],
+      readFromJsonSuccessOrFailure,
+      HeaderCarrier(
+        authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+      )
+        .withExtraHeaders(
+          "x-correlation-id" -> correlationId,
+          "CustomProcessesHost" -> "Digital",
+          "date" -> httpDateFormat.format(ZonedDateTime.now),
+          "accept" -> "application/json",
+          "environment" -> config.eisEnvironment
+        ),
+      implicitly[ExecutionContext]
+    )
+  }
 }
