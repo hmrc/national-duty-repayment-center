@@ -31,6 +31,8 @@ trait AppConfig {
 
   val eisCreateCaseApiPath: String
 
+  val eisAmendCaseApiPath: String
+
   val eisAuthorizationToken: String
 
   val eisEnvironment: String
@@ -49,6 +51,14 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
       "eis.createcaseapi.path",
       throw new IllegalStateException(
         "Missing [microservice.services.eis.createcaseapi.path] configuration property"
+      )
+    )
+
+  override val eisAmendCaseApiPath: String =
+    config.getConfString(
+      "eis.amendcaseapi.path",
+      throw new IllegalStateException(
+        "Missing [microservice.services.eis.amendcaseapi.path] configuration property"
       )
     )
 

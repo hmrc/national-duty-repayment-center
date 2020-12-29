@@ -104,22 +104,18 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       DocumentList = documentList)
   )
 
-  val amendClaimDetails = AmendClaimDetails(
-    CaseID = "Risk-2507",
-    Description = "update request for Risk-2507"
-  )
-
   val amendClaimRequest = AmendClaimRequest(
-    AmendContent(amendClaimDetails)
+    AmendContent(
+      CaseID = "Risk-2507",
+      Description = "update request for Risk-2507"
+    )
   )
 
   val amendJson = Json.obj(
     "Content" -> Json.obj(
-      "AmendClaimDetails" -> Json.obj(
         "CaseID" -> "Risk-2507",
         "Description" -> "update request for Risk-2507"
       )
-    )
   )
 
   val json = Json.obj(

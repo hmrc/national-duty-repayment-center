@@ -17,7 +17,6 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendClaimDetails
 
 /**
  * Create specified case in the PEGA system.
@@ -37,12 +36,9 @@ case class EISAmendCaseRequest(
 object EISAmendCaseRequest {
   implicit val formats: Format[EISAmendCaseRequest] = Json.format[EISAmendCaseRequest]
 
-  /**
-   * @param ClaimDetails       see AmendClaimDetails structure.
-   */
-
   case class Content(
-                      ClaimDetails: AmendClaimDetails,
+                      CaseID: String,
+                      Description: String
                     )
 
   object Content {
@@ -50,7 +46,8 @@ object EISAmendCaseRequest {
 
     def from(request: AmendClaimRequest): Content = {
       Content(
-        ClaimDetails = request.Content.AmendClaimDetails
+        CaseID = request.Content.CaseID,
+        Description = request.Content.Description
       )
     }
   }

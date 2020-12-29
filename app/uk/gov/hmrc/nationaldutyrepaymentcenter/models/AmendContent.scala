@@ -18,7 +18,8 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class AmendContent(AmendClaimDetails: AmendClaimDetails,
+final case class AmendContent(CaseID: String,
+                              Description: String
                              )
 
 object AmendContent {
