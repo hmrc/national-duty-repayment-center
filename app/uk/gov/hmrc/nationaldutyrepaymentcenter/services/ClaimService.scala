@@ -20,7 +20,7 @@ import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{AmendCaseConnector, CreateCaseConnector}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseResponse
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseResponse, EISCreateCaseResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +33,7 @@ class ClaimService @Inject()(createCaseConnector: CreateCaseConnector,
     createCaseConnector.submitClaim(request, correlationId)
   }
 
-  def amendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISCreateCaseResponse] = {
+  def amendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISAmendCaseResponse] = {
     amendCaseConnector.submitAmendClaim(request, correlationId)
   }
 }

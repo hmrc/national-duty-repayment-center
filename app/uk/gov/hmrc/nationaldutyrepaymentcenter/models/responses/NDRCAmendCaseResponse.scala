@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package utils
+package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 
-import java.time._
+import play.api.libs.json.{Format, Json}
 
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.guice.GuiceApplicationBuilder
+case class NDRCAmendCaseResponse(
+                                   correlationId: String,
+                                   error: Option[ApiError] = None,
+                                   result: Option[String] = None
+                                 )
 
-class UnitSpecBase extends WordSpec with Matchers with MockitoSugar with ScalaFutures {
-  protected def applicationBuilder: GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
-
-  val fixedInstant: Instant = LocalDateTime.parse("2027-11-02T16:33:51.880").toInstant(ZoneOffset.UTC)
-  implicit val stubClock: Clock = Clock.fixed(fixedInstant, ZoneId.systemDefault)
-
+object NDRCAmendCaseResponse {
+  implicit val formats: Format[NDRCAmendCaseResponse] =
+    Json.format[NDRCAmendCaseResponse]
 }

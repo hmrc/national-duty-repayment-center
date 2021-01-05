@@ -112,20 +112,20 @@ class ClaimController @Inject()(
         )
 
         claimService.amendClaim(eisAmendCaseRequest, correlationId).map {
-          case success: EISCreateCaseSuccess =>
+          case success: EISAmendCaseSuccess =>
             Created(
               Json.toJson(
-                NDRCCreateCaseResponse(
+                NDRCAmendCaseResponse(
                   correlationId = correlationId,
                   result = Some(success.CaseID)
                 )
               )
             )
           // when request to the upstream api returns an error
-          case error: EISCreateCaseError =>
+          case error: EISAmendCaseError =>
             BadRequest(
               Json.toJson(
-                NDRCCreateCaseResponse(
+                NDRCAmendCaseResponse(
                   correlationId = correlationId,
                   error = Some(
                     ApiError(
@@ -142,7 +142,7 @@ class ClaimController @Inject()(
         case (errorCode, errorMessage) =>
           BadRequest(
             Json.toJson(
-              NDRCCreateCaseResponse(
+              NDRCAmendCaseResponse(
                 correlationId = correlationId,
                 error = Some(
                   ApiError(errorCode, Some(errorMessage))

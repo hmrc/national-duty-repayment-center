@@ -25,7 +25,7 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseResponse, EISCreateCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseError, EISAmendCaseResponse, EISAmendCaseSuccess}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,8 +36,8 @@ class AmendCaseConnector @Inject()(
                                      metrics: Metrics
                                    )(
                                      implicit ec: ExecutionContext
-                                   ) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
-  EISCreateCaseError.fromStatusAndMessage
+                                   ) extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
+  EISAmendCaseError.fromStatusAndMessage
 ) with PegaConnector with HttpAPIMonitor {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
@@ -47,8 +47,8 @@ class AmendCaseConnector @Inject()(
   def submitAmendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
-  ): Future[EISCreateCaseResponse] = {
-    http.POST[EISAmendCaseRequest, EISCreateCaseResponse](url, request)(
+  ): Future[EISAmendCaseResponse] = {
+    http.POST[EISAmendCaseRequest, EISAmendCaseResponse](url, request)(
       implicitly[Writes[EISAmendCaseRequest]],
       readFromJsonSuccessOrFailure,
       HeaderCarrier(
