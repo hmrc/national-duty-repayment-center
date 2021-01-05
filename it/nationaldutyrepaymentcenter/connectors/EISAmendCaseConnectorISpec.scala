@@ -1,14 +1,11 @@
 package nationaldutyrepaymentcenter.connectors
 
 import play.api.Application
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import nationaldutyrepaymentcenter.stubs.AmendCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{AmendCaseConnector, PegaCaseError, PegaCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{AmendCaseConnector}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class EISAmendCaseConnectorISpec extends EISAmendCaseConnectorISpecSetup {
 
