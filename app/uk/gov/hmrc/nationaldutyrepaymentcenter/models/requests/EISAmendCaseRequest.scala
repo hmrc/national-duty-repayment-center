@@ -27,11 +27,11 @@ import play.api.libs.json.{Format, Json}
  * @param OriginatingSystem        “Digital” for all requests originating in Digital
  */
 case class EISAmendCaseRequest(
-                                 AcknowledgementReference: String,
-                                 ApplicationType: String,
-                                 OriginatingSystem: String,
-                                 Content: EISAmendCaseRequest.Content
-                               )
+                                AcknowledgementReference: String,
+                                ApplicationType: String,
+                                OriginatingSystem: String,
+                                Content: EISAmendCaseRequest.Content
+                              )
 
 object EISAmendCaseRequest {
   implicit val formats: Format[EISAmendCaseRequest] = Json.format[EISAmendCaseRequest]

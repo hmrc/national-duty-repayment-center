@@ -25,11 +25,11 @@ import play.api.libs.json.JsValue
 sealed trait EISAmendCaseResponse
 
 case class EISAmendCaseSuccess(
-  CaseID: String,
-  ProcessingDate: String,
-  Status: String,
-  StatusText: String
-) extends EISAmendCaseResponse
+                                CaseID: String,
+                                ProcessingDate: String,
+                                Status: String,
+                                StatusText: String
+                              ) extends EISAmendCaseResponse
 
 object EISAmendCaseSuccess {
   implicit val formats: Format[EISAmendCaseSuccess] =
@@ -37,10 +37,11 @@ object EISAmendCaseSuccess {
 }
 
 case class EISAmendCaseError(
-  errorDetail: EISAmendCaseError.ErrorDetail
-) extends EISAmendCaseResponse {
+                              errorDetail: EISAmendCaseError.ErrorDetail
+                            ) extends EISAmendCaseResponse {
 
   def errorCode: Option[String] = errorDetail.errorCode
+
   def errorMessage: Option[String] = errorDetail.errorMessage
 
 }
@@ -48,11 +49,11 @@ case class EISAmendCaseError(
 object EISAmendCaseError {
 
   def apply(
-    timestamp: String,
-    correlationId: String,
-    errorCode: String,
-    errorMessage: String
-  ): EISAmendCaseError =
+             timestamp: String,
+             correlationId: String,
+             errorCode: String,
+             errorMessage: String
+           ): EISAmendCaseError =
     EISAmendCaseError(errorDetail =
       ErrorDetail(Some(correlationId), Some(timestamp), Some(errorCode), Some(errorMessage))
     )
@@ -61,21 +62,21 @@ object EISAmendCaseError {
     EISAmendCaseError(errorDetail = ErrorDetail(None, None, Some(status.toString), Some(message)))
 
   case class ErrorDetail(
-    correlationId: Option[String] = None,
-    timestamp: Option[String] = None,
-    errorCode: Option[String] = None,
-    errorMessage: Option[String] = None,
-    source: Option[String] = None,
-    sourceFaultDetail: Option[EISAmendCaseError.ErrorDetail.SourceFaultDetail] = None
-  )
+                          correlationId: Option[String] = None,
+                          timestamp: Option[String] = None,
+                          errorCode: Option[String] = None,
+                          errorMessage: Option[String] = None,
+                          source: Option[String] = None,
+                          sourceFaultDetail: Option[EISAmendCaseError.ErrorDetail.SourceFaultDetail] = None
+                        )
 
   object ErrorDetail {
 
     case class SourceFaultDetail(
-      detail: Option[Seq[String]] = None,
-      restFault: Option[JsObject] = None,
-      soapFault: Option[JsObject] = None
-    )
+                                  detail: Option[Seq[String]] = None,
+                                  restFault: Option[JsObject] = None,
+                                  soapFault: Option[JsObject] = None
+                                )
 
     object SourceFaultDetail {
       implicit val formats: Format[SourceFaultDetail] =
