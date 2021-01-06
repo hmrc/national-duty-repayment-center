@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ trait AppConfig {
 
   val eisCreateCaseApiPath: String
 
+  val eisAmendCaseApiPath: String
+
   val eisAuthorizationToken: String
 
   val eisEnvironment: String
@@ -49,6 +51,14 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
       "eis.createcaseapi.path",
       throw new IllegalStateException(
         "Missing [microservice.services.eis.createcaseapi.path] configuration property"
+      )
+    )
+
+  override val eisAmendCaseApiPath: String =
+    config.getConfString(
+      "eis.amendcaseapi.path",
+      throw new IllegalStateException(
+        "Missing [microservice.services.eis.amendcaseapi.path] configuration property"
       )
     )
 

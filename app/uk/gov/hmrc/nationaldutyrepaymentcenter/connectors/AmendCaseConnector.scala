@@ -24,33 +24,32 @@ import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, _}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseResponse, EISCreateCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseError, EISAmendCaseResponse, EISAmendCaseSuccess}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateCaseConnector @Inject()(
+class AmendCaseConnector @Inject()(
                                      val config: AppConfig,
                                      val http: HttpPost,
                                      metrics: Metrics
                                    )(
                                      implicit ec: ExecutionContext
-                                   ) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
-  EISCreateCaseError.fromStatusAndMessage
+                                   ) extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
+  EISAmendCaseError.fromStatusAndMessage
 ) with PegaConnector with HttpAPIMonitor {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
-  val url = config.eisBaseUrl + config.eisCreateCaseApiPath
+  val url = config.eisBaseUrl + config.eisAmendCaseApiPath
 
-
-  def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
+  def submitAmendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
-  ): Future[EISCreateCaseResponse] = {
-    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
-      implicitly[Writes[EISCreateCaseRequest]],
+  ): Future[EISAmendCaseResponse] = {
+    http.POST[EISAmendCaseRequest, EISAmendCaseResponse](url, request)(
+      implicitly[Writes[EISAmendCaseRequest]],
       readFromJsonSuccessOrFailure,
       HeaderCarrier(
         authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))

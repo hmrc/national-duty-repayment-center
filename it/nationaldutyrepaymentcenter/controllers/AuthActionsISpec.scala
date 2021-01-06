@@ -22,6 +22,7 @@ class AuthActionsISpec extends AppBaseISpec {
       override val authBaseUrl: String = "???"
       override val eisBaseUrl: String = "???"
       override val eisCreateCaseApiPath: String = "???"
+      override val eisAmendCaseApiPath: String = "???"
       override val eisAuthorizationToken: String = "???"
       override val eisEnvironment: String = "???"
     }

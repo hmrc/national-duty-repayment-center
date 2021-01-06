@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,23 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 
 import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
+import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{AmendCaseConnector, CreateCaseConnector}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseResponse
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseResponse, EISCreateCaseResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClaimService @Inject()(createCaseConnector: CreateCaseConnector)(
+class ClaimService @Inject()(createCaseConnector: CreateCaseConnector,
+                             amendCaseConnector: AmendCaseConnector)(
   implicit ec: ExecutionContext
 ) {
 
   def createClaim(request: EISCreateCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISCreateCaseResponse] = {
     createCaseConnector.submitClaim(request, correlationId)
+  }
+
+  def amendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISAmendCaseResponse] = {
+    amendCaseConnector.submitAmendClaim(request, correlationId)
   }
 }
 

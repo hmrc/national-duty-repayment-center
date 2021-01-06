@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models
+package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, Content, Validator}
 
-final case class BankDetails(
-                              AccountName: String,
-                              SortCode: String,
-                              AccountNumber: String)
+final case class AmendClaimRequest(
+                                     Content: AmendContent
+                                   )
 
-object BankDetails {
-  implicit val format: OFormat[BankDetails] = Json.format[BankDetails]
+object AmendClaimRequest {
+
+  implicit val formats: Format[AmendClaimRequest] =
+    Json.format[AmendClaimRequest]
+
+  implicit val validate: Validator.Validate[AmendClaimRequest] =
+    Validator.always
 }
+

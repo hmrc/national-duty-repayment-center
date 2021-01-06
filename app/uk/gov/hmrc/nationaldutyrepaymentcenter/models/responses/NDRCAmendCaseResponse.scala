@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models
+package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json}
 
-final case class BankDetails(
-                              AccountName: String,
-                              SortCode: String,
-                              AccountNumber: String)
+case class NDRCAmendCaseResponse(
+                                   correlationId: String,
+                                   error: Option[ApiError] = None,
+                                   result: Option[String] = None
+                                 )
 
-object BankDetails {
-  implicit val format: OFormat[BankDetails] = Json.format[BankDetails]
+object NDRCAmendCaseResponse {
+  implicit val formats: Format[NDRCAmendCaseResponse] =
+    Json.format[NDRCAmendCaseResponse]
 }

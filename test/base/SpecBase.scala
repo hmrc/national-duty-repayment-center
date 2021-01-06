@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import play.api.inject.Injector
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
 
   val userAnswersId = "id"
@@ -102,6 +102,20 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       BankDetails = Some(bankDetails),
       DutyTypeTaxDetails = dutyTypeTaxDetails,
       DocumentList = documentList)
+  )
+
+  val amendClaimRequest = AmendClaimRequest(
+    AmendContent(
+      CaseID = "Risk-2507",
+      Description = "update request for Risk-2507"
+    )
+  )
+
+  val amendJson = Json.obj(
+    "Content" -> Json.obj(
+        "CaseID" -> "Risk-2507",
+        "Description" -> "update request for Risk-2507"
+      )
   )
 
   val json = Json.obj(

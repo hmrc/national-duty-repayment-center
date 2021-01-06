@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,63 @@ class ClaimController @Inject()(
           BadRequest(
             Json.toJson(
               NDRCCreateCaseResponse(
+                correlationId = correlationId,
+                error = Some(
+                  ApiError(errorCode, Some(errorMessage))
+                )
+              )
+            )
+          )
+      }
+    }
+  }
+
+  def submitAmendClaim(): Action[String] = Action(parse.tolerantText).async { implicit request =>
+    withAuthorised {
+      val correlationId = request.headers
+        .get("x-correlation-id")
+        .getOrElse(ju.UUID.randomUUID().toString())
+
+      withPayload[AmendClaimRequest] { amendCaseRequest =>
+        val eisAmendCaseRequest = EISAmendCaseRequest(
+          AcknowledgementReference = correlationId.replace("-", ""),
+          ApplicationType = "NDRC",
+          OriginatingSystem = "Digital",
+          Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
+        )
+
+        claimService.amendClaim(eisAmendCaseRequest, correlationId).map {
+          case success: EISAmendCaseSuccess =>
+            Created(
+              Json.toJson(
+                NDRCAmendCaseResponse(
+                  correlationId = correlationId,
+                  result = Some(success.CaseID)
+                )
+              )
+            )
+          // when request to the upstream api returns an error
+          case error: EISAmendCaseError =>
+            BadRequest(
+              Json.toJson(
+                NDRCAmendCaseResponse(
+                  correlationId = correlationId,
+                  error = Some(
+                    ApiError(
+                      errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
+                      errorMessage = error.errorMessage
+                    )
+                  )
+                )
+              )
+            )
+        }
+      } {
+        // when incoming request's payload validation fails
+        case (errorCode, errorMessage) =>
+          BadRequest(
+            Json.toJson(
+              NDRCAmendCaseResponse(
                 correlationId = correlationId,
                 error = Some(
                   ApiError(errorCode, Some(errorMessage))
