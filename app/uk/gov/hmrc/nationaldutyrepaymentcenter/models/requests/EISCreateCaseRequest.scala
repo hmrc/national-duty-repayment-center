@@ -17,7 +17,7 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, UserDetails}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, UserDetails, UserName}
 
 /**
  * Create specified case in the PEGA system.
@@ -65,12 +65,27 @@ object EISCreateCaseRequest {
           case Some(result) => Some(result)
           case _ => None
         },
-        ImporterDetails = request.Content.ImporterDetails,
+        ImporterDetails = getImporterDetails(request),
         BankDetails = request.Content.BankDetails,
         DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
         DocumentList = request.Content.DocumentList
       )
     }
+
+    def getImporterDetails( request: CreateClaimRequest) : UserDetails = {
+      val fullName =  (request.Content.ImporterDetails.Name.FistName +
+        request.Content.ImporterDetails.Name.LastName)
+
+      UserDetails(
+        IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
+        EORI = request.Content.ImporterDetails.EORI,
+        Name =  fullName,
+        Address = request.Content.ImporterDetails.Address
+      )
+    }
+
+
+
   }
 
 }
