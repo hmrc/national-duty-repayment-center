@@ -22,7 +22,7 @@ import play.api.libs.json._
 final case class Content(
                           ClaimDetails: ClaimDetails,
                           AgentDetails: Option[UserDetails],
-                          ImporterDetails: FrontEndUserDetails,
+                          ImporterDetails: UserDetails,
                           BankDetails: Option[AllBankDetails],
                           DutyTypeTaxDetails: DutyTypeTaxDetails,
                           DocumentList: Seq[DocumentList]

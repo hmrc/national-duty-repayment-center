@@ -73,14 +73,16 @@ object EISCreateCaseRequest {
     }
 
     def getImporterDetails( request: CreateClaimRequest) : UserDetails = {
-      val fullName =  (request.Content.ImporterDetails.Name.FistName +
-        request.Content.ImporterDetails.Name.LastName)
+      val fullName =  (request.Content.ImporterDetails.Name.firstName +
+        request.Content.ImporterDetails.Name.lastName)
 
       UserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
         Name =  fullName,
-        Address = request.Content.ImporterDetails.Address
+        Address = request.Content.ImporterDetails.Address,
+        TelephoneNumber = request.Content.ImporterDetails.TelephoneNumber,
+        EmailAddress = request.Content.ImporterDetails.EmailAddress
       )
     }
 
