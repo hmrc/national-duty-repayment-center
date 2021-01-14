@@ -48,7 +48,7 @@ object EISCreateCaseRequest {
 
   case class Content(
                       ClaimDetails: ClaimDetails,
-                      AgentDetails: Option[UserDetails],
+                      AgentDetails: Option[EISUserDetails],
                       ImporterDetails: EISUserDetails,
                       BankDetails: Option[AllBankDetails],
                       DutyTypeTaxDetails: DutyTypeTaxDetails,
@@ -61,8 +61,8 @@ object EISCreateCaseRequest {
     def from(request: CreateClaimRequest): Content = {
       Content(
         ClaimDetails = request.Content.ClaimDetails,
-        AgentDetails = request.Content.AgentDetails match {
-          case Some(result) => Some(result)
+        AgentDetails = request.Content.AgentDetails.isDefined match {
+          case true  => Some(getAgentUserDetails(request))
           case _ => None
         },
         ImporterDetails = getImporterDetails(request),
@@ -73,8 +73,8 @@ object EISCreateCaseRequest {
     }
 
     def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
-      val fullName =  (request.Content.ImporterDetails.Name.firstName +
-        request.Content.ImporterDetails.Name.lastName)
+      val fullName =  (request.Content.ImporterDetails.Name +
+        request.Content.ImporterDetails.Name)
 
       EISUserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
@@ -87,6 +87,19 @@ object EISCreateCaseRequest {
     }
 
 
+    def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =  {
+      val fullName =  (request.Content.AgentDetails.get.Name+
+        request.Content.AgentDetails.get.Name)
+
+      (EISUserDetails(
+        IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
+        EORI = request.Content.AgentDetails.get.EORI,
+        Name =  fullName,
+        Address = request.Content.AgentDetails.get.Address,
+        TelephoneNumber = request.Content.AgentDetails.get.TelephoneNumber,
+        EmailAddress = request.Content.AgentDetails.get.EmailAddress
+      ))
+    }
 
   }
 
