@@ -73,31 +73,31 @@ object EISCreateCaseRequest {
     }
 
     def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
-      val fullName =  (request.Content.ImporterDetails.Name +
-        request.Content.ImporterDetails.Name)
+      val name = UserName(request.Content.ImporterDetails.Name.firstName,
+          request.Content.ImporterDetails.Name.lastName)
+
+      val fullName:String = (name.firstName+ name.lastName).mkString("")
 
       EISUserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
         Name =  fullName,
-        Address = request.Content.ImporterDetails.Address,
-        TelephoneNumber = request.Content.ImporterDetails.TelephoneNumber,
-        EmailAddress = request.Content.ImporterDetails.EmailAddress
+        Address = request.Content.ImporterDetails.Address
       )
     }
 
 
     def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =  {
-      val fullName =  (request.Content.AgentDetails.get.Name+
-        request.Content.AgentDetails.get.Name)
+      val name = UserName(request.Content.AgentDetails.get.Name.firstName,
+          request.Content.ImporterDetails.Name.lastName)
+
+      val fullName:String = (name.firstName+ name.lastName).mkString("")
 
       (EISUserDetails(
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
         EORI = request.Content.AgentDetails.get.EORI,
         Name =  fullName,
-        Address = request.Content.AgentDetails.get.Address,
-        TelephoneNumber = request.Content.AgentDetails.get.TelephoneNumber,
-        EmailAddress = request.Content.AgentDetails.get.EmailAddress
+        Address = request.Content.AgentDetails.get.Address
       ))
     }
 

@@ -21,8 +21,8 @@ import play.api.libs.json._
 
 final case class Content(
                           ClaimDetails: ClaimDetails,
-                          AgentDetails: Option[EISUserDetails],
-                          ImporterDetails: EISUserDetails,
+                          AgentDetails: Option[UserDetails],
+                          ImporterDetails: UserDetails,
                           BankDetails: Option[AllBankDetails],
                           DutyTypeTaxDetails: DutyTypeTaxDetails,
                           DocumentList: Seq[DocumentList]

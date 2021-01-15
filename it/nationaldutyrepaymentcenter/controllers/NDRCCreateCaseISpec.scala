@@ -73,7 +73,7 @@ object TestData {
   val address = Address(AddressLine1 = "line 1",
     AddressLine2 = Some("line 2"),
     City = "city",
-    Region = "region",
+    Region = Some("region"),
     CountryCode = "GB",
     PostalCode = Some("ZZ111ZZ"),
     TelephoneNumber = Some("12345678"),
@@ -82,8 +82,9 @@ object TestData {
 
   val userDetails = UserDetails(IsVATRegistered = Some("true"),
     EORI = EORI("GB123456789123456"),
-    Name = UserName("Joe Bloggs"),
-    Address = address
+    Name = UserName("Joe ", "Bloggs"),
+    Address = address,
+
   )
 
   val bankDetails = AllBankDetails(
