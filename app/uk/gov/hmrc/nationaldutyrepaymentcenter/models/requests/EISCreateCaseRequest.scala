@@ -82,9 +82,7 @@ object EISCreateCaseRequest {
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
         Name =  fullName,
-        Address = request.Content.ImporterDetails.Address,
-        TelephoneNumber = request.Content.ImporterDetails.TelephoneNumber,
-        EmailAddress = request.Content.ImporterDetails.EmailAddress
+        Address = request.Content.ImporterDetails.Address
       )
     }
 
@@ -99,9 +97,7 @@ object EISCreateCaseRequest {
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
         EORI = request.Content.AgentDetails.get.EORI,
         Name =  fullName,
-        Address = request.Content.AgentDetails.get.Address,
-        TelephoneNumber = request.Content.AgentDetails.get.TelephoneNumber,
-        EmailAddress = request.Content.AgentDetails.get.EmailAddress
+        Address = request.Content.AgentDetails.get.Address
       ))
     }
 

@@ -75,15 +75,16 @@ object TestData {
     City = "city",
     Region = Some("region"),
     CountryCode = "GB",
-    postCode = Some("ZZ111ZZ")
+    PostalCode = Some("ZZ111ZZ"),
+    TelephoneNumber = Some("12345678"),
+    EmailAddress = Some("example@example.com")
   )
 
   val userDetails = UserDetails(IsVATRegistered = Some("true"),
     EORI = EORI("GB123456789123456"),
-    Name = UserName("Joe", "Bloggs"),
+    Name = UserName("Joe ", "Bloggs"),
     Address = address,
-    TelephoneNumber = Some("12345678"),
-    EmailAddress = Some("example@example.com")
+
   )
 
   val bankDetails = AllBankDetails(

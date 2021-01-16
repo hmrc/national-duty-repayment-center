@@ -22,9 +22,7 @@ final case class UserDetails(
                               IsVATRegistered: Option[String],
                               EORI: EORI,
                               Name: UserName,
-                              Address: Address,
-                              TelephoneNumber: Option[String],
-                              EmailAddress: Option[String]
+                              Address: Address
                             )
 
 object UserDetails {
