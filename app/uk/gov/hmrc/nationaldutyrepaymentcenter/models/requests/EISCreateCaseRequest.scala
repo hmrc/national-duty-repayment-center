@@ -59,7 +59,7 @@ object EISCreateCaseRequest {
     implicit val formats: Format[Content] = Json.format[Content]
 
     def from(request: CreateClaimRequest): Content = {
-      Content(
+      val content = Content(
         ClaimDetails = request.Content.ClaimDetails,
         AgentDetails = request.Content.AgentDetails.isDefined match {
           case true  => Some(getAgentUserDetails(request))
@@ -70,6 +70,11 @@ object EISCreateCaseRequest {
         DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
         DocumentList = request.Content.DocumentList
       )
+
+      println("CONTENT " + content)
+
+      content
+
     }
 
     def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
