@@ -69,7 +69,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
     EmailAddress=  Some("123@hotmail.com")
   )
 
-  val userDetails = UserDetails(IsVATRegistered = Some("true"),
+  val userDetails = UserDetails(IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
     Name = UserName("Joe", "Bloggs"),
     Address = address,

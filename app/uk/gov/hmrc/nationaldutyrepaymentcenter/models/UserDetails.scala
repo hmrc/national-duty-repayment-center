@@ -19,7 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 import play.api.libs.json.{Json, OFormat}
 
 final case class UserDetails(
-                              IsVATRegistered: Option[String],
+                              IsVATRegistered: String,
                               EORI: EORI,
                               Name: UserName,
                               Address: Address

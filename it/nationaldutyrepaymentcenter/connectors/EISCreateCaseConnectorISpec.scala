@@ -122,13 +122,13 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     EmailAddress = Some("example@example.com")
   )
 
-  val eisUserDetails = EISUserDetails(IsVATRegistered = Some("true"),
+  val eisUserDetails = EISUserDetails(IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
     Name = "Joe Bloggs",
     Address = address
   )
 
-  val userDetails = UserDetails(IsVATRegistered = Some("true"),
+  val userDetails = UserDetails(IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
     Name = UserName("Joe", "Bloggs"),
     Address = address
