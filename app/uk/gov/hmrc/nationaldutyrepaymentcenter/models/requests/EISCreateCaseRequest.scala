@@ -17,7 +17,7 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, EISUserDetails, UserDetails, UserName}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 
 /**
  * Create specified case in the PEGA system.
@@ -47,7 +47,7 @@ object EISCreateCaseRequest {
    */
 
   case class Content(
-                      ClaimDetails: ClaimDetails,
+                      ClaimDetails: EISClaimDetails,
                       AgentDetails: Option[EISUserDetails],
                       ImporterDetails: EISUserDetails,
                       BankDetails: Option[AllBankDetails],
@@ -60,7 +60,7 @@ object EISCreateCaseRequest {
 
     def from(request: CreateClaimRequest): Content = {
       Content(
-        ClaimDetails = request.Content.ClaimDetails,
+        ClaimDetails = getEISClaimDetails(request),
         AgentDetails = request.Content.AgentDetails.isDefined match {
           case true  => Some(getAgentUserDetails(request))
           case _ => None
@@ -69,6 +69,27 @@ object EISCreateCaseRequest {
         BankDetails = request.Content.BankDetails,
         DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
         DocumentList = request.Content.DocumentList
+      )
+    }
+
+    def getEISClaimDetails(request: CreateClaimRequest) : EISClaimDetails = {
+      EISClaimDetails(
+        FormType = request.Content.ClaimDetails.FormType,
+        CustomRegulationType = request.Content.ClaimDetails.CustomRegulationType,
+        ClaimedUnderArticle = request.Content.ClaimDetails.ClaimedUnderArticle,
+        Claimant = request.Content.ClaimDetails.Claimant,
+        ClaimType = request.Content.ClaimDetails.ClaimType,
+        NoOfEntries = request.Content.ClaimDetails.NoOfEntries,
+        EPU = request.Content.ClaimDetails.EntryDetails.EPU,
+        EntryNumber = request.Content.ClaimDetails.EntryDetails.EntryNumber,
+        EntryDate = request.Content.ClaimDetails.EntryDetails.EntryDate,
+        ClaimReason = request.Content.ClaimDetails.ClaimReason,
+        ClaimDescription = request.Content.ClaimDetails.ClaimDescription,
+        DateReceived = request.Content.ClaimDetails.DateReceived,
+        ClaimDate = request.Content.ClaimDetails.ClaimDate,
+        PayeeIndicator = request.Content.ClaimDetails.PayeeIndicator,
+        PaymentMethod = request.Content.ClaimDetails.PaymentMethod,
+        DeclarantRefNumber = request.Content.ClaimDetails.DeclarantRefNumber
       )
     }
 
