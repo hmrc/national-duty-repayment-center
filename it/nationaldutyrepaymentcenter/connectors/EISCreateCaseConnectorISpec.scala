@@ -117,23 +117,21 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     City = "city",
     Region = Some("region"),
     CountryCode = "GB",
-    postCode = Some("ZZ111ZZ")
+    PostalCode = Some("ZZ111ZZ"),
+    TelephoneNumber = Some("12345678"),
+    EmailAddress = Some("example@example.com")
   )
 
   val eisUserDetails = EISUserDetails(IsVATRegistered = Some("true"),
     EORI = EORI("GB123456789123456"),
     Name = "Joe Bloggs",
-    Address = address,
-    TelephoneNumber = Some("12345678"),
-    EmailAddress = Some("example@example.com")
+    Address = address
   )
 
   val userDetails = UserDetails(IsVATRegistered = Some("true"),
     EORI = EORI("GB123456789123456"),
     Name = UserName("Joe", "Bloggs"),
-    Address = address,
-    TelephoneNumber = Some("12345678"),
-    EmailAddress = Some("example@example.com")
+    Address = address
   )
 
   val bankDetails = AllBankDetails(
