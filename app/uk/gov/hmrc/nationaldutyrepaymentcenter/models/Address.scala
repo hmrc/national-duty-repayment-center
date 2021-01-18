@@ -22,11 +22,11 @@ final case class Address(
                           AddressLine1:String,
                           AddressLine2:Option[String],
                           City:String,
-                          Region:String,
+                          Region:Option[String],
                           CountryCode:String,
                           PostalCode:Option[String],
-                          TelephoneNumber:Option[String],
-                          EmailAddress:Option[String]
+                          TelephoneNumber: Option[String],
+                          EmailAddress: Option[String]
                         )
 
 object Address {

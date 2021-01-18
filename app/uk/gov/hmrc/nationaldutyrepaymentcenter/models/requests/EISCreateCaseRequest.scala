@@ -17,7 +17,7 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, UserDetails}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, EISUserDetails, UserDetails, UserName}
 
 /**
  * Create specified case in the PEGA system.
@@ -48,8 +48,8 @@ object EISCreateCaseRequest {
 
   case class Content(
                       ClaimDetails: ClaimDetails,
-                      AgentDetails: Option[UserDetails],
-                      ImporterDetails: UserDetails,
+                      AgentDetails: Option[EISUserDetails],
+                      ImporterDetails: EISUserDetails,
                       BankDetails: Option[AllBankDetails],
                       DutyTypeTaxDetails: DutyTypeTaxDetails,
                       DocumentList: Seq[DocumentList]
@@ -61,16 +61,46 @@ object EISCreateCaseRequest {
     def from(request: CreateClaimRequest): Content = {
       Content(
         ClaimDetails = request.Content.ClaimDetails,
-        AgentDetails = request.Content.AgentDetails match {
-          case Some(result) => Some(result)
+        AgentDetails = request.Content.AgentDetails.isDefined match {
+          case true  => Some(getAgentUserDetails(request))
           case _ => None
         },
-        ImporterDetails = request.Content.ImporterDetails,
+        ImporterDetails = getImporterDetails(request),
         BankDetails = request.Content.BankDetails,
         DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
         DocumentList = request.Content.DocumentList
       )
     }
+
+    def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
+      val name = UserName(request.Content.ImporterDetails.Name.firstName,
+          request.Content.ImporterDetails.Name.lastName)
+
+      val fullName:String = (name.firstName + name.lastName).mkString("")
+
+      EISUserDetails(
+        IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
+        EORI = request.Content.ImporterDetails.EORI,
+        Name =  fullName,
+        Address = request.Content.ImporterDetails.Address
+      )
+    }
+
+
+    def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =  {
+      val name = UserName(request.Content.AgentDetails.get.Name.firstName,
+          request.Content.ImporterDetails.Name.lastName)
+
+      val fullName:String = (name.firstName + name.lastName).mkString("")
+
+      (EISUserDetails(
+        IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
+        EORI = request.Content.AgentDetails.get.EORI,
+        Name =  fullName,
+        Address = request.Content.AgentDetails.get.Address
+      ))
+    }
+
   }
 
 }
