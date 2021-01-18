@@ -87,7 +87,7 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     AcknowledgementReference = "XYZ123",
     ApplicationType = "NDRC",
     OriginatingSystem = "Digital",
-    Content = EISCreateCaseRequest.Content(claimDetails,
+    Content = EISCreateCaseRequest.Content(eisClaimDetails,
       AgentDetails = Some(eisUserDetails),
       ImporterDetails = eisUserDetails,
       BankDetails = Some(bankDetails),
@@ -95,14 +95,16 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
       DocumentList = documentList)
   )
 
-  val claimDetails = ClaimDetails(
+  val eisClaimDetails = EISClaimDetails(
     FormType = FormType("01"),
     CustomRegulationType = CustomRegulationType.UKCustomsCodeRegulation,
     ClaimedUnderArticle = ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty,
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
-    EntryDetails = EntryDetails("777", "123456A", LocalDate.of(2020, 1, 1)),
+    EPU = "777",
+    EntryNumber = "123456A",
+    EntryDate = LocalDate.of(2020, 1, 1),
     ClaimReason = ClaimReason.Preference,
     ClaimDescription = ClaimDescription("this is a claim description"),
     DateReceived = LocalDate.of(2020, 8, 5),

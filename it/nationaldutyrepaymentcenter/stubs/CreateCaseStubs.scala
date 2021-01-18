@@ -20,11 +20,9 @@ trait CreateCaseStubs {
         |      "Claimant" : "02",
         |      "ClaimType" : "02",
         |      "NoOfEntries" : "10",
-        |      "EntryDetails" : {
-        |           "EPU" : "777",
-        |           "EntryNumber" : "123456A",
-        |           "EntryDate" : "20200101"
-        |       },
+        |      "EPU" : "777",
+        |      "EntryNumber" : "123456A",
+        |      "EntryDate" : "20200101",
         |      "ClaimReason" : "06",
         |      "ClaimDescription" : "this is a claim description",
         |      "DateReceived" : "20200805",
