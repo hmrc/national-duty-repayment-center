@@ -22,7 +22,7 @@ final case class EISUserDetails(
                               IsVATRegistered: String,
                               EORI: EORI,
                               Name: String,
-                              Address: Address
+                              Address: EISAddress
                             )
 
 object EISUserDetails {
