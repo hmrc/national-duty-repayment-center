@@ -82,9 +82,8 @@ object TestData {
 
   val userDetails = UserDetails(IsVATRegistered = Some("true"),
     EORI = EORI("GB123456789123456"),
-    Name = UserName("Joe ", "Bloggs"),
+    Name = UserName("Joe", "Bloggs"),
     Address = address,
-
   )
 
   val bankDetails = AllBankDetails(

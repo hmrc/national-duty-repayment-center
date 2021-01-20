@@ -76,7 +76,7 @@ object EISCreateCaseRequest {
       val name = UserName(request.Content.ImporterDetails.Name.firstName,
           request.Content.ImporterDetails.Name.lastName)
 
-      val fullName:String = (name.firstName + name.lastName).mkString("")
+      val fullName:String = name.firstName +" "+ name.lastName
 
       EISUserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
@@ -91,7 +91,7 @@ object EISCreateCaseRequest {
       val name = UserName(request.Content.AgentDetails.get.Name.firstName,
           request.Content.ImporterDetails.Name.lastName)
 
-      val fullName:String = (name.firstName + name.lastName).mkString("")
+      val fullName:String = name.firstName +" "+ name.lastName
 
       (EISUserDetails(
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
