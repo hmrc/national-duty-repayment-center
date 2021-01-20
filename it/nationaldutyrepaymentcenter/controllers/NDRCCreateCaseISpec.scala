@@ -70,21 +70,22 @@ object TestData {
     DeclarantRefNumber = "NA"
   )
 
-  val address = Address(AddressLine1 = "line 1",
+  val address = Address(
+    AddressLine1 = "line 1",
     AddressLine2 = Some("line 2"),
     City = "city",
     Region = Some("region"),
     CountryCode = "GB",
-    PostalCode = Some("ZZ111ZZ"),
-    TelephoneNumber = Some("12345678"),
-    EmailAddress = Some("example@example.com")
+    PostalCode = Some("ZZ111ZZ")
   )
 
-  val userDetails = UserDetails(IsVATRegistered = "true",
+  val userDetails = UserDetails(
+    IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
     Name = UserName("Joe ", "Bloggs"),
     Address = address,
-
+    TelephoneNumber = Some("12345678"),
+    EmailAddress = Some("example@example.com")
   )
 
   val bankDetails = AllBankDetails(
@@ -108,7 +109,8 @@ object TestData {
 
   val testCreateCaseRequest =
     CreateClaimRequest(
-      Content(claimDetails,
+      Content(
+        ClaimDetails = claimDetails,
         AgentDetails = Some(userDetails),
         ImporterDetails = userDetails,
         BankDetails = Some(bankDetails),
