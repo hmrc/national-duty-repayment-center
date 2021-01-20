@@ -93,6 +93,19 @@ object EISCreateCaseRequest {
       )
     }
 
+    def getImporterAddress(request: CreateClaimRequest) : EISAddress = {
+      EISAddress(
+        AddressLine1 = request.Content.ImporterDetails.Address.AddressLine1,
+        AddressLine2 = request.Content.ImporterDetails.Address.AddressLine2,
+        City = request.Content.ImporterDetails.Address.City,
+        Region = request.Content.ImporterDetails.Address.Region,
+        CountryCode = request.Content.ImporterDetails.Address.CountryCode,
+        PostalCode = request.Content.ImporterDetails.Address.PostalCode,
+        TelephoneNumber = request.Content.ImporterDetails.TelephoneNumber,
+        EmailAddress = request.Content.ImporterDetails.EmailAddress
+      )
+    }
+
     def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
       val name = UserName(request.Content.ImporterDetails.Name.firstName,
           request.Content.ImporterDetails.Name.lastName)
@@ -103,7 +116,20 @@ object EISCreateCaseRequest {
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
         Name =  fullName,
-        Address = request.Content.ImporterDetails.Address
+        Address = getImporterAddress(request)
+      )
+    }
+
+    def getAgentAddress(request: CreateClaimRequest) : EISAddress = {
+      EISAddress(
+        AddressLine1 = request.Content.AgentDetails.get.Address.AddressLine1,
+        AddressLine2 = request.Content.AgentDetails.get.Address.AddressLine2,
+        City = request.Content.AgentDetails.get.Address.City,
+        Region = request.Content.AgentDetails.get.Address.Region,
+        CountryCode = request.Content.AgentDetails.get.Address.CountryCode,
+        PostalCode = request.Content.AgentDetails.get.Address.PostalCode,
+        TelephoneNumber = request.Content.AgentDetails.get.TelephoneNumber,
+        EmailAddress = request.Content.AgentDetails.get.EmailAddress
       )
     }
 
@@ -118,7 +144,7 @@ object EISCreateCaseRequest {
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
         EORI = request.Content.AgentDetails.get.EORI,
         Name =  fullName,
-        Address = request.Content.AgentDetails.get.Address
+        Address = getAgentAddress(request)
       )
     }
 
