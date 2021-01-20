@@ -82,7 +82,7 @@ object TestData {
   val userDetails = UserDetails(
     IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
-    Name = UserName("Joe ", "Bloggs"),
+    Name = UserName("Joe", "Bloggs"),
     Address = address,
     TelephoneNumber = Some("12345678"),
     EmailAddress = Some("example@example.com")
