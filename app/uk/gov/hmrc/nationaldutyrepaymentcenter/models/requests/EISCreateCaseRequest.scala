@@ -136,7 +136,7 @@ object EISCreateCaseRequest {
 
     def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =  {
       val name = UserName(request.Content.AgentDetails.get.Name.firstName,
-          request.Content.ImporterDetails.Name.lastName)
+          request.Content.AgentDetails.get.Name.lastName)
 
       val fullName:String = name.firstName +" "+ name.lastName
 
