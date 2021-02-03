@@ -17,11 +17,10 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, UploadedFile, Validator}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, Validator}
 
 final case class CreateClaimRequest(
-                                     Content: Content,
-                                     uploadedFiles: Seq[UploadedFile]
+                                     Content: Content
                                    )
 
 object CreateClaimRequest {
