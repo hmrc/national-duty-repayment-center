@@ -115,8 +115,7 @@ object TestData {
         ImporterDetails = userDetails,
         BankDetails = Some(bankDetails),
         DutyTypeTaxDetails = dutyTypeTaxDetails,
-        DocumentList = documentList),
-      Nil
+        DocumentList = documentList)
     )
 
 }
