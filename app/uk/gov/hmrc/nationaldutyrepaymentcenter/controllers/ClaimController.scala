@@ -16,27 +16,36 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
-import java.{util => ju}
 
+import java.{util => ju}
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferRequest, FileTransferResult, UploadedFile}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.ClaimService
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.ExecutionContext
+import java.time.LocalDateTime
+import scala.concurrent.{ExecutionContext, Future}
+
+
+class UUIDGenerator {
+  def uuid: String = ju.UUID.randomUUID().toString()
+}
 
 @Singleton
 class ClaimController @Inject()(
                                  val authConnector: MicroserviceAuthConnector,
+                                 val fileTransferConnector: FileTransferConnector,
                                  val cc: ControllerComponents,
-                                 val createCaseConnector: CreateCaseConnector,
                                  val appConfig: AppConfig,
-                                 val claimService: ClaimService
+                                 val claimService: ClaimService,
+                                 val uuidGenerator: UUIDGenerator
                                )
                                (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActions with ControllerHelper {
 
@@ -44,7 +53,7 @@ class ClaimController @Inject()(
     withAuthorised {
       val correlationId = request.headers
         .get("x-correlation-id")
-        .getOrElse(ju.UUID.randomUUID().toString())
+        .getOrElse(uuidGenerator.uuid)
 
       withPayload[CreateClaimRequest] { createCaseRequest =>
         val eisCreateCaseRequest = EISCreateCaseRequest(
@@ -54,19 +63,21 @@ class ClaimController @Inject()(
           Content = EISCreateCaseRequest.Content.from(createCaseRequest)
         )
 
-        claimService.createClaim(eisCreateCaseRequest, correlationId).map {
+        claimService.createClaim(eisCreateCaseRequest, correlationId).flatMap {
           case success: EISCreateCaseSuccess =>
-            Created(
-              Json.toJson(
-                NDRCCreateCaseResponse(
-                  correlationId = correlationId,
-                  result = Some(success.CaseID)
-                )
-              )
-            )
+            transferFilesToPega(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
+              .map { fileTransferResults =>
+                val response = NDRCCreateCaseResponse(
+                    correlationId = correlationId,
+                    result = Option(
+                      NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
+                    ))
+               Created(Json.toJson(response))
+              }
+
           // when request to the upstream api returns an error
           case error: EISCreateCaseError =>
-              BadRequest(
+              Future.successful(BadRequest(
                 Json.toJson(
                   NDRCCreateCaseResponse(
                     correlationId = correlationId,
@@ -78,7 +89,7 @@ class ClaimController @Inject()(
                     )
                   )
                 )
-              )
+              ))
         }
       } {
         // when incoming request's payload validation fails
@@ -153,4 +164,26 @@ class ClaimController @Inject()(
       }
     }
   }
+  def transferFilesToPega(
+                           caseReferenceNumber: String,
+                           conversationId: String,
+                           uploadedFiles: Seq[UploadedFile]
+                         )(implicit hc: HeaderCarrier): Future[Seq[FileTransferResult]] =
+    Future.sequence(
+      uploadedFiles.zipWithIndex
+        .map {
+          case (file, index) =>
+            FileTransferRequest
+              .fromUploadedFile(
+                caseReferenceNumber,
+                conversationId,
+                correlationId = uuidGenerator.uuid,
+                applicationName = "NDRC",
+                batchSize = uploadedFiles.size,
+                batchCount = index + 1,
+                uploadedFile = file
+              )
+        }
+        .map(fileTransferConnector.transferFile(_, conversationId))
+    )
 }

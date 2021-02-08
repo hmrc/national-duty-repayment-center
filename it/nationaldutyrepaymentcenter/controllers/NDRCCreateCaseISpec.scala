@@ -1,22 +1,23 @@
 package nationaldutyrepaymentcenter.controllers
 
-import java.time.LocalDateTime
-import java.time.LocalDate
-
+import nationaldutyrepaymentcenter.stubs.{AuthStubs, CreateCaseStubs, FileTransferStubs}
+import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
+import org.mockito.Mockito.when
+import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
 import org.scalatestplus.play.ServerProvider
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
-import play.api.libs.json.JsObject
+import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCreateCaseResponse
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, DocumentList, DutyTypeTaxDetails, _}
+
+import java.time.{LocalDate, LocalDateTime, ZoneId, ZonedDateTime}
 import java.{util => ju}
 
-import nationaldutyrepaymentcenter.stubs.{AuthStubs, CreateCaseStubs}
-import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, DocumentList, DutyTypeTaxDetails, _}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
-
 class NDRCCreateCaseISpec
-  extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers {
+  extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers with FileTransferStubs {
 
   this: Suite with ServerProvider =>
 
@@ -25,28 +26,59 @@ class NDRCCreateCaseISpec
   val dateTime = LocalDateTime.now()
 
   val wsClient = app.injector.instanceOf[WSClient]
+  val uuidGenerator = app.injector.instanceOf[UUIDGenerator]
 
   "ClaimController" when {
     "POST /create-case" should {
       "return 201 with CaseID as a result if successful PEGA API call" in {
 
+        val correlationId = ju.UUID.randomUUID().toString()
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head
+        val fileTransferRequest = FileTransferRequest.fromUploadedFile("PCE201103470D2CC8K0NH3", correlationId, correlationId, "NDRC", 1, 1, uf)
+
         givenAuthorised()
         givenPegaCreateCaseRequestSucceeds()
-
-        val correlationId = ju.UUID.randomUUID().toString()
+        givenNdrcFileTransferSucceeds(fileTransferRequest)
 
         val result = wsClient
           .url(s"$url/create-case")
           .withHttpHeaders("X-Correlation-ID" -> correlationId)
-          .post(Json.toJson(TestData.testCreateCaseRequest))
+          .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
         result.status shouldBe 201
-        result.json.as[JsObject] should (
-          haveProperty[String]("correlationId", be(correlationId)) and
-            haveProperty[String]("result", be("PCE201103470D2CC8K0NH3"))
-          )
+        val createResponse = result.json.as[NDRCCreateCaseResponse]
+        createResponse.correlationId must be(correlationId)
+        createResponse.result.get.fileTransferResults.size must be(1)
+        createResponse.result.get.fileTransferResults.head.httpStatus must be(200)
       }
+      "return 201 with CaseID and fileResults should have error if file upload fails" in {
+
+        val correlationId = ju.UUID.randomUUID().toString()
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head
+        val fileTransferRequest = FileTransferRequest.fromUploadedFile("PCE201103470D2CC8K0NH3", correlationId, correlationId, "NDRC", 1, 1, uf)
+
+        givenAuthorised()
+        givenPegaCreateCaseRequestSucceeds()
+        givenNdrcFileTransferFails(fileTransferRequest)
+
+        val result = wsClient
+          .url(s"$url/create-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status shouldBe 201
+        val createResponse = result.json.as[NDRCCreateCaseResponse]
+        createResponse.correlationId must be(correlationId)
+        createResponse.result.get.fileTransferResults.size must be(1)
+        createResponse.result.get.fileTransferResults.head.httpStatus must be(409)
+      }
+
     }
   }
 }
@@ -105,9 +137,21 @@ object TestData {
     DocumentList(DocumentUploadType.PackingList, Some(DocumentDescription("this is a packing list")))
   )
 
+  def uploadedFiles(wireMockBaseUrlAsString: String) = Seq(
+    UploadedFile(
+      "ref-123",
+      downloadUrl = wireMockBaseUrlAsString + "/bucket/test1.jpeg",
+      uploadTimestamp = ZonedDateTime.of(2020, 10, 10, 10, 10, 10, 0, ZoneId.of("UTC")),
+      checksum = "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
+      fileName = "test1.jpeg",
+      fileMimeType = "image/jpeg"
+    )
+  )
+
+
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
 
-  val testCreateCaseRequest =
+  def testCreateCaseRequest(wireMockBaseUrlAsString: String) =
     CreateClaimRequest(
       Content(
         ClaimDetails = claimDetails,
@@ -116,9 +160,10 @@ object TestData {
         BankDetails = Some(bankDetails),
         DutyTypeTaxDetails = dutyTypeTaxDetails,
         DocumentList = documentList),
-      Nil
+      uploadedFiles(wireMockBaseUrlAsString)
     )
 
 }
+
 
 

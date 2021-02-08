@@ -18,13 +18,15 @@ class AuthActionsISpec extends AppBaseISpec {
     override def authConnector: AuthConnector = app.injector.instanceOf[AuthConnector]
 
     override val appConfig: AppConfig = new AppConfig {
-      override val appName: String = "???"
-      override val authBaseUrl: String = "???"
-      override val eisBaseUrl: String = "???"
-      override val eisCreateCaseApiPath: String = "???"
-      override val eisAmendCaseApiPath: String = "???"
-      override val eisAuthorizationToken: String = "???"
-      override val eisEnvironment: String = "???"
+      override val appName: String = ""
+      override val authBaseUrl: String = ""
+      override val eisBaseUrl: String = ""
+      override val eisCreateCaseApiPath: String = ""
+      override val eisAmendCaseApiPath: String = ""
+      override val eisAuthorizationToken: String = ""
+      override val eisEnvironment: String = ""
+      override val fileBaseUrl: String = ""
+      override val fileBasePath: String = ""
     }
 
     implicit val hc = HeaderCarrier()

@@ -121,7 +121,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
 
   val json = Json.obj(
     "AcknowledgementReference" -> "123456",
-    "ApplicationType" -> "NDRC",
+    "ApplicationType" -> "ndrc",
     "OriginatingSystem" -> "Digital",
     "Content" -> Json.obj(
       "ClaimDetails" -> Json.obj(

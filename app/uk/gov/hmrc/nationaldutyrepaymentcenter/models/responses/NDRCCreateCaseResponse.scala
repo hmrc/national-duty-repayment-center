@@ -19,10 +19,13 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 import play.api.libs.json.{Format, Json}
 
 case class NDRCCreateCaseResponse(
-                                   correlationId: String,
-                                   error: Option[ApiError] = None,
-                                   result: Option[String] = None
-                                 )
+                                       correlationId: String,
+                                       error: Option[ApiError] = None,
+                                       result: Option[NDRCFileTransferResult] = None
+                                     ) {
+  def isSuccess: Boolean = error.isEmpty && result.isDefined
+  def isDuplicate: Boolean = error.exists(_.errorCode == "409")
+}
 
 object NDRCCreateCaseResponse {
   implicit val formats: Format[NDRCCreateCaseResponse] =

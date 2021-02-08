@@ -1,17 +1,18 @@
 package nationaldutyrepaymentcenter.controllers
 
 import java.time.LocalDateTime
-
 import org.scalatest.Suite
 import org.scalatestplus.play.ServerProvider
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.libs.json.JsObject
-import java.{util => ju}
 
+import java.{util => ju}
 import nationaldutyrepaymentcenter.stubs.{AmendCaseStubs, AuthStubs}
 import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent}
+import org.mockito.Mockito.when
+import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendContent
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 
 class NDRCAmendCaseISpec
@@ -30,9 +31,9 @@ class NDRCAmendCaseISpec
       "return 201 with CaseID as a result if successful PEGA API call" in {
 
         givenAuthorised()
-        givenPegaAmendCaseRequestSucceeds()
 
         val correlationId = ju.UUID.randomUUID().toString()
+        givenPegaAmendCaseRequestSucceeds(correlationId)
 
         val result = wsClient
           .url(s"$url/amend-case")
