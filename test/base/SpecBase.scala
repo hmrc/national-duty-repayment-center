@@ -101,7 +101,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       ImporterDetails = userDetails,
       BankDetails = Some(bankDetails),
       DutyTypeTaxDetails = dutyTypeTaxDetails,
-      DocumentList = documentList)
+      DocumentList = documentList),
+    uploadedFiles = Nil
   )
 
   val amendClaimRequest = AmendClaimRequest(
