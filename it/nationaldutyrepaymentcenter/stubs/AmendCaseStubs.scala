@@ -6,10 +6,11 @@ import nationaldutyrepaymentcenter.support.WireMockSupport
 trait AmendCaseStubs {
   me: WireMockSupport =>
 
-  def givenPegaAmendCaseRequestSucceeds(): Unit =
+  def givenPegaAmendCaseRequestSucceeds(correlationId: String): Unit =
     stubForPostWithResponse(
       200,
-      """{
+      s"""{
+        |"AcknowledgementReference" : "${correlationId.replace("-", "")}",
         |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
         |  "Content": {

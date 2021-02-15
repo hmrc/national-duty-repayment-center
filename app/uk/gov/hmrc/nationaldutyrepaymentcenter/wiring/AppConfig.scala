@@ -36,6 +36,12 @@ trait AppConfig {
   val eisAuthorizationToken: String
 
   val eisEnvironment: String
+
+  val fileBaseUrl: String
+
+  val fileBasePath: String
+
+
 }
 
 class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
@@ -45,6 +51,17 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
   override val authBaseUrl: String = config.baseUrl("auth")
 
   override val eisBaseUrl: String = config.baseUrl("eis.createcaseapi")
+
+  override val fileBaseUrl: String = config.baseUrl("file-transfer")
+
+  override lazy val fileBasePath: String =
+    config.getConfString(
+      "file-transfer.path",
+      throw new IllegalStateException(
+        "Missing [microservice.services.file-transfer.path] configuration property"
+      )
+    )
+
 
   override val eisCreateCaseApiPath: String =
     config.getConfString(

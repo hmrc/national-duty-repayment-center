@@ -43,6 +43,11 @@ case class EISCreateCaseError(
   def errorCode: Option[String] = errorDetail.errorCode
   def errorMessage: Option[String] = errorDetail.errorMessage
 
+  def isDuplicateCaseError: Boolean =
+    errorDetail.errorMessage.exists(_.replace(" ", "").startsWith("999:"))
+
+  def duplicateCaseID: Option[String] =
+    errorDetail.errorMessage.map(_.replace(" ", "").drop(4))
 }
 
 object EISCreateCaseError {

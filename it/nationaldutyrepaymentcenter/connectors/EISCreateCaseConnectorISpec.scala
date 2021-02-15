@@ -85,7 +85,7 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
 
   val testRequest = EISCreateCaseRequest(
     AcknowledgementReference = "XYZ123",
-    ApplicationType = "NDRC",
+    ApplicationType = "ndrc",
     OriginatingSystem = "Digital",
     Content = EISCreateCaseRequest.Content(eisClaimDetails,
       AgentDetails = Some(eisUserDetails),
