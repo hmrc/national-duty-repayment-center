@@ -88,7 +88,8 @@ object TestData {
   val claimDetails = ClaimDetails(
     FormType = FormType("01"),
     CustomRegulationType = CustomRegulationType.UKCustomsCodeRegulation,
-    ClaimedUnderArticle = ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty,
+    ClaimedUnderArticleFE = None,
+    ClaimedUnderRegulation = Some(ClaimedUnderRegulation.Rejected),
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
