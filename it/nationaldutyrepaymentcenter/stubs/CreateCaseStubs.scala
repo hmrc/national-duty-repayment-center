@@ -16,7 +16,7 @@ trait CreateCaseStubs {
         |  "ClaimDetails": {
         |      "FormType" : "01",
         |      "CustomRegulationType" : "02",
-        |      "ClaimedUnderArticle" : "117",
+        |      "ClaimedUnderArticle" : "051",
         |      "Claimant" : "02",
         |      "ClaimType" : "02",
         |      "NoOfEntries" : "10",

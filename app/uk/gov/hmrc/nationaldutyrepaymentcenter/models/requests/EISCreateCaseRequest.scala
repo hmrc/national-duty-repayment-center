@@ -72,11 +72,28 @@ object EISCreateCaseRequest {
       )
     }
 
+    def getClaimedUnderArticle(request: CreateClaimRequest): ClaimedUnderArticle =
+      request.Content.ClaimDetails.ClaimedUnderArticleFE.isDefined match {
+      case true => request.Content.ClaimDetails.ClaimedUnderArticleFE match {
+        case Some(ClaimedUnderArticleFE.Equity) => ClaimedUnderArticle.Equity
+        case Some(ClaimedUnderArticleFE.ErrorByTheCompetentAuthorities) => ClaimedUnderArticle.ErrorByTheCompetentAuthorities
+        case Some(ClaimedUnderArticleFE.OverchargedAmountsOfImportOrExportDuty) => ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty
+      }
+      case false => request.Content.ClaimDetails.ClaimedUnderRegulation match {
+        case Some(ClaimedUnderRegulation.ErrorByCustoms) => ClaimedUnderArticle.ErrorByCustoms
+        case Some(ClaimedUnderRegulation.LowerRateWasApplicable) => ClaimedUnderArticle.LowerRateWasApplicable
+        case Some(ClaimedUnderRegulation.OverPaymentOfDutyOrVAT) => ClaimedUnderArticle.OverPaymentOfDutyOrVAT
+        case Some(ClaimedUnderRegulation.Rejected) => ClaimedUnderArticle.Rejected
+        case Some(ClaimedUnderRegulation.SpecialCircumstances) => ClaimedUnderArticle.SpecialCircumstances
+        case Some(ClaimedUnderRegulation.WithdrawalOfCustomsDeclaration) => ClaimedUnderArticle.WithdrawalOfCustomsDeclaration
+      }
+    }
+
     def getEISClaimDetails(request: CreateClaimRequest) : EISClaimDetails = {
       EISClaimDetails(
         FormType = request.Content.ClaimDetails.FormType,
         CustomRegulationType = request.Content.ClaimDetails.CustomRegulationType,
-        ClaimedUnderArticle = request.Content.ClaimDetails.ClaimedUnderArticle,
+        ClaimedUnderArticle = getClaimedUnderArticle(request),
         Claimant = request.Content.ClaimDetails.Claimant,
         ClaimType = request.Content.ClaimDetails.ClaimType,
         NoOfEntries = request.Content.ClaimDetails.NoOfEntries,

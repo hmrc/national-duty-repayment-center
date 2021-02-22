@@ -19,16 +19,35 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 sealed trait ClaimedUnderArticle
 
 object ClaimedUnderArticle extends Enumerable.Implicits {
+
   case object OverchargedAmountsOfImportOrExportDuty extends WithName("117") with ClaimedUnderArticle
+
   case object ErrorByTheCompetentAuthorities extends WithName("119") with ClaimedUnderArticle
+
   case object Equity extends WithName("120") with ClaimedUnderArticle
-  case object Schedule extends WithName("990") with ClaimedUnderArticle
+
+  case object ErrorByCustoms extends WithName("048") with ClaimedUnderArticle
+
+  case object LowerRateWasApplicable extends WithName("049") with ClaimedUnderArticle
+
+  case object OverPaymentOfDutyOrVAT extends WithName("050") with ClaimedUnderArticle
+
+  case object Rejected extends WithName("051") with ClaimedUnderArticle
+
+  case object SpecialCircumstances extends WithName("052") with ClaimedUnderArticle
+
+  case object WithdrawalOfCustomsDeclaration extends WithName("053") with ClaimedUnderArticle
 
   val values: Seq[ClaimedUnderArticle] = Seq(
     OverchargedAmountsOfImportOrExportDuty,
     ErrorByTheCompetentAuthorities,
     Equity,
-    Schedule
+    ErrorByCustoms,
+    LowerRateWasApplicable,
+    OverPaymentOfDutyOrVAT,
+    Rejected,
+    SpecialCircumstances,
+    WithdrawalOfCustomsDeclaration
   )
 
   implicit val enumerable: Enumerable[ClaimedUnderArticle] =

@@ -45,7 +45,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   val claimDetails = ClaimDetails(
     FormType = FormType("01"),
     CustomRegulationType = CustomRegulationType.UKCustomsCodeRegulation,
-    ClaimedUnderArticle = ClaimedUnderArticle.Equity,
+    ClaimedUnderArticleFE = None,
+    ClaimedUnderRegulation = Some(ClaimedUnderRegulation.Rejected),
     Claimant = Claimant.RepresentativeOfTheImporter,
     ClaimType = ClaimType.Multiple,
     NoOfEntries = Some(NoOfEntries("10")),
@@ -127,7 +128,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       "ClaimDetails" -> Json.obj(
         "FormType" -> "01",
         "CustomRegulationType" -> "02",
-        "ClaimedUnderArticle" -> "120",
+        "ClaimedUnderArticle" -> "051",
         "Claimant" -> "02",
         "ClaimType" -> "02",
         "NoOfEntries" -> "10",
