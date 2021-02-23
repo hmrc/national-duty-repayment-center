@@ -73,8 +73,8 @@ object EISCreateCaseRequest {
     }
 
     def getClaimedUnderArticle(request: CreateClaimRequest): ClaimedUnderArticle =
-      request.Content.ClaimDetails.ClaimedUnderArticleFE.isDefined match {
-      case true => request.Content.ClaimDetails.ClaimedUnderArticleFE match {
+      request.Content.ClaimDetails.ClaimedUnderArticle.isDefined match {
+      case true => request.Content.ClaimDetails.ClaimedUnderArticle match {
         case Some(ClaimedUnderArticleFE.Equity) => ClaimedUnderArticle.Equity
         case Some(ClaimedUnderArticleFE.ErrorByTheCompetentAuthorities) => ClaimedUnderArticle.ErrorByTheCompetentAuthorities
         case Some(ClaimedUnderArticleFE.OverchargedAmountsOfImportOrExportDuty) => ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty
