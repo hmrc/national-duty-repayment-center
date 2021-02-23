@@ -110,7 +110,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
     AmendContent(
       CaseID = "Risk-2507",
       Description = "update request for Risk-2507"
-    )
+    ), Nil
   )
 
   val amendJson = Json.obj(

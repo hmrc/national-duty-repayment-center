@@ -112,7 +112,7 @@ class ClaimController @Inject()(
     withAuthorised {
       val correlationId = request.headers
         .get("x-correlation-id")
-        .getOrElse(ju.UUID.randomUUID().toString())
+        .getOrElse(uuidGenerator.uuid)
 
       withPayload[AmendClaimRequest] { amendCaseRequest =>
         val eisAmendCaseRequest = EISAmendCaseRequest(
@@ -122,19 +122,20 @@ class ClaimController @Inject()(
           Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
         )
 
-        claimService.amendClaim(eisAmendCaseRequest, correlationId).map {
+        claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
           case success: EISAmendCaseSuccess =>
-            Created(
-              Json.toJson(
-                NDRCAmendCaseResponse(
+            transferFilesToPega(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
+              .map { fileTransferResults =>
+                val response = NDRCCreateCaseResponse(
                   correlationId = correlationId,
-                  result = Some(success.CaseID)
-                )
-              )
-            )
+                  result = Option(
+                    NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
+                  ))
+                Created(Json.toJson(response))
+              }
           // when request to the upstream api returns an error
           case error: EISAmendCaseError =>
-            BadRequest(
+            Future.successful(BadRequest(
               Json.toJson(
                 NDRCAmendCaseResponse(
                   correlationId = correlationId,
@@ -146,12 +147,12 @@ class ClaimController @Inject()(
                   )
                 )
               )
-            )
+            ))
         }
       } {
         // when incoming request's payload validation fails
         case (errorCode, errorMessage) =>
-          BadRequest(
+         BadRequest(
             Json.toJson(
               NDRCAmendCaseResponse(
                 correlationId = correlationId,
@@ -168,7 +169,7 @@ class ClaimController @Inject()(
                            caseReferenceNumber: String,
                            conversationId: String,
                            uploadedFiles: Seq[UploadedFile]
-                         )(implicit hc: HeaderCarrier): Future[Seq[FileTransferResult]] =
+                         )(implicit hc: HeaderCarrier): Future[Seq[FileTransferResult]] = {
     Future.sequence(
       uploadedFiles.zipWithIndex
         .map {
@@ -186,4 +187,5 @@ class ClaimController @Inject()(
         }
         .map(fileTransferConnector.transferFile(_, conversationId))
     )
+  }
 }
