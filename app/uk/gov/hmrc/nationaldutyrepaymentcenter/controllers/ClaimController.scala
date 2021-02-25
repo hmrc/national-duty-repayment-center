@@ -26,7 +26,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferRequest, FileTransferResult, UploadedFile}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.services.ClaimService
+import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimService}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -45,17 +45,18 @@ class ClaimController @Inject()(
                                  val cc: ControllerComponents,
                                  val appConfig: AppConfig,
                                  val claimService: ClaimService,
-                                 val uuidGenerator: UUIDGenerator
+                                 val uuidGenerator: UUIDGenerator,
+                                 val auditService: AuditService,
                                )
                                (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActions with ControllerHelper {
 
   def submitClaim(): Action[String] = Action(parse.tolerantText).async { implicit request =>
-    withAuthorised {
-      val correlationId = request.headers
-        .get("x-correlation-id")
-        .getOrElse(uuidGenerator.uuid)
+    val correlationId = request.headers
+      .get("x-correlation-id")
+      .getOrElse(uuidGenerator.uuid)
 
-      withPayload[CreateClaimRequest] { createCaseRequest =>
+    withAuthorised {
+      withPayload[CreateClaimRequest]{ createCaseRequest =>
         val eisCreateCaseRequest = EISCreateCaseRequest(
           AcknowledgementReference = correlationId.replace("-", ""),
           ApplicationType = "NDRC",
@@ -66,54 +67,67 @@ class ClaimController @Inject()(
         claimService.createClaim(eisCreateCaseRequest, correlationId).flatMap {
           case success: EISCreateCaseSuccess =>
             transferFilesToPega(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
-              .map { fileTransferResults =>
-                val response = NDRCCreateCaseResponse(
-                    correlationId = correlationId,
-                    result = Option(
-                      NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
-                    ))
-               Created(Json.toJson(response))
+              .flatMap { fileTransferResults =>
+                val response = NDRCCaseResponse(
+                  correlationId = correlationId,
+                  result = Option(
+                    NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
+                  ))
+                auditService
+                  .auditCreateCaseEvent(createCaseRequest)(response)
+                  .map(_ => Created(Json.toJson(response)))
               }
 
           // when request to the upstream api returns an error
-          case error: EISCreateCaseError =>
-              Future.successful(BadRequest(
-                Json.toJson(
-                  NDRCCreateCaseResponse(
-                    correlationId = correlationId,
-                    error = Some(
-                      ApiError(
-                        errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
-                        errorMessage = error.errorMessage
-                      )
-                    )
-                  )
-                )
-              ))
-        }
-      } {
-        // when incoming request's payload validation fails
-        case (errorCode, errorMessage) =>
-          BadRequest(
-            Json.toJson(
-              NDRCCreateCaseResponse(
+          case error: EISCreateCaseError => {
+              val response = NDRCCaseResponse(
                 correlationId = correlationId,
                 error = Some(
-                  ApiError(errorCode, Some(errorMessage))
+                  ApiError(
+                    errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
+                    errorMessage = error.errorMessage
+                  )
                 )
               )
+              auditService
+                .auditCreateCaseEvent(createCaseRequest)(response)
+                .map(_ => BadRequest(Json.toJson(response)))
+            }
+      }} {
+        // when incoming request's payload validation fails
+        case (errorCode, errorMessage) =>
+          val response = NDRCCaseResponse(
+            correlationId = correlationId,
+            error = Some(
+              ApiError(errorCode, Some(errorMessage))
             )
           )
+          auditService
+            .auditCreateCaseErrorEvent(response)
+            .map(_ => BadRequest(Json.toJson(response)))
       }
+    }.recoverWith {
+      // last resort fallback when request processing fails
+      case e =>
+        val response = NDRCCaseResponse(
+          correlationId = correlationId,
+          error = Some(
+            ApiError("500", Some(e.getMessage()))
+          )
+        )
+        auditService
+          .auditCreateCaseErrorEvent(response)
+          .map(_ => InternalServerError(Json.toJson(response)))
     }
   }
 
   def submitAmendClaim(): Action[String] = Action(parse.tolerantText).async { implicit request =>
-    withAuthorised {
-      val correlationId = request.headers
-        .get("x-correlation-id")
-        .getOrElse(uuidGenerator.uuid)
 
+    val correlationId = request.headers
+      .get("x-correlation-id")
+      .getOrElse(uuidGenerator.uuid)
+
+    withAuthorised {
       withPayload[AmendClaimRequest] { amendCaseRequest =>
         val eisAmendCaseRequest = EISAmendCaseRequest(
           AcknowledgementReference = correlationId.replace("-", ""),
@@ -125,44 +139,54 @@ class ClaimController @Inject()(
         claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
           case success: EISAmendCaseSuccess =>
             transferFilesToPega(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
-              .map { fileTransferResults =>
-                val response = NDRCCreateCaseResponse(
+              .flatMap { fileTransferResults =>
+                val response = NDRCCaseResponse(
                   correlationId = correlationId,
                   result = Option(
                     NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
                   ))
-                Created(Json.toJson(response))
+                auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map ( _ =>
+                Created(Json.toJson(response)))
               }
           // when request to the upstream api returns an error
           case error: EISAmendCaseError =>
-            Future.successful(BadRequest(
-              Json.toJson(
-                NDRCAmendCaseResponse(
-                  correlationId = correlationId,
-                  error = Some(
-                    ApiError(
-                      errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
-                      errorMessage = error.errorMessage
-                    )
-                  )
+            val response = NDRCCaseResponse(
+              correlationId = correlationId,
+              error = Some(
+                ApiError(
+                  errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
+                  errorMessage = error.errorMessage
                 )
               )
-            ))
+            )
+            auditService.auditUpdateCaseEvent(amendCaseRequest)(response)
+              .map(_ => BadRequest(Json.toJson(response)))
         }
       } {
         // when incoming request's payload validation fails
         case (errorCode, errorMessage) =>
-         BadRequest(
-            Json.toJson(
-              NDRCAmendCaseResponse(
-                correlationId = correlationId,
-                error = Some(
-                  ApiError(errorCode, Some(errorMessage))
-                )
-              )
+          val response = NDRCCaseResponse(
+            correlationId = correlationId,
+            error = Some(
+              ApiError(errorCode, Some(errorMessage))
             )
           )
+          auditService
+            .auditUpdateCaseErrorEvent(response)
+            .map(_ => BadRequest(Json.toJson(response)))
       }
+    } .recoverWith {
+      // last resort fallback when request processing fails
+      case e =>
+        val response = NDRCCaseResponse(
+          correlationId = correlationId,
+          error = Some(
+            ApiError("500", Some(e.getMessage()))
+          )
+        )
+        auditService
+          .auditUpdateCaseErrorEvent(response)
+          .map(_ => InternalServerError(Json.toJson(response)))
     }
   }
   def transferFilesToPega(

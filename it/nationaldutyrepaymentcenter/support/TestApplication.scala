@@ -12,6 +12,7 @@ trait TestApplication {
 
   override implicit lazy val app: Application = appBuilder.build()
   val uuideGeneratorMock = mock[UUIDGenerator]
+
   protected def appBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(

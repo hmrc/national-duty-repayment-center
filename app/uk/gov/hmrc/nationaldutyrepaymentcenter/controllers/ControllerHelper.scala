@@ -26,7 +26,7 @@ import scala.util.{Failure, Success, Try}
 
 trait ControllerHelper {
 
-  type HandleError = (String, String) => Result
+  type HandleError = (String, String) => Future[Result]
 
   protected def withPayload[T](
     f: T => Future[Result]
@@ -47,14 +47,14 @@ trait ControllerHelper {
             f(payload)
 
           case Invalid(errs) =>
-            Future successful handleError(
+            handleError(
               "ERROR_VALIDATION",
               s"Invalid payload: Validation failed due to ${errs.mkString(", and ")}."
             )
         }
 
       case Success(JsError(errs)) =>
-        Future successful handleError(
+        handleError(
           "ERROR_JSON",
           s"Invalid payload: Parsing failed due to ${errs
             .map {
@@ -64,8 +64,7 @@ trait ControllerHelper {
             .mkString(", and ")}."
         )
 
-      case Failure(e) =>
-        Future successful handleError("ERROR_UNKNOWN", s"Could not parse payload due to ${e.getMessage}.")
+      case Failure(e) => handleError("ERROR_UNKNOWN", s"Could not parse payload due to ${e.getMessage}.")
     }
 
 }

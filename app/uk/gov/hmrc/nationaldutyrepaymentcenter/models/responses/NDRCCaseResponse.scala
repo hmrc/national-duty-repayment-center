@@ -18,13 +18,15 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 
 import play.api.libs.json.{Format, Json}
 
-case class NDRCAmendCaseResponse(
-                                   correlationId: String,
-                                   error: Option[ApiError] = None,
-                                   result: Option[String] = None
-                                 )
+case class NDRCCaseResponse(
+                                       correlationId: String,
+                                       error: Option[ApiError] = None,
+                                       result: Option[NDRCFileTransferResult] = None
+                                     ) {
+  def isSuccess: Boolean = error.isEmpty && result.isDefined
+}
 
-object NDRCAmendCaseResponse {
-  implicit val formats: Format[NDRCAmendCaseResponse] =
-    Json.format[NDRCAmendCaseResponse]
+object NDRCCaseResponse {
+  implicit val formats: Format[NDRCCaseResponse] =
+    Json.format[NDRCCaseResponse]
 }
