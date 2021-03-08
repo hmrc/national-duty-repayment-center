@@ -3,9 +3,12 @@ package nationaldutyrepaymentcenter.connectors
 import play.api.Application
 import nationaldutyrepaymentcenter.stubs.AmendCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
+import play.api.inject.bind
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{AmendCaseConnector}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.AmendCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
+
+import java.time.{Clock, Instant, ZoneId}
 
 class EISAmendCaseConnectorISpec extends EISAmendCaseConnectorISpecSetup {
 

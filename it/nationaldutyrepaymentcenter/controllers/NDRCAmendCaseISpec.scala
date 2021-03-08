@@ -5,6 +5,7 @@ import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
+import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatestplus.play.ServerProvider
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -17,7 +18,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, FileTransferRequest, SendDocuments, UploadedFile}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.NDRCAuditEvent
 
-import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{Clock, LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
 import java.{util => ju}
 
 class NDRCAmendCaseISpec
@@ -27,6 +28,11 @@ class NDRCAmendCaseISpec
 
   val url = s"http://localhost:$port"
 
+  import java.time.Clock
+  import java.time.Instant
+  import java.time.ZoneId
+
+  override val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
   override def appBuilder: GuiceApplicationBuilder = {
     new GuiceApplicationBuilder()
       .configure(
@@ -42,7 +48,8 @@ class NDRCAmendCaseISpec
         "microservice.services.file-transfer.host" -> wireMockHost,
         "microservice.services.file-transfer.port" -> wireMockPort,
       )  .overrides(
-      bind[UUIDGenerator].toInstance(uuideGeneratorMock))
+        bind[Clock].toInstance(clock),
+        bind[UUIDGenerator].toInstance(uuideGeneratorMock))
   }
 
   override lazy val app =  appBuilder.build()

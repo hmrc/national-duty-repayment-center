@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferRequest, FileTransferResult}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,6 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class FileTransferConnector @Inject()(
   val config: AppConfig,
   val http: HttpPost,
+  val clock: Clock,
   metrics: Metrics
 ) extends HttpAPIMonitor {
 
@@ -50,7 +51,7 @@ class FileTransferConnector @Inject()(
             fileTransferRequest.upscanReference,
             isSuccess(response),
             response.status,
-            LocalDateTime.now(),
+            LocalDateTime.now(clock),
             None
           )
         )

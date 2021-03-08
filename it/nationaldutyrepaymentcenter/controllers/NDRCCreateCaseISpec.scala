@@ -18,7 +18,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, DocumentList, DutyTypeTaxDetails, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, NDRCAuditEvent}
 
-import java.time.{LocalDate, LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZonedDateTime}
 import java.{util => ju}
 
 class NDRCCreateCaseISpec
@@ -27,6 +27,7 @@ class NDRCCreateCaseISpec
   this: Suite with ServerProvider =>
 
   val url = s"http://localhost:$port"
+  override val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
 
   override def appBuilder: GuiceApplicationBuilder = {
     new GuiceApplicationBuilder()
@@ -43,6 +44,7 @@ class NDRCCreateCaseISpec
         "microservice.services.file-transfer.host" -> wireMockHost,
         "microservice.services.file-transfer.port" -> wireMockPort,
       )  .overrides(
+      bind[Clock].toInstance(clock),
       bind[UUIDGenerator].toInstance(uuideGeneratorMock))
   }
 
