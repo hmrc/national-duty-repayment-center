@@ -38,9 +38,10 @@ import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{Furtherinformation, Supportingdocuments}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, FileTransferAudit, FileTransferResult, UploadedFile, UserDetails}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, AmendCaseResponseType, ClaimDetails, DocumentList, DutyTypeTaxDetails, FileTransferAudit, FileTransferResult, UploadedFile, UserDetails}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -194,8 +195,7 @@ object AuditService {
           UpdateCaseAuditEventDetails(
             success = true,
             caseId = updateRequest.Content.CaseID,
-            action = if(updateRequest.uploadedFiles.nonEmpty && !updateRequest.Content.Description.contains("Files Uploaded")) "SendDocumentsAndFurtherInformation"
-            else if(updateRequest.uploadedFiles.nonEmpty) "SendDocuments" else "SendFurtherInformation",
+            action = updateRequest.Content.selectedAmendments,
             description = Option(updateRequest.Content.Description),
             numberOfFilesUploaded = updateRequest.uploadedFiles.size,
             uploadedFiles = combineFileUploadAndTransferResults(

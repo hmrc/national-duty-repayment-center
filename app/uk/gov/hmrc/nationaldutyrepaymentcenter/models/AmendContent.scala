@@ -17,12 +17,21 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{Furtherinformation, Supportingdocuments}
 
 final case class AmendContent(CaseID: String,
-                              Description: String
-                             )
+                              Description: String,
+                              TypeOfAmendments: Seq[AmendCaseResponseType]
+                             ) {
 
-object AmendContent {
-  implicit val format: OFormat[AmendContent] = Json.format[AmendContent]
+    def selectedAmendments: String =
+      if (TypeOfAmendments.contains(Supportingdocuments) && TypeOfAmendments.contains(Furtherinformation))
+        SendDocumentsAndFurtherInformation.toString
+      else if (TypeOfAmendments.contains(Supportingdocuments)) SendDocuments.toString
+      else SendFurtherInformation.toString
 }
+
+  object AmendContent {
+    implicit val format: OFormat[AmendContent] = Json.format[AmendContent]
+  }
 
