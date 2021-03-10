@@ -28,6 +28,7 @@ import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.http.ws.WSHttp
 
+import java.time.Clock
 import scala.util.matching.Regex
 
 class MicroserviceModule(val environment: Environment, val configuration: Configuration) extends AbstractModule {
@@ -35,6 +36,7 @@ class MicroserviceModule(val environment: Environment, val configuration: Config
   def configure(): Unit = {
     val appName = "national-duty-repayment-center"
     Logger(getClass).info(s"Starting microservice : $appName : in mode : ${environment.mode}")
+    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
 
     bind(classOf[HttpGet]).to(classOf[CustomHttpClient])
     bind(classOf[HttpPost]).to(classOf[CustomHttpClient])
