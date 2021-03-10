@@ -12,7 +12,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{Furtherinformation, Supportingdocuments}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, FileTransferRequest, SendDocuments, UploadedFile}
@@ -174,7 +174,7 @@ object AmendTestData {
       AmendContent(
         CaseID = "Risk-2507",
         Description = "update request for Risk-2507",
-        TypeOfAmendments = Seq(Furtherinformation, Supportingdocuments)
+        TypeOfAmendments = Seq(FurtherInformation, SupportingDocuments)
       ), uploadedFiles(wireMockBaseUrlAsString))
 
   def createAuditEventRequest(baseUrl: String, transferSuccess: Boolean, transferredAt: String, transferHttpStatus: Int): JsObject = {
