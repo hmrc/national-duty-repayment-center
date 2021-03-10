@@ -25,7 +25,7 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.Furtherinformation
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.FurtherInformation
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
@@ -110,7 +110,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
     AmendContent(
       CaseID = "Risk-2507",
       Description = "update request for Risk-2507",
-      TypeOfAmendments = Seq(Furtherinformation)
+      TypeOfAmendments = Seq(FurtherInformation)
     ), Nil
   )
 

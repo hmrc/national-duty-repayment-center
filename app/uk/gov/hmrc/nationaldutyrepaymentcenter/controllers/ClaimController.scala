@@ -135,7 +135,6 @@ class ClaimController @Inject()(
           OriginatingSystem = "Digital",
           Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
         )
-
         claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
           case success: EISAmendCaseSuccess =>
             transferFilesToPega(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
