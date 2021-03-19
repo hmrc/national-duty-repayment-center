@@ -1,4 +1,5 @@
 import sbt.Tests.{Group, SubProcess}
+import scoverage.ScoverageKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 
@@ -55,6 +56,12 @@ lazy val root = (project in file("."))
       Resolver.typesafeRepo("releases"),
       Resolver.jcenterRepo
     ),
+    ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*repositories.*;" +
+      ".*BuildInfo.*;.*javascript.*;.*Routes.*;.*GuiceInjector;" +
+      ".*ControllerConfiguration",
+    ScoverageKeys.coverageMinimum := 46.43,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true,
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
     dependencyOverrides ++= jettyOverrides,
     publishingSettings,
