@@ -119,7 +119,7 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     City = "city",
     Region = Some("region"),
     CountryCode = "GB",
-    PostalCode = Some("ZZ111ZZ"),
+    PostalCode = "ZZ111ZZ",
     TelephoneNumber = Some("12345678"),
     EmailAddress = Some("example@example.com")
   )
