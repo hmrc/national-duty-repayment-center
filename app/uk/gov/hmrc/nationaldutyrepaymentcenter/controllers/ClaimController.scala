@@ -63,6 +63,7 @@ class ClaimController @Inject()(
           OriginatingSystem = "Digital",
           Content = EISCreateCaseRequest.Content.from(createCaseRequest)
         )
+        println(s"Final outgoing json ${eisCreateCaseRequest}")
 
         claimService.createClaim(eisCreateCaseRequest, correlationId).flatMap {
           case success: EISCreateCaseSuccess =>
@@ -135,6 +136,7 @@ class ClaimController @Inject()(
           OriginatingSystem = "Digital",
           Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
         )
+        println(s"Final outgoing json ${eisAmendCaseRequest}")
         claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
           case success: EISAmendCaseSuccess =>
             transferFilesToPega(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)

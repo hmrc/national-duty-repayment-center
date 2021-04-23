@@ -110,8 +110,7 @@ object EISCreateCaseRequest {
         PayeeIndicator = request.Content.ClaimDetails.PayeeIndicator,
         PaymentMethod = request.Content.ClaimDetails.PaymentMethod,
         DeclarantRefNumber = request.Content.ClaimDetails.DeclarantRefNumber,
-        DeclarantName = getImporterDetails(request).Name
-
+        DeclarantName = request.Content.ClaimDetails.DeclarantName
       )
     }
 
