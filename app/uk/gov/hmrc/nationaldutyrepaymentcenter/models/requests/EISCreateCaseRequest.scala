@@ -60,7 +60,10 @@ object EISCreateCaseRequest {
 
     def from(request: CreateClaimRequest): Content = {
       Content(
-        ClaimDetails = getEISClaimDetails(request),
+        ClaimDetails = {
+          println(getEISClaimDetails(request))
+          getEISClaimDetails(request)
+        },
         AgentDetails = request.Content.AgentDetails.isDefined match {
           case true  => Some(getAgentUserDetails(request))
           case _ => None
@@ -107,7 +110,7 @@ object EISCreateCaseRequest {
         PayeeIndicator = request.Content.ClaimDetails.PayeeIndicator,
         PaymentMethod = request.Content.ClaimDetails.PaymentMethod,
         DeclarantRefNumber = request.Content.ClaimDetails.DeclarantRefNumber,
-        DeclarantName = request.Content.ClaimDetails.DeclarantName
+        DeclarantName = getImporterDetails(request).Name
 
       )
     }
