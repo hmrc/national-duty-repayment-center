@@ -176,7 +176,8 @@ object TestData {
     ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
     PaymentMethod = PaymentMethod.BACS,
-    DeclarantRefNumber = "NA"
+    DeclarantRefNumber = "NA",
+    DeclarantName = "DummyData"
   )
 
   val invalidClaimDetails = ClaimDetails(
@@ -194,7 +195,8 @@ object TestData {
     ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
     PaymentMethod = PaymentMethod.BACS,
-    DeclarantRefNumber = "NA"
+    DeclarantRefNumber = "NA",
+    DeclarantName = "DummyData"
   )
 
   val address = Address(
@@ -291,7 +293,8 @@ object TestData {
         "ClaimDate" -> "20200805",
         "PayeeIndicator" -> "01",
         "PaymentMethod" -> "02",
-        "DeclarantRefNumber" -> "NA"
+        "DeclarantRefNumber" -> "NA",
+        "DeclarantName" -> "DummyData"
       ),
       "agentDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
@@ -411,7 +414,8 @@ object TestData {
         "ClaimDate" -> "20200805",
         "PayeeIndicator" -> "01",
         "PaymentMethod" -> "02",
-        "DeclarantRefNumber" -> "NA"
+        "DeclarantRefNumber" -> "NA",
+        "DeclarantName" -> "DummyData"
       ),
       "agentDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
@@ -530,7 +534,8 @@ object TestData {
         "ClaimDate" -> "20200805",
         "PayeeIndicator" -> "01",
         "PaymentMethod" -> "02",
-        "DeclarantRefNumber" -> "NA"
+        "DeclarantRefNumber" -> "NA",
+        "DeclarantName" -> "DummyData"
       ),
       "agentDetails" -> Json.obj(
         "IsVATRegistered" -> "true",

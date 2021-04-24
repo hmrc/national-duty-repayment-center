@@ -39,8 +39,10 @@ final case class EISClaimDetails(
                                ClaimDate: LocalDate,
                                PayeeIndicator: PayeeIndicator,
                                PaymentMethod: PaymentMethod,
-                               DeclarantRefNumber: String
-                             )
+                               DeclarantRefNumber: String,
+                               DeclarantName:String
+
+                                )
 
 object EISClaimDetails {
 
