@@ -111,7 +111,8 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
     PaymentMethod = PaymentMethod.BACS,
-    DeclarantRefNumber = "NA"
+    DeclarantRefNumber = "NA",
+    DeclarantName = "DummyData"
   )
 
   val eisAddress = EISAddress(AddressLine1 = "line 1",
