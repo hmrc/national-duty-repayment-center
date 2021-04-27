@@ -1,58 +1,30 @@
 package nationaldutyrepaymentcenter.controllers
 
 import nationaldutyrepaymentcenter.stubs.{AmendCaseStubs, AuthStubs, DataStreamStubs, FileTransferStubs}
-import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
+import nationaldutyrepaymentcenter.support.ServerBaseISpec
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
-import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatestplus.play.ServerProvider
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, FileTransferRequest, SendDocuments, UploadedFile}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, FileTransferRequest, UploadedFile}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.NDRCAuditEvent
-
-import java.time.{Clock, LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{ZoneId, ZonedDateTime}
 import java.{util => ju}
 
+
+
 class NDRCAmendCaseISpec
-  extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  with FileTransferStubs with DataStreamStubs {
+  extends ServerBaseISpec with AuthStubs with AmendCaseStubs with FileTransferStubs with DataStreamStubs {
 
   this: Suite with ServerProvider =>
 
   val url = s"http://localhost:$port"
 
-  import java.time.Clock
-  import java.time.Instant
-  import java.time.ZoneId
-
-  override val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
-  override def appBuilder: GuiceApplicationBuilder = {
-    new GuiceApplicationBuilder()
-      .configure(
-        "microservice.services.auth.port" -> wireMockPort,
-        "microservice.services.eis.createcaseapi.host" -> wireMockHost,
-        "microservice.services.eis.createcaseapi.port" -> wireMockPort,
-        "microservice.services.eis.createcaseapi.token" -> "dummy-it-token",
-        "microservice.services.eis.createcaseapi.environment" -> "it",
-        "metrics.enabled" -> true,
-        "auditing.enabled" -> true,
-        "auditing.consumer.baseUri.host" -> wireMockHost,
-        "auditing.consumer.baseUri.port" -> wireMockPort,
-        "microservice.services.file-transfer.host" -> wireMockHost,
-        "microservice.services.file-transfer.port" -> wireMockPort,
-      )  .overrides(
-        bind[Clock].toInstance(clock),
-        bind[UUIDGenerator].toInstance(uuideGeneratorMock))
-  }
-
-  override lazy val app =  appBuilder.build()
   val wsClient = app.injector.instanceOf[WSClient]
   val uuidGenerator = app.injector.instanceOf[UUIDGenerator]
 
@@ -77,11 +49,11 @@ class NDRCAmendCaseISpec
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 201
+        result.status should be(201)
         val response = result.json.as[NDRCCaseResponse]
-        response.correlationId must be(correlationId)
-        response.result.get.fileTransferResults.size must be(1)
-        response.result.get.fileTransferResults.head.httpStatus must be(200)
+        response.correlationId should be(correlationId)
+        response.result.get.fileTransferResults.size should be(1)
+        response.result.get.fileTransferResults.head.httpStatus should be(200)
 
         verifyAuditRequestSent(
           1,
@@ -111,11 +83,11 @@ class NDRCAmendCaseISpec
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 201
+        result.status should be(201)
         val response = result.json.as[NDRCCaseResponse]
-        response.correlationId must be(correlationId)
-        response.result.get.fileTransferResults.size must be(1)
-        response.result.get.fileTransferResults.head.httpStatus must be(409)
+        response.correlationId should be(correlationId)
+        response.result.get.fileTransferResults.size should be(1)
+        response.result.get.fileTransferResults.head.httpStatus should be(409)
 
         verifyAuditRequestSent(
           1,
@@ -142,7 +114,7 @@ class NDRCAmendCaseISpec
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 400
+        result.status should be(400)
 
         verifyAuditRequestSent(
           1,

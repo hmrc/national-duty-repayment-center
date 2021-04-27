@@ -6,6 +6,11 @@ import nationaldutyrepaymentcenter.support.WireMockSupport
 trait CreateCaseStubs {
   me: WireMockSupport =>
 
+  val CREATE_CASE_URL = "/cpr/caserequest/ndrc/create/v1"
+
+  def verifyPegaCreateCaseRequestHasHappened(times: Int = 1) =
+    verify(times, postRequestedFor(urlEqualTo(CREATE_CASE_URL)))
+
   def givenPegaCreateCaseRequestSucceeds(): Unit =
     stubForPostWithResponse(
       200,

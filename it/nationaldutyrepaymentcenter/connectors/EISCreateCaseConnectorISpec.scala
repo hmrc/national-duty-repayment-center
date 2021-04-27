@@ -3,14 +3,12 @@ package nationaldutyrepaymentcenter.connectors
 import java.time.LocalDate
 
 import play.api.Application
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, _}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import nationaldutyrepaymentcenter.stubs.CreateCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{CreateCaseConnector, PegaCaseError, PegaCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class EISCreateCaseConnectorISpec extends EISCreateCaseConnectorISpecSetup {
 

@@ -1,18 +1,19 @@
 package nationaldutyrepaymentcenter.support
 
-import org.scalatest.mockito.MockitoSugar.mock
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
-
 import java.time.{Clock, Instant, ZoneId}
+
+import org.mockito.Mockito
+
 
 trait TestApplication {
   _: BaseISpec =>
 
   override implicit lazy val app: Application = appBuilder.build()
-  val uuideGeneratorMock = mock[UUIDGenerator]
+  val uuideGeneratorMock = Mockito.mock(classOf[UUIDGenerator])
   val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
 
   protected def appBuilder: GuiceApplicationBuilder =

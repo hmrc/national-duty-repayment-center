@@ -1,7 +1,5 @@
 package nationaldutyrepaymentcenter.connectors
 
-
-import nationaldutyrepaymentcenter.controllers.TestData
 import play.api.Application
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
@@ -22,7 +20,7 @@ class FileTransferConnectorISpec extends FileTransferConnectorISpecSetup with Fi
         val request = testRequest
         givenNdrcFileTransferSucceeds(request)
         val result = await(connector.transferFile(request, correlationId))
-        result.success shouldBe true
+        result.success should be(true)
       }
     }
   }

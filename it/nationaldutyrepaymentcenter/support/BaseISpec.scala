@@ -1,6 +1,7 @@
 package nationaldutyrepaymentcenter.support
 
 import akka.stream.Materializer
+import org.scalatest.matchers.should.Matchers
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.Result
@@ -9,9 +10,8 @@ import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.test.UnitSpec
 
-abstract class BaseISpec extends UnitSpec with WireMockSupport with MetricsTestSupport {
+abstract class BaseISpec extends UnitSpec with WireMockSupport with MetricsTestSupport with Matchers {
 
   def app: Application
 
@@ -22,9 +22,9 @@ abstract class BaseISpec extends UnitSpec with WireMockSupport with MetricsTestS
   protected implicit def materializer: Materializer = app.materializer
 
   protected def checkHtmlResultWithBodyText(result: Result, expectedSubstring: String): Unit = {
-    status(result) shouldBe 200
-    contentType(result) shouldBe Some("text/html")
-    charset(result) shouldBe Some("utf-8")
+    status(result) should be(200)
+    contentType(result) should be(Some("text/html"))
+    charset(result) should be(Some("utf-8"))
     bodyOf(result) should include(expectedSubstring)
   }
 
