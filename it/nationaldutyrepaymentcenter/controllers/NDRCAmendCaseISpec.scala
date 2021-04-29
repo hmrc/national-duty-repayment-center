@@ -1,7 +1,7 @@
 package nationaldutyrepaymentcenter.controllers
 
 import nationaldutyrepaymentcenter.stubs.{AmendCaseStubs, AuthStubs, DataStreamStubs, FileTransferStubs}
-import nationaldutyrepaymentcenter.support.ServerBaseISpec
+import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
 import org.scalatest.Suite
 import org.scalatestplus.play.ServerProvider
@@ -16,10 +16,8 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.NDRCAuditEvent
 import java.time.{ZoneId, ZonedDateTime}
 import java.{util => ju}
 
-
-
 class NDRCAmendCaseISpec
-  extends ServerBaseISpec with AuthStubs with AmendCaseStubs with FileTransferStubs with DataStreamStubs {
+  extends ServerBaseISpec with AuthStubs with AmendCaseStubs with FileTransferStubs with DataStreamStubs with JsonMatchers {
 
   this: Suite with ServerProvider =>
 
@@ -93,7 +91,7 @@ class NDRCAmendCaseISpec
           1,
           NDRCAuditEvent.UpdateCase,
           Json.obj(
-            "success"             -> true,
+            "success" -> true,
           ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString, transferSuccess = false,
             transferredAt = response.result.get.fileTransferResults.head.transferredAt.toString, 409)
         )
@@ -120,7 +118,7 @@ class NDRCAmendCaseISpec
           1,
           NDRCAuditEvent.UpdateCase,
           Json.obj(
-            "success"             -> false
+            "success" -> false
           ) ++ AmendTestData.createAuditEventRequestWhenError(wireMockBaseUrlAsString, transferSuccess = false)
         )
       }
@@ -150,9 +148,9 @@ object AmendTestData {
       ), uploadedFiles(wireMockBaseUrlAsString))
 
   def createAuditEventRequest(baseUrl: String, transferSuccess: Boolean, transferredAt: String, transferHttpStatus: Int): JsObject = {
-   Json.obj(
-       "caseId" -> "Risk-2507",
-        "description" -> "update request for Risk-2507",
+    Json.obj(
+      "caseId" -> "Risk-2507",
+      "description" -> "update request for Risk-2507",
       "action" -> "SendDocumentsAndFurtherInformation",
 
       "uploadedFiles" -> Json.arr(
@@ -171,6 +169,7 @@ object AmendTestData {
       "numberOfFilesUploaded" -> 1
     )
   }
+
   def createAuditEventRequestWhenError(baseUrl: String, transferSuccess: Boolean): JsObject = {
 
     Json.obj(
@@ -190,10 +189,8 @@ object AmendTestData {
         )
       ),
       "numberOfFilesUploaded" -> 1,
-      "errorCode" ->  "400",
+      "errorCode" -> "400",
       "errorMessage" -> "Something went wrong",
     )
   }
 }
-
-
