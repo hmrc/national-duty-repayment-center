@@ -54,7 +54,7 @@ trait DataStreamStubs extends Eventually {
     stubFor(post(urlPathEqualTo(auditUrl + "/merged")).willReturn(aResponse().withStatus(204)))
   }
 
-  private def auditUrl = "/write/audit"
+  private def auditUrl = "/write/audit.*"
 
   private def similarToJson(value: String) = equalToJson(value.stripMargin, true, true)
 

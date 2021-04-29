@@ -1,6 +1,5 @@
 package nationaldutyrepaymentcenter.support
 
-import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
@@ -12,7 +11,6 @@ import org.mockito.Mockito
 trait TestApplication {
   _: BaseISpec =>
 
-  override implicit lazy val app: Application = appBuilder.build()
   val uuideGeneratorMock = Mockito.mock(classOf[UUIDGenerator])
   val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
 

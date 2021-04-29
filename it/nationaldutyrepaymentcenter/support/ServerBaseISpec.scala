@@ -2,10 +2,10 @@ package nationaldutyrepaymentcenter.support
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Seconds, Span}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatestplus.play.OneServerPerSuite
 import play.api.Application
 
-abstract class ServerBaseISpec extends BaseISpec with GuiceOneAppPerSuite with TestApplication with ScalaFutures {
+abstract class ServerBaseISpec extends BaseISpec with OneServerPerSuite with TestApplication with ScalaFutures {
 
   override implicit lazy val app: Application = appBuilder.build()
 
