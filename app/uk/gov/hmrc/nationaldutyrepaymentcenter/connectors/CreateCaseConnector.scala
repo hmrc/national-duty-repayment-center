@@ -22,7 +22,6 @@ import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Writes
-import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseResponse, EISCreateCaseSuccess}
@@ -49,19 +48,14 @@ class CreateCaseConnector @Inject()(
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
   ): Future[EISCreateCaseResponse] = {
-    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
+    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
+      url,
+      request,
+      pegaApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken)
+    )(
       implicitly[Writes[EISCreateCaseRequest]],
       readFromJsonSuccessOrFailure,
-      HeaderCarrier(
-        authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
-      )
-        .withExtraHeaders(
-          "x-correlation-id" -> correlationId,
-          "CustomProcessesHost" -> "Digital",
-          "date" -> httpDateFormat.format(ZonedDateTime.now),
-          "accept" -> "application/json",
-          "environment" -> config.eisEnvironment
-        ),
+      hc,
       implicitly[ExecutionContext]
     )
   }
