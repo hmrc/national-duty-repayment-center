@@ -49,14 +49,19 @@ class CreateCaseConnector @Inject()(
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
   ): Future[EISCreateCaseResponse] = {
-    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
-      url,
-      request,
-      pegaApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken)
-    )(
+    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
       implicitly[Writes[EISCreateCaseRequest]],
       readFromJsonSuccessOrFailure,
-      hc,
+      HeaderCarrier(
+        authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+      )
+        .withExtraHeaders(
+          "x-correlation-id" -> correlationId,
+          "CustomProcessesHost" -> "Digital",
+          "date" -> httpDateFormat.format(ZonedDateTime.now),
+          "accept" -> "application/json",
+          "environment" -> config.eisEnvironment
+        ),
       implicitly[ExecutionContext]
     )
   }
