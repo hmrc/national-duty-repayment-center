@@ -125,15 +125,11 @@ object EISCreateCaseRequest {
     }
 
     def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
-      val name = UserName(request.Content.ImporterDetails.Name.firstName,
-          request.Content.ImporterDetails.Name.lastName)
-
-      val fullName:String = name.firstName +" "+ name.lastName
 
       EISUserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
-        Name =  fullName,
+        Name =  request.Content.ImporterDetails.Name,
         Address = getImporterAddress(request)
       )
     }
@@ -153,19 +149,13 @@ object EISCreateCaseRequest {
 
 
     def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =  {
-      val name = UserName(request.Content.AgentDetails.get.Name.firstName,
-          request.Content.AgentDetails.get.Name.lastName)
-
-      val fullName:String = name.firstName +" "+ name.lastName
 
       EISUserDetails(
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
         EORI = request.Content.AgentDetails.get.EORI,
-        Name =  fullName,
+        Name =  request.Content.AgentDetails.get.Name,
         Address = getAgentAddress(request)
       )
     }
-
   }
-
 }

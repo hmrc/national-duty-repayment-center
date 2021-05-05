@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OFormat}
 final case class UserDetails(
                               IsVATRegistered: String,
                               EORI: EORI,
-                              Name: UserName,
+                              Name: String,
                               Address: Address,
                               TelephoneNumber: Option[String],
                               EmailAddress: Option[String]
