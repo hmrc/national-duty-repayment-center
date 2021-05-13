@@ -48,20 +48,22 @@ class AmendCaseConnector @Inject()(
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
   ): Future[EISAmendCaseResponse] = {
-    http.POST[EISAmendCaseRequest, EISAmendCaseResponse](url, request)(
-      implicitly[Writes[EISAmendCaseRequest]],
-      readFromJsonSuccessOrFailure,
-      HeaderCarrier(
-        authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+    monitor(s"ConsumedAPI-eis-pega-amend-case-api-POST") {
+      http.POST[EISAmendCaseRequest, EISAmendCaseResponse](url, request)(
+        implicitly[Writes[EISAmendCaseRequest]],
+        readFromJsonSuccessOrFailure,
+        HeaderCarrier(
+          authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+        )
+          .withExtraHeaders(
+            "x-correlation-id" -> correlationId,
+            "CustomProcessesHost" -> "Digital",
+            "date" -> httpDateFormat.format(ZonedDateTime.now),
+            "accept" -> "application/json",
+            "environment" -> config.eisEnvironment
+          ),
+        implicitly[ExecutionContext]
       )
-        .withExtraHeaders(
-          "x-correlation-id" -> correlationId,
-          "CustomProcessesHost" -> "Digital",
-          "date" -> httpDateFormat.format(ZonedDateTime.now),
-          "accept" -> "application/json",
-          "environment" -> config.eisEnvironment
-        ),
-      implicitly[ExecutionContext]
-    )
+    }
   }
 }

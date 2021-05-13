@@ -49,20 +49,22 @@ class CreateCaseConnector @Inject()(
                                                                         hc: HeaderCarrier,
                                                                         ec: ExecutionContext
   ): Future[EISCreateCaseResponse] = {
-    http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
-      implicitly[Writes[EISCreateCaseRequest]],
-      readFromJsonSuccessOrFailure,
-      HeaderCarrier(
-        authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+    monitor(s"ConsumedAPI-eis-pega-create-case-api-POST") {
+      http.POST[EISCreateCaseRequest, EISCreateCaseResponse](url, request)(
+        implicitly[Writes[EISCreateCaseRequest]],
+        readFromJsonSuccessOrFailure,
+        HeaderCarrier(
+          authorization = Some(Authorization(s"Bearer ${config.eisAuthorizationToken}"))
+        )
+          .withExtraHeaders(
+            "x-correlation-id" -> correlationId,
+            "CustomProcessesHost" -> "Digital",
+            "date" -> httpDateFormat.format(ZonedDateTime.now),
+            "accept" -> "application/json",
+            "environment" -> config.eisEnvironment
+          ),
+        implicitly[ExecutionContext]
       )
-        .withExtraHeaders(
-          "x-correlation-id" -> correlationId,
-          "CustomProcessesHost" -> "Digital",
-          "date" -> httpDateFormat.format(ZonedDateTime.now),
-          "accept" -> "application/json",
-          "environment" -> config.eisEnvironment
-        ),
-      implicitly[ExecutionContext]
-    )
+    }
   }
 }
