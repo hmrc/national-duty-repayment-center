@@ -63,6 +63,8 @@ class ClaimController @Inject()(
           OriginatingSystem = "Digital",
           Content = EISCreateCaseRequest.Content.from(createCaseRequest)
         )
+        println(s"Claim request = ${Json.toJson(eisCreateCaseRequest).toString()}")
+
         claimService.createClaim(eisCreateCaseRequest, correlationId).flatMap {
           case success: EISCreateCaseSuccess =>
             transferFilesToPega(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
