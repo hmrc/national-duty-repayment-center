@@ -24,6 +24,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait AverageResponseTimer {
   val kenshooRegistry: MetricRegistry
+  private val logger = Logger(this.getClass)
 
   def timer[T](serviceName: String)(function: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     val start = System.nanoTime()
@@ -33,7 +34,7 @@ trait AverageResponseTimer {
         kenshooRegistry.getTimers
           .getOrDefault(timerName(serviceName), kenshooRegistry.timer(timerName(serviceName)))
           .update(duration.length, duration.unit)
-        Logger.debug(
+        logger.debug(
           s"kenshoo-event::timer::${timerName(serviceName)}::duration:{'length':${duration.length}, 'unit':${duration.unit}}"
         )
     }

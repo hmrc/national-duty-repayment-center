@@ -33,7 +33,7 @@ import scala.util.matching.Regex
 
 class MicroserviceModule(val environment: Environment, val configuration: Configuration) extends AbstractModule {
 
-  def configure(): Unit = {
+ override def configure(): Unit = {
     val appName = "national-duty-repayment-center"
     Logger(getClass).info(s"Starting microservice : $appName : in mode : ${environment.mode}")
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
@@ -63,7 +63,7 @@ class CustomHttpClient @Inject() (
   override protected val actorSystem: ActorSystem
 ) extends uk.gov.hmrc.http.HttpClient with WSHttp {
 
-  override lazy val configuration: Option[Config] = Option(config.underlying)
+  override lazy val configuration: Config = config.underlying
 
   override val hooks: Seq[HttpHook] = Seq(httpAuditing.AuditingHook)
 }

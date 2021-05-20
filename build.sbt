@@ -5,8 +5,7 @@ import uk.gov.hmrc.SbtAutoBuildPlugin
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-26" % "3.4.0",
-  "uk.gov.hmrc"        %% "auth-client"               % "3.2.0-play-26",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-26" % "5.3.0",
   "com.kenshoo"        %% "metrics-play"              % "2.6.19_0.7.0",
   "uk.gov.hmrc"        %% "domain"                    % "5.11.0-play-26",
   "com.github.blemale" %% "scaffeine"                 % "3.1.0",
@@ -20,7 +19,7 @@ def testDeps(scope: String) =
     "uk.gov.hmrc"            %% "hmrctest"           % "3.10.0-play-26"  % scope,
     "org.scalatest"          %% "scalatest"          % "3.0.9"          % scope,
     "org.mockito"             % "mockito-core"       % "3.1.0"          % scope,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3"          % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.0"          % scope,
     "uk.gov.hmrc"            %% "reactivemongo-test" % "5.0.0-play-26" % scope,
     "com.github.tomakehurst"  % "wiremock"           % "2.27.2"         % scope
   )
@@ -72,7 +71,7 @@ lazy val root = (project in file("."))
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     majorVersion := 0
   )
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
   tests.map { test =>
