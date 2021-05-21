@@ -5,23 +5,23 @@ import uk.gov.hmrc.SbtAutoBuildPlugin
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-26" % "5.3.0",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-27" % "5.3.0",
   "com.kenshoo"        %% "metrics-play"              % "2.6.19_0.7.0",
-  "uk.gov.hmrc"        %% "domain"                    % "5.11.0-play-26",
+  "uk.gov.hmrc"        %% "domain"                    % "5.11.0-play-27",
   "com.github.blemale" %% "scaffeine"                 % "3.1.0",
-  "uk.gov.hmrc"        %% "simple-reactivemongo"      % "8.0.0-play-26",
+  "uk.gov.hmrc"        %% "simple-reactivemongo"      % "8.0.0-play-27",
   "org.typelevel"      %% "cats-core"                 % "2.2.0",
   ws
 )
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "hmrctest"           % "3.10.0-play-26"  % scope,
     "org.scalatest"          %% "scalatest"          % "3.0.9"          % scope,
     "org.mockito"             % "mockito-core"       % "3.1.0"          % scope,
     "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.0"          % scope,
-    "uk.gov.hmrc"            %% "reactivemongo-test" % "5.0.0-play-26" % scope,
-    "com.github.tomakehurst"  % "wiremock"           % "2.27.2"         % scope
+    "uk.gov.hmrc"            %% "reactivemongo-test" % "5.0.0-play-27" % scope,
+    "com.github.tomakehurst"  % "wiremock"           % "2.27.2"         % scope,
+    "org.pegdown"             %  "pegdown"        % "1.6.0"             %scope
   )
 
 val jettyVersion = "9.2.24.v20180105"

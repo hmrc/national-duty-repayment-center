@@ -8,6 +8,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, Insufficien
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.AuthActions
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
+import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
@@ -33,10 +34,10 @@ class AuthActionsISpec extends AppBaseISpec {
     implicit val request = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    def withAuthorised[A]: Result =
-      await(super.withAuthorised {
+    def withAuthorised[A]: Future[Result] =
+      super.withAuthorised {
         Future.successful(Ok("Hello!"))
-      })
+      }
 
   }
 
@@ -49,7 +50,7 @@ class AuthActionsISpec extends AppBaseISpec {
       )
       val result = TestController.withAuthorised
       status(result) shouldBe 200
-      bodyOf(result) shouldBe "Hello!"
+      contentAsString(result) shouldBe "Hello!"
     }
 
     "throw an AutorisationException when user not logged in" in {

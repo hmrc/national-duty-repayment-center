@@ -5,7 +5,6 @@ import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
-import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatestplus.play.ServerProvider
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -52,7 +51,7 @@ class NDRCAmendCaseISpec
         bind[UUIDGenerator].toInstance(uuideGeneratorMock))
   }
 
-  override lazy val app =  appBuilder.build()
+  //override lazy val app =  appBuilder.build()
   val wsClient = app.injector.instanceOf[WSClient]
   val uuidGenerator = app.injector.instanceOf[UUIDGenerator]
 
