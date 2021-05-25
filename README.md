@@ -1,7 +1,22 @@
-
 # national-duty-repayment-center
 
-This is a placeholder README.md for a new repository
+Backend microservice supporting the submission of NDRC claims from the [national-duty-repayment-center-frontend](https://github.com/hmrc/national-duty-repayment-center-frontend) microservice
+
+## Local Setup
+
+1. Checkout this repo
+1. Start dependent services with [service-manager](https://github.com/hmrc/service-manager): `sm --start NDRC_ALL -r`
+1. Stop the `service-manager` owned version of the service: `sm --stop NATIONAL_DUTY_REPAYMENT_CENTER`
+1. Start the service: `sbt run`
+
+Ensure you get a JSON response from `curl -i http://localhost:8451/`
+
+## API
+
+| Method | Url | Required Headers | RequestBody | Response | 
+| --- | --- | --- | --- | --- |
+| POST | /create-case | x-correlation-id | JSON - [request model](./app/uk/gov/hmrc/nationaldutyrepaymentcenter/models/requests/CreateClaimRequest.scala) | JSON - [response model](./app/uk/gov/hmrc/nationaldutyrepaymentcenter/models/responses/EISCreateCaseResponse.scala) |
+| POST | /amend-case | x-correlation-id | JSON - [request model](./app/uk/gov/hmrc/nationaldutyrepaymentcenter/models/requests/AmendClaimRequest.scala) | JSON - [response model](./app/uk/gov/hmrc/nationaldutyrepaymentcenter/models/responses/EISAmendCaseResponse.scala) |
 
 ### License
 
