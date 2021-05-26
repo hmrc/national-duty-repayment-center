@@ -5,7 +5,7 @@ import uk.gov.hmrc.SbtAutoBuildPlugin
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-26" % "5.3.0",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-26" % "3.4.0",
   "uk.gov.hmrc"        %% "auth-client"               % "3.2.0-play-26",
   "com.kenshoo"        %% "metrics-play"              % "2.6.19_0.7.0",
   "uk.gov.hmrc"        %% "domain"                    % "5.11.0-play-26",
