@@ -17,7 +17,7 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
 import cats.data.Validated.{Invalid, Valid}
-import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.Validator
 
@@ -29,16 +29,16 @@ trait ControllerHelper {
   type HandleError = (String, String) => Future[Result]
 
   protected def withPayload[T](
-    f: T => Future[Result]
-  )(
-    handleError: HandleError
-  )(implicit
-    request: Request[String],
-    reads: Reads[T],
-    validate: Validator.Validate[T],
-    ec: ExecutionContext
-  ): Future[Result] =
-    Try(Json.parse(request.body).validate[T]) match {
+                                f: T => Future[Result]
+                              )(
+                                handleError: HandleError
+                              )(implicit
+                                request: Request[JsValue],
+                                reads: Reads[T],
+                                validate: Validator.Validate[T],
+                                ec: ExecutionContext
+                              ): Future[Result] =
+    Try(request.body.validate[T]) match {
 
       case Success(JsSuccess(payload, _)) =>
         validate(payload) match {
@@ -56,12 +56,14 @@ trait ControllerHelper {
       case Success(JsError(errs)) =>
         handleError(
           "ERROR_JSON",
-          s"Invalid payload: Parsing failed due to ${errs
-            .map {
-              case (path, errors) =>
-                s"at path $path with ${errors.map(e => e.messages.mkString(", ")).mkString(", ")}"
-            }
-            .mkString(", and ")}."
+          s"Invalid payload: Parsing failed due to ${
+            errs
+              .map {
+                case (path, errors) =>
+                  s"at path $path with ${errors.map(e => e.messages.mkString(", ")).mkString(", ")}"
+              }
+              .mkString(", and ")
+          }."
         )
 
       case Failure(e) => handleError("ERROR_UNKNOWN", s"Could not parse payload due to ${e.getMessage}.")
