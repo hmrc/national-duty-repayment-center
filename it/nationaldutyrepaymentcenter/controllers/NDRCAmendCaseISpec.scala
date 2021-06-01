@@ -173,14 +173,14 @@ object AmendTestData {
     AmendClaimRequest(
       AmendContent(
         CaseID = "Risk-2507",
-        Description = "update request for Risk-2507",
+        Description = "update request for Risk-2507: Value £199.99",
         TypeOfAmendments = Seq(FurtherInformation, SupportingDocuments)
       ), uploadedFiles(wireMockBaseUrlAsString))
 
   def createAuditEventRequest(baseUrl: String, transferSuccess: Boolean, transferredAt: String, transferHttpStatus: Int): JsObject = {
    Json.obj(
        "caseId" -> "Risk-2507",
-        "description" -> "update request for Risk-2507",
+        "description" -> "update request for Risk-2507: Value £199.99",
       "action" -> "SendDocumentsAndFurtherInformation",
 
       "uploadedFiles" -> Json.arr(
@@ -203,7 +203,7 @@ object AmendTestData {
 
     Json.obj(
       "caseId" -> "Risk-2507",
-      "description" -> "update request for Risk-2507",
+      "description" -> "update request for Risk-2507: Value £199.99",
       "action" -> "SendDocumentsAndFurtherInformation",
 
       "uploadedFiles" -> Json.arr(

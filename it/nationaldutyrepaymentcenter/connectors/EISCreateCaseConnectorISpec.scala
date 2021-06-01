@@ -106,7 +106,7 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     EntryNumber = "123456A",
     EntryDate = LocalDate.of(2020, 1, 1),
     ClaimReason = ClaimReason.Preference,
-    ClaimDescription = ClaimDescription("this is a claim description"),
+    ClaimDescription = ClaimDescription("this is a claim description for £123"),
     DateReceived = LocalDate.of(2020, 8, 5),
     ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,

@@ -52,7 +52,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
     NoOfEntries = Some(NoOfEntries("10")),
     EntryDetails(EPU = "777", EntryNumber = "123456A", EntryDate = LocalDate.of(2020, 1, 1)),
     ClaimReason = ClaimReason.Preference,
-    ClaimDescription = ClaimDescription("this is a claim description"),
+    ClaimDescription = ClaimDescription("this is a claim description for £123"),
     DateReceived = LocalDate.of(2020, 8, 5),
     ClaimDate = LocalDate.of(2020, 8, 5),
     PayeeIndicator = PayeeIndicator.Importer,
@@ -110,7 +110,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   val amendClaimRequest = AmendClaimRequest(
     AmendContent(
       CaseID = "Risk-2507",
-      Description = "update request for Risk-2507",
+      Description = "update request for Risk-2507: Value £199.99",
       TypeOfAmendments = Seq(FurtherInformation)
     ), Nil
   )
@@ -118,7 +118,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   val amendJson = Json.obj(
     "Content" -> Json.obj(
         "CaseID" -> "Risk-2507",
-        "Description" -> "update request for Risk-2507"
+        "Description" -> "update request for Risk-2507: Value £199.99"
       )
   )
 
@@ -138,7 +138,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
         "EntryNumber" -> "123456A",
         "EntryDate" -> "20200101",
         "ClaimReason" -> "06",
-        "ClaimDescription" -> "this is a claim description",
+        "ClaimDescription" -> "this is a claim description for £123",
         "DateReceived" -> "20200805",
         "ClaimDate" -> "20200805",
         "PayeeIndicator" -> "01",

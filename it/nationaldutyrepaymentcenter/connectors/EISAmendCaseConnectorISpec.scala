@@ -86,6 +86,6 @@ trait EISAmendCaseConnectorISpecSetup extends AppBaseISpec with AmendCaseStubs {
     ApplicationType = "NDRC",
     OriginatingSystem = "Digital",
     Content = EISAmendCaseRequest.Content(CaseID = "Risk-2507",
-      Description = "update request for Risk-2507")
+      Description = "update request for Risk-2507: Value £199.99")
   )
 }

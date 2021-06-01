@@ -24,7 +24,7 @@ trait CreateCaseStubs {
         |      "EntryNumber" : "123456A",
         |      "EntryDate" : "20200101",
         |      "ClaimReason" : "06",
-        |      "ClaimDescription" : "this is a claim description",
+        |      "ClaimDescription" : "this is a claim description for £123",
         |      "DateReceived" : "20200805",
         |      "ClaimDate" : "20200805",
         |      "PayeeIndicator" : "01",

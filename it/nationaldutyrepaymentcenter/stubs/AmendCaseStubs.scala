@@ -15,7 +15,7 @@ trait AmendCaseStubs {
         |  "OriginatingSystem" : "Digital",
         |  "Content": {
         |       "CaseID":"Risk-2507",
-        |       "Description":"update request for Risk-2507"
+        |       "Description":"update request for Risk-2507: Value £199.99"
         |    }
         |}""".stripMargin,
       """{
