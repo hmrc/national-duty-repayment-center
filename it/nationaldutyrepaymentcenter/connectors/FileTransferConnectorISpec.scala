@@ -1,7 +1,5 @@
 package nationaldutyrepaymentcenter.connectors
 
-
-import nationaldutyrepaymentcenter.controllers.TestData
 import play.api.Application
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
@@ -21,7 +19,7 @@ class FileTransferConnectorISpec extends FileTransferConnectorISpecSetup with Fi
 
         val request = testRequest
         givenNdrcFileTransferSucceeds(request)
-        val result = await(connector.transferFile(request, correlationId))
+        val result = await(connector.transferFile(request))
         result.success shouldBe true
       }
     }
@@ -37,10 +35,10 @@ trait FileTransferConnectorISpecSetup extends AppBaseISpec with FileTransferStub
   lazy val connector: FileTransferConnector =
     app.injector.instanceOf[FileTransferConnector]
 
-  val correlationId = java.util.UUID.randomUUID().toString()
-  val conversationId = java.util.UUID.randomUUID().toString()
+  val correlationId: String = java.util.UUID.randomUUID().toString
+  val conversationId: String = java.util.UUID.randomUUID().toString
 
-  val testRequest = Json
+  val testRequest: FileTransferRequest = Json
     .parse(s"""{
               |"conversationId":"$conversationId",
               |"caseReferenceNumber":"Risk-123",

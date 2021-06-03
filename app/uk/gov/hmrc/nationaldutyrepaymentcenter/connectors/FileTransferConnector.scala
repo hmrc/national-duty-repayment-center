@@ -37,9 +37,9 @@ class FileTransferConnector @Inject()(
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
-  val url = config.fileBaseUrl + config.fileBasePath
+  val url: String = config.fileBaseUrl + config.fileBasePath
 
-  final def transferFile(fileTransferRequest: FileTransferRequest, correlationId: String)(implicit
+  final def transferFile(fileTransferRequest: FileTransferRequest)(implicit
                                                                                           hc: HeaderCarrier,
                                                                                           ec: ExecutionContext
   ): Future[FileTransferResult] =
