@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
+
 import java.time.{ZoneId, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import java.{util => ju}
@@ -27,8 +29,14 @@ trait EISConnector {
     .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", ju.Locale.ENGLISH)
     .withZone(ZoneId.of("GMT"))
 
-  /** Headers required by the PEGA API */
-  final def eisApiHeaders(correlationId: String, environment: String, token: String): Seq[(String, String)] =
+  // TODO - simplify/make intent clearer!
+  final def MDTPTracingHeaders(hc: HeaderCarrier): Seq[(String, String)] = {
+    hc.requestId.map(xRequestId => Seq(HeaderNames.xRequestId -> xRequestId.toString)).getOrElse(Seq.empty) ++
+    hc.sessionId.map(xSessionId => Seq(HeaderNames.xSessionId -> xSessionId.toString)).getOrElse(Seq.empty)
+  }
+
+  /** Headers required by the EIS API */
+  final def EISApiHeaders(correlationId: String, environment: String, token: String): Seq[(String, String)] =
     Seq(
       "x-correlation-id"    -> correlationId,
       "CustomProcessesHost" -> "Digital",
