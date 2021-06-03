@@ -29,10 +29,11 @@ trait EISConnector {
     .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", ju.Locale.ENGLISH)
     .withZone(ZoneId.of("GMT"))
 
-  // TODO - simplify/make intent clearer!
   final def MDTPTracingHeaders(hc: HeaderCarrier): Seq[(String, String)] = {
-    hc.requestId.map(xRequestId => Seq(HeaderNames.xRequestId -> xRequestId.toString)).getOrElse(Seq.empty) ++
-    hc.sessionId.map(xSessionId => Seq(HeaderNames.xSessionId -> xSessionId.toString)).getOrElse(Seq.empty)
+    Seq(
+      hc.requestId.map(HeaderNames.xRequestId -> _.value),
+      hc.sessionId.map(HeaderNames.xSessionId -> _.value)
+    ).flatten
   }
 
   /** Headers required by the EIS API */

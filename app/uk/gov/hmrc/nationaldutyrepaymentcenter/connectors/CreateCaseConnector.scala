@@ -52,7 +52,11 @@ class CreateCaseConnector @Inject()(
       )(
         implicitly[Writes[EISCreateCaseRequest]],
         readFromJsonSuccessOrFailure,
-        hc.copy(authorization = None),
+        hc.copy(
+          authorization = None, // sent via EISApiHeaders
+          requestId = None, // sent via MDTPTracingHeaders (None here prevents sending duplicate header to internal stubs)
+          sessionId = None // sent via MDTPTracingHeaders (None here prevents sending duplicate header to internal stubs)
+        ),
         implicitly[ExecutionContext]
       )
     }
