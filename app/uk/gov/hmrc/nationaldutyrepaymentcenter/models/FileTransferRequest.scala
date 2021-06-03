@@ -29,10 +29,7 @@ case class FileTransferRequest(
                                               fileMimeType: String,
                                               batchSize: Int,
                                               batchCount: Int,
-                                              correlationId: Option[String] = None,
-                                              // private field, this value will be overwritten
-                                              // with x-request-id header value in the controller
-                                              requestId: Option[String] = None
+                                              correlationId: String
                                             )
 
 object FileTransferRequest {
@@ -57,7 +54,7 @@ object FileTransferRequest {
       fileMimeType = uploadedFile.fileMimeType,
       batchSize = batchSize,
       batchCount = batchCount,
-      correlationId = Some(correlationId)
+      correlationId = correlationId
     )
 
   implicit val formats: Format[FileTransferRequest] =
