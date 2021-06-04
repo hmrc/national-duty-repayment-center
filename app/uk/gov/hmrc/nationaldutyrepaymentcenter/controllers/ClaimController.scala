@@ -18,8 +18,6 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
 
 import java.time.LocalDateTime
-import java.{util => ju}
-
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
@@ -28,16 +26,11 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferRequest, FileTransferResult, UploadedFile}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimService}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimService, UUIDGenerator}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.{ExecutionContext, Future}
-
-
-class UUIDGenerator {
-  def uuid: String = ju.UUID.randomUUID().toString
-}
 
 @Singleton
 class ClaimController @Inject()(
@@ -51,12 +44,15 @@ class ClaimController @Inject()(
                                )
                                (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActions with ControllerHelper with WithCorrelationId {
 
+  private def acknowledgementReferenceFrom (correlationId: String): String =
+    correlationId.replace("-", "").takeRight(32)
+
   def submitClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withCorrelationId { correlationId: String =>
       withAuthorised {
         withPayload[CreateClaimRequest] { createCaseRequest =>
           val eisCreateCaseRequest = EISCreateCaseRequest(
-            AcknowledgementReference = correlationId.replace("-", ""),
+            AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
             ApplicationType = "NDRC",
             OriginatingSystem = "Digital",
             Content = EISCreateCaseRequest.Content.from(createCaseRequest)
@@ -124,7 +120,7 @@ class ClaimController @Inject()(
       withAuthorised {
         withPayload[AmendClaimRequest] { amendCaseRequest =>
           val eisAmendCaseRequest = EISAmendCaseRequest(
-            AcknowledgementReference = correlationId.replace("-", ""),
+            AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
             ApplicationType = "NDRC",
             OriginatingSystem = "Digital",
             Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
