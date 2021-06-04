@@ -52,9 +52,7 @@ class CreateCaseConnector @Inject()(
       )(
         implicitly[Writes[EISCreateCaseRequest]],
         readFromJsonSuccessOrFailure,
-        hc.copy(
-          authorization = None,
-        ),
+        hc.copy(authorization = None),
         implicitly[ExecutionContext]
       )
     }

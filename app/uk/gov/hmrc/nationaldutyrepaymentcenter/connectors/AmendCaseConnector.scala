@@ -51,9 +51,7 @@ class AmendCaseConnector @Inject()(
       )(
         implicitly[Writes[EISAmendCaseRequest]],
         readFromJsonSuccessOrFailure,
-        hc.copy(
-          authorization = None,
-        ),
+        hc.copy(authorization = None),
         implicitly[ExecutionContext]
       )
     }
