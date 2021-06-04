@@ -47,7 +47,7 @@ class AmendCaseConnector @Inject()(
       http.POST[EISAmendCaseRequest, EISAmendCaseResponse](
         url,
         request,
-        EISApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ MDTPTracingHeaders(hc)
+        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
       )(
         implicitly[Writes[EISAmendCaseRequest]],
         readFromJsonSuccessOrFailure,

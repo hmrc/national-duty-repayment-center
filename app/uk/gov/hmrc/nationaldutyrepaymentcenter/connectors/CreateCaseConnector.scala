@@ -48,7 +48,7 @@ class CreateCaseConnector @Inject()(
       http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
         url,
         request,
-        EISApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ MDTPTracingHeaders(hc)
+        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
       )(
         implicitly[Writes[EISCreateCaseRequest]],
         readFromJsonSuccessOrFailure,
