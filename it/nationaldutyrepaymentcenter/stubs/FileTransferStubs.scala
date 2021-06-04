@@ -19,7 +19,7 @@ trait FileTransferStubs {
         .willReturn(
           aResponse()
             .withStatus(200)
-            .withBody(Json.toJson(FileTransferResult(fileTransferRequest.correlationId.get, true, 200, time)).toString())
+            .withBody(Json.toJson(FileTransferResult(fileTransferRequest.correlationId, success = true, 200, time)).toString())
         )
     )
   }
@@ -34,7 +34,7 @@ trait FileTransferStubs {
         .willReturn(
           aResponse()
             .withStatus(409)
-            .withBody(Json.toJson(FileTransferResult(fileTransferRequest.correlationId.get, true, 409, time)).toString())
+            .withBody(Json.toJson(FileTransferResult(fileTransferRequest.correlationId, success = true, 409, time)).toString())
         )
     )
   }

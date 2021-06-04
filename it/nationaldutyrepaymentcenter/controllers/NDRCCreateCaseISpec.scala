@@ -12,11 +12,10 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
-import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, DocumentList, DutyTypeTaxDetails, _}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, NDRCAuditEvent}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, NDRCAuditEvent, UUIDGenerator}
 
 import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZonedDateTime}
 import java.{util => ju}
@@ -45,7 +44,7 @@ class NDRCCreateCaseISpec
         "microservice.services.file-transfer.port" -> wireMockPort,
       )  .overrides(
       bind[Clock].toInstance(clock),
-      bind[UUIDGenerator].toInstance(uuideGeneratorMock))
+      bind[UUIDGenerator].toInstance(uuidGeneratorMock))
   }
 
   override lazy val app =  appBuilder.build()
@@ -53,13 +52,13 @@ class NDRCCreateCaseISpec
   val dateTime = LocalDateTime.now()
 
   val wsClient = app.injector.instanceOf[WSClient]
-  val uuidGenerator = app.injector.instanceOf[UUIDGenerator]
+  val uuidGenerator: UUIDGenerator = app.injector.instanceOf[UUIDGenerator]
 
   "ClaimController" when {
     "POST /create-case" should {
       "return 201 with CaseID as a result if successful PEGA API call" in {
 
-        val correlationId = ju.UUID.randomUUID().toString()
+        val correlationId = ju.UUID.randomUUID().toString
         when(uuidGenerator.uuid).thenReturn(correlationId)
 
         val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head

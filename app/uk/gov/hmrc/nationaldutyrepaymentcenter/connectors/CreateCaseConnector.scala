@@ -39,7 +39,7 @@ class CreateCaseConnector @Inject()(
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
-  val url = config.eisBaseUrl + config.eisCreateCaseApiPath
+  val url: String = config.eisBaseUrl + config.eisCreateCaseApiPath
 
 
   def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit hc: HeaderCarrier
@@ -48,7 +48,7 @@ class CreateCaseConnector @Inject()(
       http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
         url,
         request,
-        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken)
+        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
       )(
         implicitly[Writes[EISCreateCaseRequest]],
         readFromJsonSuccessOrFailure,

@@ -39,7 +39,7 @@ class AmendCaseConnector @Inject()(
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
-  val url = config.eisBaseUrl + config.eisAmendCaseApiPath
+  val url: String = config.eisBaseUrl + config.eisAmendCaseApiPath
 
   def submitAmendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit hc: HeaderCarrier
   ): Future[EISAmendCaseResponse] = {
@@ -47,7 +47,7 @@ class AmendCaseConnector @Inject()(
       http.POST[EISAmendCaseRequest, EISAmendCaseResponse](
         url,
         request,
-        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken)
+        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
       )(
         implicitly[Writes[EISAmendCaseRequest]],
         readFromJsonSuccessOrFailure,

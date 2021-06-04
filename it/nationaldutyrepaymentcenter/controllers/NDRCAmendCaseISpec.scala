@@ -5,20 +5,18 @@ import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
-import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatestplus.play.ServerProvider
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
-import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.UUIDGenerator
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, FileTransferRequest, SendDocuments, UploadedFile}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.services.NDRCAuditEvent
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, FileTransferRequest, UploadedFile}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGenerator}
 
-import java.time.{Clock, LocalDateTime, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{ZoneId, ZonedDateTime}
 import java.{util => ju}
 
 class NDRCAmendCaseISpec
@@ -49,7 +47,7 @@ class NDRCAmendCaseISpec
         "microservice.services.file-transfer.port" -> wireMockPort,
       )  .overrides(
         bind[Clock].toInstance(clock),
-        bind[UUIDGenerator].toInstance(uuideGeneratorMock))
+        bind[UUIDGenerator].toInstance(uuidGeneratorMock))
   }
 
   override lazy val app =  appBuilder.build()
