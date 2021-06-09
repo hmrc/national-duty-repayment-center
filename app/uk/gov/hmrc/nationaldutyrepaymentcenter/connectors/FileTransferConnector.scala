@@ -43,7 +43,7 @@ class FileTransferConnector @Inject()(
                                                                                           hc: HeaderCarrier,
                                                                                           ec: ExecutionContext
   ): Future[FileTransferResult] =
-    monitor(s"ConsumedAPI-national-duty-repayment-center-file-api-POST") {
+    monitor(s"ConsumedAPI-trader-services-transfer-file-api-POST") {
       http
         .POST[FileTransferRequest, HttpResponse](url, fileTransferRequest)
         .map(response =>
