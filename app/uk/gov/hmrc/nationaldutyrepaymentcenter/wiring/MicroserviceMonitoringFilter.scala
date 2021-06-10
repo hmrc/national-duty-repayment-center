@@ -17,25 +17,25 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.wiring
 
 import java.util.regex.{Matcher, Pattern}
+import javax.inject.{Inject, Singleton}
 
 import akka.stream.Materializer
 import app.uk.gov.hmrc.nationaldutyrepaymentcenter.Routes
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
-import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.{Filter, RequestHeader, Result}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, Upstream4xxResponse, Upstream5xxResponse}
-import uk.gov.hmrc.play.HeaderCarrierConverter.fromHeadersAndSession
 
 import scala.concurrent.duration.NANOSECONDS
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 @Singleton
 class MicroserviceMonitoringFilter @Inject() (metrics: Metrics, routes: Routes)(implicit
-  ec: ExecutionContext,
-  val mat: Materializer
+                                                                                ec: ExecutionContext,
+                                                                                val mat: Materializer
 ) extends MonitoringFilter(metrics.defaultRegistry) {
   override def keyToPatternMapping: Seq[(String, String)] =
     KeyToPatternMappingFromRoutes(routes, Set())
@@ -54,7 +54,7 @@ object KeyToPatternMappingFromRoutes {
               if (placeholders.contains(name)) s"{$name}" else ":"
             } else p
           )
-          .mkString("|")
+          .mkString("__")
         val pattern = r.replace("$", ":")
         Logger(getClass).info(s"$key-$method -> $pattern")
         (key, pattern)
@@ -62,13 +62,14 @@ object KeyToPatternMappingFromRoutes {
 }
 
 abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: ExecutionContext)
-    extends Filter with MonitoringKeyMatcher {
+  extends Filter with MonitoringKeyMatcher {
 
   override def apply(
-    nextFilter: (RequestHeader) => Future[Result]
-  )(requestHeader: RequestHeader): Future[Result] = {
+                      nextFilter: (RequestHeader) => Future[Result]
+                    )(requestHeader: RequestHeader): Future[Result] = {
 
-    implicit val hc: HeaderCarrier = fromHeadersAndSession(requestHeader.headers)
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter.fromRequest(requestHeader)
 
     findMatchingKey(requestHeader.uri) match {
       case Some(key) =>
@@ -82,8 +83,8 @@ abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: Ex
   }
 
   private def monitor(
-    serviceName: String
-  )(function: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+                       serviceName: String
+                     )(function: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     timer(serviceName) {
       function
     }
@@ -115,10 +116,10 @@ abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: Ex
   }
 
   private def recordFailure(
-    serviceName: String,
-    upstreamResponseCode: Int,
-    startTime: Long
-  ): Unit = {
+                             serviceName: String,
+                             upstreamResponseCode: Int,
+                             startTime: Long
+                           ): Unit = {
     val timerName = s"Timer-$serviceName"
     val counterName =
       if (upstreamResponseCode >= 500) s"Http5xxErrorCount-$serviceName"
