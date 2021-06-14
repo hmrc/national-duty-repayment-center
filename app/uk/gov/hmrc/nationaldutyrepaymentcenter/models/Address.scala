@@ -24,7 +24,7 @@ final case class Address(
                           City:String,
                           Region:Option[String],
                           CountryCode:String,
-                          PostalCode:String
+                          PostalCode:Option[String]
                         )
 
 object Address {

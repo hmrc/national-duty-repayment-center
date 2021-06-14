@@ -204,7 +204,7 @@ object TestData {
     City = "city",
     Region = Some("region"),
     CountryCode = "GB",
-    PostalCode = "ZZ111ZZ"
+    PostalCode = Some("ZZ111ZZ")
   )
 
   val userDetails = UserDetails(

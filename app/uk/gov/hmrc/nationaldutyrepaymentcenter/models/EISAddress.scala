@@ -24,7 +24,7 @@ final case class EISAddress(
                              City: String,
                              Region: Option[String],
                              CountryCode: String,
-                             PostalCode: String,
+                             PostalCode: Option[String],
                              TelephoneNumber: Option[String],
                              EmailAddress: Option[String]
                            )
