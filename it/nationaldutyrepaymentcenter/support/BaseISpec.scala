@@ -1,17 +1,19 @@
 package nationaldutyrepaymentcenter.support
 
 import akka.stream.Materializer
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.Application
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.test.UnitSpec
 
-abstract class BaseISpec extends UnitSpec with WireMockSupport with MetricsTestSupport {
+import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration}
+import scala.concurrent.{Await, Future}
+
+abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport with MetricsTestSupport {
 
   def app: Application
 
@@ -19,16 +21,14 @@ abstract class BaseISpec extends UnitSpec with WireMockSupport with MetricsTestS
     givenCleanMetricRegistry()
   }
 
+  implicit val defaultTimeout: FiniteDuration = 5 seconds
+
+  def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
+
   protected implicit def materializer: Materializer = app.materializer
 
-  protected def checkHtmlResultWithBodyText(result: Result, expectedSubstring: String): Unit = {
-    status(result) shouldBe 200
-    contentType(result) shouldBe Some("text/html")
-    charset(result) shouldBe Some("utf-8")
-    bodyOf(result) should include(expectedSubstring)
-  }
-
   private lazy val messagesApi = app.injector.instanceOf[MessagesApi]
+
   private implicit def messages: Messages = messagesApi.preferred(Seq.empty[Lang])
 
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString

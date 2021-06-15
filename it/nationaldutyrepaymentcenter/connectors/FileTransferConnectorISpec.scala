@@ -20,7 +20,7 @@ class FileTransferConnectorISpec extends FileTransferConnectorISpecSetup with Fi
         val request = testRequest
         givenNdrcFileTransferSucceeds(request)
         val result = await(connector.transferFile(request))
-        result.success shouldBe true
+        result.success mustBe true
       }
     }
   }

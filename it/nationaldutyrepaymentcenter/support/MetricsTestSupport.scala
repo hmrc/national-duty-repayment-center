@@ -2,7 +2,8 @@ package nationaldutyrepaymentcenter.support
 
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
-import org.scalatest.{Matchers, Suite}
+import org.scalatest.Suite
+import org.scalatest.matchers.must.Matchers
 import play.api.Application
 
 import scala.collection.JavaConverters
@@ -18,7 +19,7 @@ trait MetricsTestSupport {
     val registry = app.injector.instanceOf[Metrics].defaultRegistry
     for (
       metric <- JavaConverters
-                  .asScalaIterator[String](registry.getMetrics.keySet().iterator())
+        .asScalaIterator[String](registry.getMetrics.keySet().iterator())
     )
       registry.remove(metric)
     metricsRegistry = registry

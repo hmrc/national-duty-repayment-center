@@ -19,11 +19,11 @@ package utils
 import java.time._
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class UnitSpecBase extends WordSpec with Matchers with MockitoSugar with ScalaFutures {
+class UnitSpecBase extends AnyWordSpec with Matchers with ScalaFutures {
   protected def applicationBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
 

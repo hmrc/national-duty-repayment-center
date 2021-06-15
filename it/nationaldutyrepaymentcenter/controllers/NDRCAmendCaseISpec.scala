@@ -3,7 +3,6 @@ package nationaldutyrepaymentcenter.controllers
 import nationaldutyrepaymentcenter.stubs.{AmendCaseStubs, AuthStubs, DataStreamStubs, FileTransferStubs}
 import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
 import org.scalatestplus.play.ServerProvider
 import play.api.inject.bind
@@ -18,19 +17,15 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGen
 
 import java.time.{ZoneId, ZonedDateTime}
 import java.{util => ju}
+import java.time.Clock
 
 class NDRCAmendCaseISpec
-  extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  with FileTransferStubs with DataStreamStubs {
+extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  with FileTransferStubs with DataStreamStubs {
 
   this: Suite with ServerProvider =>
 
   val url = s"http://localhost:$port"
 
-  import java.time.Clock
-  import java.time.Instant
-  import java.time.ZoneId
-
-  override val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
   override def appBuilder: GuiceApplicationBuilder = {
     new GuiceApplicationBuilder()
       .configure(
@@ -75,7 +70,7 @@ class NDRCAmendCaseISpec
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 201
+        result.status mustBe 201
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
         response.result.get.fileTransferResults.size must be(1)
@@ -109,7 +104,7 @@ class NDRCAmendCaseISpec
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 201
+        result.status mustBe 201
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
         response.result.get.fileTransferResults.size must be(1)
@@ -140,7 +135,7 @@ class NDRCAmendCaseISpec
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 400
+        result.status mustBe 400
 
         verifyAuditRequestSent(
           1,

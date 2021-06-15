@@ -1,13 +1,13 @@
 package nationaldutyrepaymentcenter.model
 
-import org.scalatest.{MustMatchers, OptionValues, WordSpec}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendContent
 
-class AmendContentSpec extends WordSpec with MustMatchers {
+class AmendContentSpec extends AnyWordSpec {
 
-  "AmendContentSpec" must {
+  "AmendContentSpec" should {
 
     "amendment type as 'Supportingdocuments'" in {
       val content = AmendContent("caseId", "desc", Seq(SupportingDocuments))

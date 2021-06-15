@@ -1,11 +1,13 @@
 package nationaldutyrepaymentcenter.controllers
 
+import java.time._
+import java.{util => ju}
+
 import com.github.tomakehurst.wiremock.client.WireMock.{moreThanOrExactly, postRequestedFor, urlEqualTo}
 import nationaldutyrepaymentcenter.controllers.TestData.verifyAuthorisationHasHappened
 import nationaldutyrepaymentcenter.stubs.{AuthStubs, CreateCaseStubs, DataStreamStubs, FileTransferStubs}
 import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
-import org.scalatest.MustMatchers.convertToAnyMustWrapper
 import org.scalatest.Suite
 import org.scalatestplus.play.ServerProvider
 import play.api.inject.bind
@@ -15,10 +17,7 @@ import play.api.libs.ws.WSClient
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.CreateClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, DocumentList, DutyTypeTaxDetails, _}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, NDRCAuditEvent, UUIDGenerator}
-
-import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZonedDateTime}
-import java.{util => ju}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGenerator}
 
 class NDRCCreateCaseISpec
   extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers with FileTransferStubs with DataStreamStubs {
@@ -26,7 +25,6 @@ class NDRCCreateCaseISpec
   this: Suite with ServerProvider =>
 
   val url = s"http://localhost:$port"
-  override val clock: Clock = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
 
   override def appBuilder: GuiceApplicationBuilder = {
     new GuiceApplicationBuilder()
@@ -42,12 +40,12 @@ class NDRCCreateCaseISpec
         "auditing.consumer.baseUri.port" -> wireMockPort,
         "microservice.services.file-transfer.host" -> wireMockHost,
         "microservice.services.file-transfer.port" -> wireMockPort,
-      )  .overrides(
+      ).overrides(
       bind[Clock].toInstance(clock),
       bind[UUIDGenerator].toInstance(uuidGeneratorMock))
   }
 
-  override lazy val app =  appBuilder.build()
+  override lazy val app = appBuilder.build()
 
   val dateTime = LocalDateTime.now()
 
@@ -76,7 +74,7 @@ class NDRCCreateCaseISpec
           .post(Json.toJson(claimRequest))
           .futureValue
 
-        result.status shouldBe 201
+        result.status mustBe 201
         val createResponse = result.json.as[NDRCCaseResponse]
         createResponse.correlationId must be(correlationId)
         createResponse.result.get.fileTransferResults.size must be(1)
@@ -88,7 +86,7 @@ class NDRCCreateCaseISpec
           1,
           NDRCAuditEvent.CreateCase,
           Json.obj(
-            "success"             -> true,
+            "success" -> true,
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
           ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString, transferSuccess = true, transferredAt = createResponse.result.get.fileTransferResults.head.transferredAt.toString)
         )
@@ -112,7 +110,7 @@ class NDRCCreateCaseISpec
           .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 201
+        result.status mustBe 201
         val createResponse = result.json.as[NDRCCaseResponse]
         createResponse.correlationId must be(correlationId)
         createResponse.result.get.fileTransferResults.size must be(1)
@@ -122,7 +120,7 @@ class NDRCCreateCaseISpec
           1,
           NDRCAuditEvent.CreateCase,
           Json.obj(
-            "success"             -> true,
+            "success" -> true,
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
           ) ++ TestData.createRequestDetailsWithFileTransferFailures(wireMockBaseUrlAsString, transferSuccess = false, transferredAt = createResponse.result.get.fileTransferResults.head.transferredAt.toString)
         )
@@ -143,13 +141,13 @@ class NDRCCreateCaseISpec
           .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
-        result.status shouldBe 400
+        result.status mustBe 400
 
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.CreateCase,
           Json.obj(
-            "success"             -> false
+            "success" -> false
           ) ++ TestData.createAuditEventWhenError(wireMockBaseUrlAsString, transferSuccess = false)
         )
       }
@@ -387,7 +385,7 @@ object TestData {
   }
 
   def createRequestDetailsWithFileTransferFailures(baseUrl: String, transferSuccess: Boolean, transferredAt: String): JsObject = {
-   Json.obj(
+    Json.obj(
 
       "claimDetails" -> Json.obj(
         "FormType" -> "01",
@@ -610,7 +608,7 @@ object TestData {
         )
       ),
       "numberOfFilesUploaded" -> 1,
-      "errorCode" ->  "400",
+      "errorCode" -> "400",
       "errorMessage" -> "Something went wrong",
     )
   }
