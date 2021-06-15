@@ -5,44 +5,22 @@ import uk.gov.hmrc.SbtAutoBuildPlugin
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-26" % "5.3.0",
-  "uk.gov.hmrc"        %% "auth-client"               % "3.2.0-play-26",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "5.3.0",
   "com.kenshoo"        %% "metrics-play"              % "2.6.19_0.7.0",
-  "uk.gov.hmrc"        %% "domain"                    % "5.11.0-play-26",
   "com.github.blemale" %% "scaffeine"                 % "3.1.0",
-  "uk.gov.hmrc"        %% "simple-reactivemongo"      % "8.0.0-play-26",
   "org.typelevel"      %% "cats-core"                 % "2.2.0",
   ws
 )
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "hmrctest"           % "3.10.0-play-26"  % scope,
-    "org.scalatest"          %% "scalatest"          % "3.0.9"          % scope,
-    "org.mockito"             % "mockito-core"       % "3.1.0"          % scope,
-    "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3"          % scope,
-    "uk.gov.hmrc"            %% "reactivemongo-test" % "5.0.0-play-26" % scope,
-    "com.github.tomakehurst"  % "wiremock"           % "2.27.2"         % scope
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "5.3.0"          % scope,
+    "org.scalatest"          %% "scalatest"               % "3.2.9"          % scope,
+    "org.scalatestplus"      %% "mockito-3-4"            % "3.2.9.0"         % scope,
+    "com.vladsch.flexmark"    % "flexmark-all"            % "0.36.8"         % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0"          % scope,
+    "com.github.tomakehurst"  % "wiremock-jre8"           % "2.26.3"         % scope
   )
-
-val jettyVersion = "9.2.24.v20180105"
-
-val jettyOverrides = Seq(
-  "org.eclipse.jetty"           % "jetty-server"       % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-servlet"      % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-security"     % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-servlets"     % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-continuation" % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-webapp"       % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-xml"          % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-client"       % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-http"         % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-io"           % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty"           % "jetty-util"         % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty.websocket" % "websocket-api"      % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty.websocket" % "websocket-common"   % jettyVersion % IntegrationTest,
-  "org.eclipse.jetty.websocket" % "websocket-client"   % jettyVersion % IntegrationTest
-)
 
 lazy val root = (project in file("."))
   .settings(
@@ -58,7 +36,6 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
-    dependencyOverrides ++= jettyOverrides,
     publishingSettings,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
     routesImport ++= Seq("uk.gov.hmrc.nationaldutyrepaymentcenter.binders.UrlBinders._")

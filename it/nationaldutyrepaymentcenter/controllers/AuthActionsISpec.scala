@@ -4,7 +4,8 @@ import nationaldutyrepaymentcenter.support.AppBaseISpec
 import play.api.mvc.Result
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, InsufficientEnrolments}
+import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.AuthActions
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
@@ -31,12 +32,13 @@ class AuthActionsISpec extends AppBaseISpec {
 
     implicit val hc = HeaderCarrier()
     implicit val request = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
+
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    def withAuthorised[A]: Result =
-      await(super.withAuthorised {
+    def withAuthorised[A]: Future[Result] =
+      super.withAuthorised {
         Future.successful(Ok("Hello!"))
-      })
+      }
 
   }
 
@@ -48,14 +50,15 @@ class AuthActionsISpec extends AppBaseISpec {
         "{}"
       )
       val result = TestController.withAuthorised
-      status(result) shouldBe 200
-      bodyOf(result) shouldBe "Hello!"
+
+      status(result) mustBe 200
+      contentAsString(result) mustBe "Hello!"
     }
 
     "throw an AutorisationException when user not logged in" in {
       givenUnauthorisedWith("MissingBearerToken")
       an[AuthorisationException] shouldBe thrownBy {
-        TestController.withAuthorised
+        await(TestController.withAuthorised)
       }
     }
   }

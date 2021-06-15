@@ -33,7 +33,7 @@ import scala.util.matching.Regex
 
 class MicroserviceModule(val environment: Environment, val configuration: Configuration) extends AbstractModule {
 
-  def configure(): Unit = {
+  override def configure(): Unit = {
     val appName = "national-duty-repayment-center"
     Logger(getClass).info(s"Starting microservice : $appName : in mode : ${environment.mode}")
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)

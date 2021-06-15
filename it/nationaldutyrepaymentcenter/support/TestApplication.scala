@@ -1,12 +1,13 @@
 package nationaldutyrepaymentcenter.support
 
-import org.scalatest.mockito.MockitoSugar.mock
+import java.time.{Clock, Instant, ZoneId}
+
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.UUIDGenerator
 
-import java.time.{Clock, Instant, ZoneId}
 
 trait TestApplication {
   _: BaseISpec =>
@@ -29,7 +30,7 @@ trait TestApplication {
         "auditing.consumer.baseUri.port" -> wireMockPort,
         "microservice.services.file-transfer.host" -> wireMockHost,
         "microservice.services.file-transfer.port" -> wireMockPort,
-      )  .overrides(
+      ).overrides(
       bind[Clock].toInstance(clock),
       bind[UUIDGenerator].toInstance(uuidGeneratorMock))
 }
