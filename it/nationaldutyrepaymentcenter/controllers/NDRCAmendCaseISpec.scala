@@ -81,6 +81,7 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
             "success" -> true
           ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferSucceededAudit(1)
       }
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
 
@@ -112,6 +113,7 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
             "success"             -> true,
           ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferFailedAudit(1)
       }
 
       "audit when payload validation fails" in {
@@ -138,6 +140,7 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
             "success"             -> false
           ) ++ AmendTestData.createAuditEventRequestWhenError(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferredAudit(0)
       }
 
     }

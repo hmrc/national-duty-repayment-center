@@ -88,6 +88,7 @@ class NDRCCreateCaseISpec
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
           ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferSucceededAudit(1)
       }
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
 
@@ -120,6 +121,7 @@ class NDRCCreateCaseISpec
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
           ) ++ TestData.createRequestDetailsWithFileTransferFailures(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferFailedAudit(1)
       }
 
       "audit when incoming validation fails" in {
@@ -146,6 +148,7 @@ class NDRCCreateCaseISpec
             "success" -> false
           ) ++ TestData.createAuditEventWhenError(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferredAudit(0)
       }
 
     }
