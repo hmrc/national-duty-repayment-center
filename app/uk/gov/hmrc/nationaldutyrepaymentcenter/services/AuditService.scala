@@ -135,7 +135,7 @@ object AuditService {
                                           documentTypeTaxDetails: DutyTypeTaxDetails,
                                           documentList: Seq[DocumentList],
                                           numberOfFilesUploaded: Int,
-                                          uploadedFiles: Seq[FileTransferAudit]
+                                          uploadedFiles: Seq[UploadedFile]
                                         )
 
   object CreateCaseAuditEventDetails {
@@ -157,10 +157,7 @@ object AuditService {
                 documentTypeTaxDetails = createRequest.Content.DutyTypeTaxDetails,
                 documentList = createRequest.Content.DocumentList,
                 numberOfFilesUploaded = createRequest.uploadedFiles.size,
-                uploadedFiles = combineFileUploadAndTransferResults(
-                  createRequest.uploadedFiles,
-                  createResponse.result.map(_.fileTransferResults)
-                )
+                uploadedFiles = createRequest.uploadedFiles
               ))
         .as[JsObject]
 
@@ -179,7 +176,7 @@ object AuditService {
                                           action: String,
                                           description: Option[String],
                                           numberOfFilesUploaded: Int,
-                                          uploadedFiles: Seq[FileTransferAudit]
+                                          uploadedFiles: Seq[UploadedFile]
                                         )
 
   object UpdateCaseAuditEventDetails {
@@ -196,15 +193,12 @@ object AuditService {
             action = updateRequest.Content.selectedAmendments,
             description = Option(updateRequest.Content.Description),
             numberOfFilesUploaded = updateRequest.uploadedFiles.size,
-            uploadedFiles = combineFileUploadAndTransferResults(
-              updateRequest.uploadedFiles,
-              updateResponse.result.map(_.fileTransferResults)
-            )
+            uploadedFiles = updateRequest.uploadedFiles
           )
         )
         .as[JsObject]
 
-      if (updateResponse.result.isDefined) requestDetails
+      if (updateResponse.isSuccess) requestDetails
       else
         (requestDetails ++ pegaResponseToDetails(updateResponse))
     }
@@ -215,7 +209,8 @@ object AuditService {
 
   def pegaResponseToDetails(
                              caseResponse: NDRCCaseResponse
-                           ): JsObject =
+                           ): JsObject = {
+    println("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
     Json.obj(
       "success" -> caseResponse.isSuccess
     ) ++
@@ -228,26 +223,7 @@ object AuditService {
             .flatMap(_.errorMessage)
             .map(m => Json.obj("errorMessage" -> m))
             .getOrElse(Json.obj())
-
-  def combineFileUploadAndTransferResults(
-                                           uploadedFiles: Seq[UploadedFile],
-                                           fileTransferResults: Option[Seq[FileTransferResult]]
-                                         ): Seq[FileTransferAudit] =
-    uploadedFiles.map { upload =>
-      val transferResultOpt = fileTransferResults.flatMap(_.find(_.upscanReference == upload.upscanReference))
-      FileTransferAudit(
-        upscanReference = upload.upscanReference,
-        downloadUrl = upload.downloadUrl,
-        uploadTimestamp = upload.uploadTimestamp,
-        checksum = upload.checksum,
-        fileName = upload.fileName,
-        fileMimeType = upload.fileMimeType,
-        transferSuccess = transferResultOpt.map(_.success).orElse(Some(false)),
-        transferHttpStatus = transferResultOpt.map(_.httpStatus),
-        transferredAt = transferResultOpt.map(_.transferredAt),
-        transferError = transferResultOpt.flatMap(_.error)
-      )
-    }
+  }
 
 }
 
