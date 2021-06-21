@@ -77,8 +77,6 @@ class NDRCCreateCaseISpec
         result.status mustBe 201
         val createResponse = result.json.as[NDRCCaseResponse]
         createResponse.correlationId must be(correlationId)
-        createResponse.result.get.fileTransferResults.size must be(1)
-        createResponse.result.get.fileTransferResults.head.httpStatus must be(200)
 
         verifyAuthorisationHasHappened()
 
@@ -88,7 +86,7 @@ class NDRCCreateCaseISpec
           Json.obj(
             "success" -> true,
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
-          ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString, transferSuccess = true, transferredAt = createResponse.result.get.fileTransferResults.head.transferredAt.toString)
+          ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString)
         )
       }
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
@@ -113,8 +111,6 @@ class NDRCCreateCaseISpec
         result.status mustBe 201
         val createResponse = result.json.as[NDRCCaseResponse]
         createResponse.correlationId must be(correlationId)
-        createResponse.result.get.fileTransferResults.size must be(1)
-        createResponse.result.get.fileTransferResults.head.httpStatus must be(409)
 
         verifyAuditRequestSent(
           1,
@@ -122,7 +118,7 @@ class NDRCCreateCaseISpec
           Json.obj(
             "success" -> true,
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
-          ) ++ TestData.createRequestDetailsWithFileTransferFailures(wireMockBaseUrlAsString, transferSuccess = false, transferredAt = createResponse.result.get.fileTransferResults.head.transferredAt.toString)
+          ) ++ TestData.createRequestDetailsWithFileTransferFailures(wireMockBaseUrlAsString)
         )
       }
 
@@ -148,7 +144,7 @@ class NDRCCreateCaseISpec
           NDRCAuditEvent.CreateCase,
           Json.obj(
             "success" -> false
-          ) ++ TestData.createAuditEventWhenError(wireMockBaseUrlAsString, transferSuccess = false)
+          ) ++ TestData.createAuditEventWhenError(wireMockBaseUrlAsString)
         )
       }
 
@@ -269,7 +265,7 @@ object TestData {
       uploadedFiles(wireMockBaseUrlAsString)
     )
 
-  def createRequestDetails(baseUrl: String, transferSuccess: Boolean, transferredAt: String): JsObject = {
+  def createRequestDetails(baseUrl: String): JsObject = {
     Json.obj(
 
       "claimDetails" -> Json.obj(
@@ -374,17 +370,14 @@ object TestData {
           "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
           "fileMimeType" -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg"),
-          "transferSuccess" -> transferSuccess,
-          "transferHttpStatus" -> 200,
-          "transferredAt" -> transferredAt,
+          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1
     )
   }
 
-  def createRequestDetailsWithFileTransferFailures(baseUrl: String, transferSuccess: Boolean, transferredAt: String): JsObject = {
+  def createRequestDetailsWithFileTransferFailures(baseUrl: String): JsObject = {
     Json.obj(
 
       "claimDetails" -> Json.obj(
@@ -489,17 +482,14 @@ object TestData {
           "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
           "fileMimeType" -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg"),
-          "transferSuccess" -> transferSuccess,
-          "transferHttpStatus" -> 409,
-          "transferredAt" -> transferredAt,
+          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1
     )
   }
 
-  def createAuditEventWhenError(baseUrl: String, transferSuccess: Boolean): JsObject = {
+  def createAuditEventWhenError(baseUrl: String): JsObject = {
     Json.obj(
       "claimDetails" -> Json.obj(
         "FormType" -> "01",
@@ -603,8 +593,7 @@ object TestData {
           "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
           "fileMimeType" -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg"),
-          "transferSuccess" -> transferSuccess
+          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1,

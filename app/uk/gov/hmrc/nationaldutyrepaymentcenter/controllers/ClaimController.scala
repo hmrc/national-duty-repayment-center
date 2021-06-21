@@ -58,7 +58,7 @@ class ClaimController @Inject()(
             case success: EISCreateCaseSuccess =>
               fileTransferService.transferFiles(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
                 .flatMap { fileTransferResults =>
-                  val response = NDRCCaseResponse(correlationId = correlationId)
+                  val response = NDRCCaseResponse(caseId = Some(success.CaseID), correlationId = correlationId)
                   auditService.auditCreateCaseEvent(createCaseRequest)(response)
                     .map(_ => Created(Json.toJson(response)))
                 }
@@ -67,6 +67,7 @@ class ClaimController @Inject()(
             case error: EISCreateCaseError =>
               val response = NDRCCaseResponse(
                 correlationId = correlationId,
+                caseId = None,
                 error = Some(
                   ApiError(
                     errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
@@ -83,6 +84,7 @@ class ClaimController @Inject()(
           case (errorCode, errorMessage) =>
             val response = NDRCCaseResponse(
               correlationId = correlationId,
+              caseId = None,
               error = Some(
                 ApiError(errorCode, Some(errorMessage))
               )
@@ -96,6 +98,7 @@ class ClaimController @Inject()(
         case e =>
           val response = NDRCCaseResponse(
             correlationId = correlationId,
+            caseId = None,
             error = Some(
               ApiError("500", Some(e.getMessage))
             )
@@ -119,34 +122,17 @@ class ClaimController @Inject()(
           )
           claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
             case success: EISAmendCaseSuccess =>
-              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
-              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
-              println(success)
-              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
-              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
-              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
               fileTransferService.transferFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
                 .flatMap { fileTransferResults =>
-                  val response = NDRCCaseResponse(correlationId = correlationId)
-                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
-                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
-                  println(response)
-                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
-                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
-                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+                  val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
                   auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(_ =>
                     Created(Json.toJson(response)))
                 }
             // when request to the upstream api returns an error
             case error: EISAmendCaseError =>
-              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-              println(error)
-              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
               val response = NDRCCaseResponse(
                 correlationId = correlationId,
+                caseId = None,
                 error = Some(
                   ApiError(
                     errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
@@ -162,6 +148,7 @@ class ClaimController @Inject()(
           case (errorCode, errorMessage) =>
             val response = NDRCCaseResponse(
               correlationId = correlationId,
+              caseId = None,
               error = Some(
                 ApiError(errorCode, Some(errorMessage))
               )
@@ -175,6 +162,7 @@ class ClaimController @Inject()(
         case e =>
           val response = NDRCCaseResponse(
             correlationId = correlationId,
+            caseId = None,
             error = Some(
               ApiError("500", Some(e.getMessage))
             )

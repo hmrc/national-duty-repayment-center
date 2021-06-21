@@ -20,6 +20,7 @@ import play.api.libs.json.{Format, Json}
 
 case class NDRCCaseResponse(
                                        correlationId: String,
+                                       caseId: Option[String],
                                        error: Option[ApiError] = None,
                                        result: Option[NDRCFileTransferResult] = None
                                      ) {

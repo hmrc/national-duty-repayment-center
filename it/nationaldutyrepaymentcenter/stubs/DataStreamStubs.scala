@@ -57,12 +57,6 @@ trait DataStreamStubs extends Eventually {
   private def auditUrl = "/write/audit"
 
   private def similarToJson(value: String) = {
-    println("***********************************************************")
-    println("***********************************************************")
-    println("***********************************************************")
-    println(value)
-    println("***********************************************************")
-    println("***********************************************************")
     equalToJson(value.stripMargin, true, true)
   }
 

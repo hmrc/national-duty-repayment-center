@@ -144,12 +144,14 @@ object AuditService {
               createRequest: CreateClaimRequest,
               createResponse: NDRCCaseResponse
             ): JsValue = {
-      val requestDetails: JsObject = Json
+      val requestDetails: JsObject = {
+
+        Json
         .toJson(
 
               CreateCaseAuditEventDetails(
                 success = true,
-                caseReferenceNumber = createResponse.result.map(_.caseId),
+                caseReferenceNumber = createResponse.caseId,
                 claimDetails = createRequest.Content.ClaimDetails,
                 agentDetails = createRequest.Content.AgentDetails,
                 importerDetails = createRequest.Content.ImporterDetails,
@@ -160,8 +162,9 @@ object AuditService {
                 uploadedFiles = createRequest.uploadedFiles
               ))
         .as[JsObject]
+      }
 
-      if (createResponse.result.isDefined) requestDetails
+      if (createResponse.isSuccess) requestDetails
       else
         (requestDetails ++ pegaResponseToDetails(createResponse))
     }
@@ -209,9 +212,7 @@ object AuditService {
 
   def pegaResponseToDetails(
                              caseResponse: NDRCCaseResponse
-                           ): JsObject = {
-    println("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN")
-    Json.obj(
+                           ): JsObject = {Json.obj(
       "success" -> caseResponse.isSuccess
     ) ++
       (if (caseResponse.isSuccess)
