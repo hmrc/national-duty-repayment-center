@@ -23,7 +23,7 @@ case class NDRCCaseResponse(
                                        error: Option[ApiError] = None,
                                        result: Option[NDRCFileTransferResult] = None
                                      ) {
-  def isSuccess: Boolean = error.isEmpty && result.isDefined
+  def isSuccess: Boolean = error.isEmpty
 }
 
 object NDRCCaseResponse {

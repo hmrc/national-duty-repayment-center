@@ -17,29 +17,26 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
 
-import java.time.LocalDateTime
-import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferRequest, FileTransferResult, UploadedFile}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimService, UUIDGenerator}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimService, FileTransferService, UUIDGenerator}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ClaimController @Inject()(
                                  val authConnector: MicroserviceAuthConnector,
-                                 val fileTransferConnector: FileTransferConnector,
+                                 fileTransferService: FileTransferService,
+                                 val uuidGenerator: UUIDGenerator,
                                  val cc: ControllerComponents,
                                  val appConfig: AppConfig,
                                  val claimService: ClaimService,
-                                 val uuidGenerator: UUIDGenerator,
                                  val auditService: AuditService,
                                )
                                (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActions with ControllerHelper with WithCorrelationId {
@@ -59,15 +56,10 @@ class ClaimController @Inject()(
           )
           claimService.createClaim(eisCreateCaseRequest, correlationId).flatMap {
             case success: EISCreateCaseSuccess =>
-              transferFilesToPega(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
+              fileTransferService.transferFiles(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
                 .flatMap { fileTransferResults =>
-                  val response = NDRCCaseResponse(
-                    correlationId = correlationId,
-                    result = Option(
-                      NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
-                    ))
-                  auditService
-                    .auditCreateCaseEvent(createCaseRequest)(response)
+                  val response = NDRCCaseResponse(correlationId = correlationId)
+                  auditService.auditCreateCaseEvent(createCaseRequest)(response)
                     .map(_ => Created(Json.toJson(response)))
                 }
 
@@ -127,18 +119,32 @@ class ClaimController @Inject()(
           )
           claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
             case success: EISAmendCaseSuccess =>
-              transferFilesToPega(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
+              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+              println(success)
+              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+              println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+              fileTransferService.transferFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
                 .flatMap { fileTransferResults =>
-                  val response = NDRCCaseResponse(
-                    correlationId = correlationId,
-                    result = Option(
-                      NDRCFileTransferResult(success.CaseID, LocalDateTime.now(), fileTransferResults)
-                    ))
+                  val response = NDRCCaseResponse(correlationId = correlationId)
+                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+                  println(response)
+                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
+                  println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr")
                   auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(_ =>
                     Created(Json.toJson(response)))
                 }
             // when request to the upstream api returns an error
             case error: EISAmendCaseError =>
+              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+              println(error)
+              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+              println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
               val response = NDRCCaseResponse(
                 correlationId = correlationId,
                 error = Some(
@@ -178,29 +184,5 @@ class ClaimController @Inject()(
             .map(_ => InternalServerError(Json.toJson(response)))
       }
     }
-  }
-
-  def transferFilesToPega(
-                           caseReferenceNumber: String,
-                           conversationId: String,
-                           uploadedFiles: Seq[UploadedFile]
-                         )(implicit hc: HeaderCarrier): Future[Seq[FileTransferResult]] = {
-    Future.sequence(
-      uploadedFiles.zipWithIndex
-        .map {
-          case (file, index) =>
-            FileTransferRequest
-              .fromUploadedFile(
-                caseReferenceNumber,
-                conversationId, // expect all file transfers to have the same conversation ID/x-request-id
-                correlationId = uuidGenerator.uuid, // expect a unique correlation ID per file transfer
-                applicationName = "NDRC",
-                batchSize = uploadedFiles.size,
-                batchCount = index + 1,
-                uploadedFile = file
-              )
-        }
-        .map(fileTransferConnector.transferFile)
-    )
   }
 }
