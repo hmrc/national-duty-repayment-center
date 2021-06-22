@@ -73,17 +73,15 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
         result.status mustBe 201
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
-        response.result.get.fileTransferResults.size must be(1)
-        response.result.get.fileTransferResults.head.httpStatus must be(200)
 
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
           Json.obj(
             "success" -> true
-          ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString, transferSuccess = true,
-            transferredAt = response.result.get.fileTransferResults.head.transferredAt.toString, 200)
+          ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferSucceededAudit(1)
       }
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
 
@@ -107,17 +105,15 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
         result.status mustBe 201
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
-        response.result.get.fileTransferResults.size must be(1)
-        response.result.get.fileTransferResults.head.httpStatus must be(409)
 
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
           Json.obj(
             "success"             -> true,
-          ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString, transferSuccess = false,
-            transferredAt = response.result.get.fileTransferResults.head.transferredAt.toString, 409)
+          ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferFailedAudit(1)
       }
 
       "audit when payload validation fails" in {
@@ -142,8 +138,9 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
           NDRCAuditEvent.UpdateCase,
           Json.obj(
             "success"             -> false
-          ) ++ AmendTestData.createAuditEventRequestWhenError(wireMockBaseUrlAsString, transferSuccess = false)
+          ) ++ AmendTestData.createAuditEventRequestWhenError(wireMockBaseUrlAsString)
         )
+        verifyFilesTransferredAudit(0)
       }
 
     }
@@ -170,7 +167,7 @@ object AmendTestData {
         TypeOfAmendments = Seq(FurtherInformation, SupportingDocuments)
       ), uploadedFiles(wireMockBaseUrlAsString))
 
-  def createAuditEventRequest(baseUrl: String, transferSuccess: Boolean, transferredAt: String, transferHttpStatus: Int): JsObject = {
+  def createAuditEventRequest(baseUrl: String): JsObject = {
    Json.obj(
        "caseId" -> "Risk-2507",
         "description" -> "update request for Risk-2507: Value £199.99",
@@ -183,16 +180,13 @@ object AmendTestData {
           "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
           "fileMimeType" -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg"),
-          "transferSuccess" -> transferSuccess,
-          "transferHttpStatus" -> transferHttpStatus,
-          "transferredAt" -> transferredAt,
+          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1
     )
   }
-  def createAuditEventRequestWhenError(baseUrl: String, transferSuccess: Boolean): JsObject = {
+  def createAuditEventRequestWhenError(baseUrl: String): JsObject = {
 
     Json.obj(
       "caseId" -> "Risk-2507",
@@ -206,8 +200,7 @@ object AmendTestData {
           "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
           "fileMimeType" -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg"),
-          "transferSuccess" -> transferSuccess
+          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1,

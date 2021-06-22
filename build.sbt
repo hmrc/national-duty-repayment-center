@@ -19,7 +19,8 @@ def testDeps(scope: String) =
     "org.scalatestplus"      %% "mockito-3-4"            % "3.2.9.0"         % scope,
     "com.vladsch.flexmark"    % "flexmark-all"            % "0.36.8"         % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0"          % scope,
-    "com.github.tomakehurst"  % "wiremock-jre8"           % "2.26.3"         % scope
+    "com.github.tomakehurst"  % "wiremock-jre8"           % "2.26.3"         % scope,
+    "com.typesafe.akka"      %% "akka-testkit"            % "2.6.10"         % scope
   )
 
 lazy val root = (project in file("."))

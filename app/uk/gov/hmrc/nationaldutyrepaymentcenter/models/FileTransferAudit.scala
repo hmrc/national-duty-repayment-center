@@ -16,21 +16,11 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, Writes}
 
 import java.time.{LocalDateTime, ZonedDateTime}
 
-case class FileTransferAudit(
-                              upscanReference: String,
-                              downloadUrl: String,
-                              uploadTimestamp: ZonedDateTime,
-                              checksum: String,
-                              fileName: String,
-                              fileMimeType: String,
-                              transferSuccess: Option[Boolean] = None,
-                              transferHttpStatus: Option[Int] = None,
-                              transferredAt: Option[LocalDateTime] = None,
-                              transferError: Option[String] = None
+case class FileTransferAudit(caseReferenceNumber: String, fileTransferResults: Seq[FileTransferResult]
                             )
 
 object FileTransferAudit {

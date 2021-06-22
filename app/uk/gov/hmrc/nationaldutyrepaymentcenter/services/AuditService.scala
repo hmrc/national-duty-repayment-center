@@ -135,7 +135,7 @@ object AuditService {
                                           documentTypeTaxDetails: DutyTypeTaxDetails,
                                           documentList: Seq[DocumentList],
                                           numberOfFilesUploaded: Int,
-                                          uploadedFiles: Seq[FileTransferAudit]
+                                          uploadedFiles: Seq[UploadedFile]
                                         )
 
   object CreateCaseAuditEventDetails {
@@ -144,12 +144,14 @@ object AuditService {
               createRequest: CreateClaimRequest,
               createResponse: NDRCCaseResponse
             ): JsValue = {
-      val requestDetails: JsObject = Json
+      val requestDetails: JsObject = {
+
+        Json
         .toJson(
 
               CreateCaseAuditEventDetails(
                 success = true,
-                caseReferenceNumber = createResponse.result.map(_.caseId),
+                caseReferenceNumber = createResponse.caseId,
                 claimDetails = createRequest.Content.ClaimDetails,
                 agentDetails = createRequest.Content.AgentDetails,
                 importerDetails = createRequest.Content.ImporterDetails,
@@ -157,14 +159,12 @@ object AuditService {
                 documentTypeTaxDetails = createRequest.Content.DutyTypeTaxDetails,
                 documentList = createRequest.Content.DocumentList,
                 numberOfFilesUploaded = createRequest.uploadedFiles.size,
-                uploadedFiles = combineFileUploadAndTransferResults(
-                  createRequest.uploadedFiles,
-                  createResponse.result.map(_.fileTransferResults)
-                )
+                uploadedFiles = createRequest.uploadedFiles
               ))
         .as[JsObject]
+      }
 
-      if (createResponse.result.isDefined) requestDetails
+      if (createResponse.isSuccess) requestDetails
       else
         (requestDetails ++ pegaResponseToDetails(createResponse))
     }
@@ -179,7 +179,7 @@ object AuditService {
                                           action: String,
                                           description: Option[String],
                                           numberOfFilesUploaded: Int,
-                                          uploadedFiles: Seq[FileTransferAudit]
+                                          uploadedFiles: Seq[UploadedFile]
                                         )
 
   object UpdateCaseAuditEventDetails {
@@ -196,15 +196,12 @@ object AuditService {
             action = updateRequest.Content.selectedAmendments,
             description = Option(updateRequest.Content.Description),
             numberOfFilesUploaded = updateRequest.uploadedFiles.size,
-            uploadedFiles = combineFileUploadAndTransferResults(
-              updateRequest.uploadedFiles,
-              updateResponse.result.map(_.fileTransferResults)
-            )
+            uploadedFiles = updateRequest.uploadedFiles
           )
         )
         .as[JsObject]
 
-      if (updateResponse.result.isDefined) requestDetails
+      if (updateResponse.isSuccess) requestDetails
       else
         (requestDetails ++ pegaResponseToDetails(updateResponse))
     }
@@ -215,39 +212,19 @@ object AuditService {
 
   def pegaResponseToDetails(
                              caseResponse: NDRCCaseResponse
-                           ): JsObject =
-    Json.obj(
+                           ): JsObject = {Json.obj(
       "success" -> caseResponse.isSuccess
     ) ++
       (if (caseResponse.isSuccess)
         Json.obj(
-          "caseReferenceNumber" -> caseResponse.result.get.caseId
+          "caseReferenceNumber" -> caseResponse.caseId
         )
       else Json.obj()) ++ caseResponse.error.map(e => Json.obj("errorCode" -> e.errorCode)).getOrElse(Json.obj()) ++
           caseResponse.error
             .flatMap(_.errorMessage)
             .map(m => Json.obj("errorMessage" -> m))
             .getOrElse(Json.obj())
-
-  def combineFileUploadAndTransferResults(
-                                           uploadedFiles: Seq[UploadedFile],
-                                           fileTransferResults: Option[Seq[FileTransferResult]]
-                                         ): Seq[FileTransferAudit] =
-    uploadedFiles.map { upload =>
-      val transferResultOpt = fileTransferResults.flatMap(_.find(_.upscanReference == upload.upscanReference))
-      FileTransferAudit(
-        upscanReference = upload.upscanReference,
-        downloadUrl = upload.downloadUrl,
-        uploadTimestamp = upload.uploadTimestamp,
-        checksum = upload.checksum,
-        fileName = upload.fileName,
-        fileMimeType = upload.fileMimeType,
-        transferSuccess = transferResultOpt.map(_.success).orElse(Some(false)),
-        transferHttpStatus = transferResultOpt.map(_.httpStatus),
-        transferredAt = transferResultOpt.map(_.transferredAt),
-        transferError = transferResultOpt.flatMap(_.error)
-      )
-    }
+  }
 
 }
 
