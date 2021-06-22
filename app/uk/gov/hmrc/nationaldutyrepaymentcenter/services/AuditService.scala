@@ -217,7 +217,7 @@ object AuditService {
     ) ++
       (if (caseResponse.isSuccess)
         Json.obj(
-          "caseReferenceNumber" -> caseResponse.result.get.caseId
+          "caseReferenceNumber" -> caseResponse.caseId
         )
       else Json.obj()) ++ caseResponse.error.map(e => Json.obj("errorCode" -> e.errorCode)).getOrElse(Json.obj()) ++
           caseResponse.error

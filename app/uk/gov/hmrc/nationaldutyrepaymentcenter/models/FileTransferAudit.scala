@@ -25,5 +25,4 @@ case class FileTransferAudit(caseReferenceNumber: String, fileTransferResults: S
 
 object FileTransferAudit {
   implicit val formats: Format[FileTransferAudit] = Json.format[FileTransferAudit]
-//  implicit val resultWrites: Writes[FileTransferAudit] = Json.writes[FileTransferAudit]
 }
