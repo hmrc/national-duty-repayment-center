@@ -24,35 +24,26 @@ import play.api.libs.json.JsValue
 
 sealed trait PegaCaseResponse
 
-case class PegaCaseSuccess(
-  CaseID: String,
-  ProcessingDate: String,
-  Status: String,
-  StatusText: String
-) extends PegaCaseResponse
+case class PegaCaseSuccess(CaseID: String, ProcessingDate: String, Status: String, StatusText: String)
+    extends PegaCaseResponse
 
 object PegaCaseSuccess {
+
   implicit val formats: Format[PegaCaseSuccess] =
     Json.format[PegaCaseSuccess]
+
 }
 
-case class PegaCaseError(
-  errorDetail: PegaCaseError.ErrorDetail
-) extends PegaCaseResponse {
+case class PegaCaseError(errorDetail: PegaCaseError.ErrorDetail) extends PegaCaseResponse {
 
-  def errorCode: Option[String] = errorDetail.errorCode
+  def errorCode: Option[String]    = errorDetail.errorCode
   def errorMessage: Option[String] = errorDetail.errorMessage
 
 }
 
 object PegaCaseError {
 
-  def apply(
-    timestamp: String,
-    correlationId: String,
-    errorCode: String,
-    errorMessage: String
-  ): PegaCaseError =
+  def apply(timestamp: String, correlationId: String, errorCode: String, errorMessage: String): PegaCaseError =
     PegaCaseError(errorDetail = ErrorDetail(Some(correlationId), Some(timestamp), Some(errorCode), Some(errorMessage)))
 
   def fromStatusAndMessage(status: Int, message: String): PegaCaseError =
@@ -76,6 +67,7 @@ object PegaCaseError {
     )
 
     object SourceFaultDetail {
+
       implicit val formats: Format[SourceFaultDetail] =
         Json.format[SourceFaultDetail]
 
@@ -83,6 +75,7 @@ object PegaCaseError {
 
     implicit val formats: Format[ErrorDetail] =
       Json.format[ErrorDetail]
+
   }
 
   implicit val formats: Format[PegaCaseError] =
@@ -102,6 +95,7 @@ object PegaCreateCaseResponse {
 
   implicit def writes: Writes[PegaCaseResponse] =
     new Writes[PegaCaseResponse] {
+
       override def writes(o: PegaCaseResponse): JsValue =
         o match {
           case s: PegaCaseSuccess =>
@@ -109,6 +103,7 @@ object PegaCreateCaseResponse {
           case e: PegaCaseError =>
             PegaCaseError.formats.writes(e)
         }
+
     }
 
 }

@@ -43,6 +43,5 @@ object ClaimedUnderRegulation extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[ClaimedUnderRegulation] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }
-
-

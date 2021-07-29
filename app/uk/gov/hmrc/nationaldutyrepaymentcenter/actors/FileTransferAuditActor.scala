@@ -25,11 +25,11 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import scala.concurrent.ExecutionContext
 
 class FileTransferAuditActor(
-                              caseReferenceNumber: String,
-                              auditConnector: AuditConnector,
-                              headerCarrier: HeaderCarrier,
-                              executionContext: ExecutionContext
-                            ) extends Actor {
+  caseReferenceNumber: String,
+  auditConnector: AuditConnector,
+  headerCarrier: HeaderCarrier,
+  executionContext: ExecutionContext
+) extends Actor {
 
   import FileTransferAuditActor.AuditFileTransferResults
 
@@ -37,13 +37,11 @@ class FileTransferAuditActor(
 
     case AuditFileTransferResults(results) =>
       auditConnector
-        .sendExplicitAudit(
-          "FilesTransferred",
-          FileTransferAudit(caseReferenceNumber, results))(
-        headerCarrier,
-        executionContext,
-        Json.writes[FileTransferAudit]
-      )
+        .sendExplicitAudit("FilesTransferred", FileTransferAudit(caseReferenceNumber, results))(
+          headerCarrier,
+          executionContext,
+          Json.writes[FileTransferAudit]
+        )
   }
 
 }

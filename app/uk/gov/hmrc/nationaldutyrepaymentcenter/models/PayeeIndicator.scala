@@ -19,16 +19,13 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 sealed trait PayeeIndicator
 
 object PayeeIndicator extends Enumerable.Implicits {
-  case object Importer extends WithName("01") with PayeeIndicator
-  case object Agent extends WithName("02") with PayeeIndicator
+  case object Importer              extends WithName("01") with PayeeIndicator
+  case object Agent                 extends WithName("02") with PayeeIndicator
   case object CurrentMonthAmendment extends WithName("03") with PayeeIndicator
 
-  val values: Seq[PayeeIndicator] = Seq(
-    Importer,
-    Agent,
-    CurrentMonthAmendment
-  )
+  val values: Seq[PayeeIndicator] = Seq(Importer, Agent, CurrentMonthAmendment)
 
   implicit val enumerable: Enumerable[PayeeIndicator] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }

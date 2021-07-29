@@ -42,13 +42,12 @@ class MicroserviceModule(val environment: Environment, val configuration: Config
     bind(classOf[HttpPost]).to(classOf[CustomHttpClient])
     bind(classOf[AuthConnector]).to(classOf[MicroserviceAuthConnector])
   }
+
 }
 
 @Singleton
-class CustomHttpAuditing @Inject() (
-  val auditConnector: AuditConnector,
-  @Named("appName") val appName: String
-) extends HttpAuditing {
+class CustomHttpAuditing @Inject() (val auditConnector: AuditConnector, @Named("appName") val appName: String)
+    extends HttpAuditing {
 
   override val auditDisabledForPattern: Regex =
     """none""".r

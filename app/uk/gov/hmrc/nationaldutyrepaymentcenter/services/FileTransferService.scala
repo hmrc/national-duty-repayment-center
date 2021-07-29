@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FileTransferService @Inject()(
+class FileTransferService @Inject() (
   fileTransferConnector: FileTransferConnector,
   uuidGenerator: UUIDGenerator,
   auditConnector: AuditConnector,
@@ -45,7 +45,14 @@ class FileTransferService @Inject()(
     // Single-use actor responsible for transferring files batch to PEGA
     val fileTransferActor: ActorRef =
       actorSystem.actorOf(
-        Props(classOf[FileTransferActor], caseReferenceNumber, fileTransferConnector, uuidGenerator, conversationId, auditActor)
+        Props(
+          classOf[FileTransferActor],
+          caseReferenceNumber,
+          fileTransferConnector,
+          uuidGenerator,
+          conversationId,
+          auditActor
+        )
       )
 
     fileTransferActor ! FileTransferActor.TransferMultipleFiles(uploadedFiles.zipWithIndex, uploadedFiles.size, hc)

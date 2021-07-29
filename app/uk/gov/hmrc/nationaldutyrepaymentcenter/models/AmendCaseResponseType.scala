@@ -18,18 +18,14 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 sealed trait AmendCaseResponseType
 
-  object AmendCaseResponseType extends Enumerable.Implicits {
+object AmendCaseResponseType extends Enumerable.Implicits {
 
-    case object SupportingDocuments extends WithName("supportingDocuments") with AmendCaseResponseType
-    case object FurtherInformation extends WithName("furtherInformation") with AmendCaseResponseType
+  case object SupportingDocuments extends WithName("supportingDocuments") with AmendCaseResponseType
+  case object FurtherInformation  extends WithName("furtherInformation") with AmendCaseResponseType
 
+  val values: Seq[AmendCaseResponseType] = Seq(SupportingDocuments, FurtherInformation)
 
-    val values: Seq[AmendCaseResponseType] = Seq(
-      SupportingDocuments,
-      FurtherInformation
-    )
-
-    implicit val enumerable: Enumerable[AmendCaseResponseType] =
-      Enumerable(values.map(v => v.toString -> v): _*)
+  implicit val enumerable: Enumerable[AmendCaseResponseType] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 
 }

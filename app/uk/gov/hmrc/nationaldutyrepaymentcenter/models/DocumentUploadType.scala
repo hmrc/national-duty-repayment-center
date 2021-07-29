@@ -19,25 +19,17 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 sealed trait DocumentUploadType
 
 object DocumentUploadType extends Enumerable.Implicits {
-  case object Invoice extends WithName("01") with DocumentUploadType
+  case object Invoice            extends WithName("01") with DocumentUploadType
   case object TransportDocuments extends WithName("02") with DocumentUploadType
-  case object CopyOfC88 extends WithName("03") with DocumentUploadType
-  case object PackingList extends WithName("04") with DocumentUploadType
-  case object ProofOfOrigin extends WithName("05") with DocumentUploadType
-  case object ProofOfAuthority extends WithName("06") with DocumentUploadType
-  case object SubstituteEntry extends WithName("07") with DocumentUploadType
-  case object Other extends WithName("08") with DocumentUploadType
+  case object CopyOfC88          extends WithName("03") with DocumentUploadType
+  case object PackingList        extends WithName("04") with DocumentUploadType
+  case object ProofOfOrigin      extends WithName("05") with DocumentUploadType
+  case object ProofOfAuthority   extends WithName("06") with DocumentUploadType
+  case object SubstituteEntry    extends WithName("07") with DocumentUploadType
+  case object Other              extends WithName("08") with DocumentUploadType
 
-  val values: Seq[DocumentUploadType] = Seq(
-    Invoice,
-    TransportDocuments,
-    CopyOfC88,
-    PackingList,
-    ProofOfOrigin,
-    ProofOfAuthority,
-    SubstituteEntry,
-    Other
-  )
+  val values: Seq[DocumentUploadType] =
+    Seq(Invoice, TransportDocuments, CopyOfC88, PackingList, ProofOfOrigin, ProofOfAuthority, SubstituteEntry, Other)
 
   implicit val enumerable: Enumerable[DocumentUploadType] =
     Enumerable(values.map(v => v.toString -> v): _*)

@@ -19,10 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Content, UploadedFile, Validator}
 
-final case class CreateClaimRequest(
-                                     Content: Content,
-                                     uploadedFiles: Seq[UploadedFile]
-                                   )
+final case class CreateClaimRequest(Content: Content, uploadedFiles: Seq[UploadedFile])
 
 object CreateClaimRequest {
 
@@ -31,5 +28,5 @@ object CreateClaimRequest {
 
   implicit val validate: Validator.Validate[CreateClaimRequest] =
     Validator.always
-}
 
+}

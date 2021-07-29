@@ -27,5 +27,3 @@ object CreateClaimSuccess {
 }
 
 case object CreateClaimFailedUnexpected extends CreateClaimResult
-
-

@@ -22,27 +22,28 @@ import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseError, EISAmendCaseResponse, EISAmendCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{
+  EISAmendCaseError,
+  EISAmendCaseResponse,
+  EISAmendCaseSuccess
+}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmendCaseConnector @Inject()(
-                                     val config: AppConfig,
-                                     val http: HttpPost,
-                                     metrics: Metrics
-                                   )(
-                                     implicit ec: ExecutionContext
-                                   ) extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
-  EISAmendCaseError.fromStatusAndMessage
-) with EISConnector with HttpAPIMonitor {
+class AmendCaseConnector @Inject() (val config: AppConfig, val http: HttpPost, metrics: Metrics)(implicit
+  ec: ExecutionContext
+) extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
+      EISAmendCaseError.fromStatusAndMessage
+    ) with EISConnector with HttpAPIMonitor {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url: String = config.eisBaseUrl + config.eisAmendCaseApiPath
 
-  def submitAmendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit hc: HeaderCarrier
-  ): Future[EISAmendCaseResponse] = {
+  def submitAmendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[EISAmendCaseResponse] =
     monitor(s"ConsumedAPI-eis-pega-amend-case-api-POST") {
       http.POST[EISAmendCaseRequest, EISAmendCaseResponse](
         url,
@@ -55,5 +56,5 @@ class AmendCaseConnector @Inject()(
         implicitly[ExecutionContext]
       )
     }
-  }
+
 }

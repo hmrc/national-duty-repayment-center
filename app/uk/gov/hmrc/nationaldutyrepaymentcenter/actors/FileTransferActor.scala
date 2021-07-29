@@ -30,12 +30,12 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 class FileTransferActor(
-                         caseReferenceNumber: String,
-                         fileTransferConnector: FileTransferConnector,
-                         uuidGenerator: UUIDGenerator,
-                         conversationId: String,
-                         auditor: ActorRef
-                       ) extends Actor {
+  caseReferenceNumber: String,
+  fileTransferConnector: FileTransferConnector,
+  uuidGenerator: UUIDGenerator,
+  conversationId: String,
+  auditor: ActorRef
+) extends Actor {
 
   import FileTransferActor._
   import context.dispatcher
@@ -98,7 +98,7 @@ class FileTransferActor(
   }
 
   def transferAFile(file: UploadedFile, index: Int, batchSize: Int)(implicit
-                                                                    hc: HeaderCarrier
+    hc: HeaderCarrier
   ): Future[FileTransferResult] =
     fileTransferConnector.transferFile(
       FileTransferRequest

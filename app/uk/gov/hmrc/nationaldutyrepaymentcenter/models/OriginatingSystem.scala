@@ -21,6 +21,8 @@ import play.api.libs.json.Format
 case class OriginatingSystem(value: String)
 
 object OriginatingSystem {
+
   implicit val format: Format[OriginatingSystem] =
     JsonFormatUtils.stringFormat(OriginatingSystem.apply)(_.value)
+
 }

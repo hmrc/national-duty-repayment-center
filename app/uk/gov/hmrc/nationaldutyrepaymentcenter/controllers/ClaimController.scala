@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
-
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
@@ -30,18 +29,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ClaimController @Inject()(
-                                 val authConnector: MicroserviceAuthConnector,
-                                 fileTransferService: FileTransferService,
-                                 val uuidGenerator: UUIDGenerator,
-                                 val cc: ControllerComponents,
-                                 val appConfig: AppConfig,
-                                 val claimService: ClaimService,
-                                 val auditService: AuditService,
-                               )
-                               (implicit ec: ExecutionContext) extends BackendController(cc) with AuthActions with ControllerHelper with WithCorrelationId {
+class ClaimController @Inject() (
+  val authConnector: MicroserviceAuthConnector,
+  fileTransferService: FileTransferService,
+  val uuidGenerator: UUIDGenerator,
+  val cc: ControllerComponents,
+  val appConfig: AppConfig,
+  val claimService: ClaimService,
+  val auditService: AuditService
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc) with AuthActions with ControllerHelper with WithCorrelationId {
 
-  private def acknowledgementReferenceFrom (correlationId: String): String =
+  private def acknowledgementReferenceFrom(correlationId: String): String =
     correlationId.replace("-", "").takeRight(32)
 
   def submitClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
@@ -85,9 +84,7 @@ class ClaimController @Inject()(
             val response = NDRCCaseResponse(
               correlationId = correlationId,
               caseId = None,
-              error = Some(
-                ApiError(errorCode, Some(errorMessage))
-              )
+              error = Some(ApiError(errorCode, Some(errorMessage)))
             )
             auditService
               .auditCreateCaseErrorEvent(response)
@@ -99,9 +96,7 @@ class ClaimController @Inject()(
           val response = NDRCCaseResponse(
             correlationId = correlationId,
             caseId = None,
-            error = Some(
-              ApiError("500", Some(e.getMessage))
-            )
+            error = Some(ApiError("500", Some(e.getMessage)))
           )
           auditService
             .auditCreateCaseErrorEvent(response)
@@ -125,8 +120,7 @@ class ClaimController @Inject()(
               fileTransferService.transferFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
                 .flatMap { fileTransferResults =>
                   val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
-                  auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(_ =>
-                    Created(Json.toJson(response)))
+                  auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(_ => Created(Json.toJson(response)))
                 }
             // when request to the upstream api returns an error
             case error: EISAmendCaseError =>
@@ -149,9 +143,7 @@ class ClaimController @Inject()(
             val response = NDRCCaseResponse(
               correlationId = correlationId,
               caseId = None,
-              error = Some(
-                ApiError(errorCode, Some(errorMessage))
-              )
+              error = Some(ApiError(errorCode, Some(errorMessage)))
             )
             auditService
               .auditUpdateCaseErrorEvent(response)
@@ -163,9 +155,7 @@ class ClaimController @Inject()(
           val response = NDRCCaseResponse(
             correlationId = correlationId,
             caseId = None,
-            error = Some(
-              ApiError("500", Some(e.getMessage))
-            )
+            error = Some(ApiError("500", Some(e.getMessage)))
           )
           auditService
             .auditUpdateCaseErrorEvent(response)
@@ -173,4 +163,5 @@ class ClaimController @Inject()(
       }
     }
   }
+
 }

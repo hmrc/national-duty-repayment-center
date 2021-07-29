@@ -24,10 +24,11 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.inject.guice.GuiceApplicationBuilder
 
 class UnitSpecBase extends AnyWordSpec with Matchers with ScalaFutures {
+
   protected def applicationBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
 
-  val fixedInstant: Instant = LocalDateTime.parse("2027-11-02T16:33:51.880").toInstant(ZoneOffset.UTC)
+  val fixedInstant: Instant     = LocalDateTime.parse("2027-11-02T16:33:51.880").toInstant(ZoneOffset.UTC)
   implicit val stubClock: Clock = Clock.fixed(fixedInstant, ZoneId.systemDefault)
 
 }

@@ -19,30 +19,30 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 import play.api.libs.json.{Format, Json}
 
 case class FileTransferRequest(
-                                              conversationId: String,
-                                              caseReferenceNumber: String,
-                                              applicationName: String,
-                                              upscanReference: String,
-                                              downloadUrl: String,
-                                              checksum: String,
-                                              fileName: String,
-                                              fileMimeType: String,
-                                              batchSize: Int,
-                                              batchCount: Int,
-                                              correlationId: String
-                                            )
+  conversationId: String,
+  caseReferenceNumber: String,
+  applicationName: String,
+  upscanReference: String,
+  downloadUrl: String,
+  checksum: String,
+  fileName: String,
+  fileMimeType: String,
+  batchSize: Int,
+  batchCount: Int,
+  correlationId: String
+)
 
 object FileTransferRequest {
 
   def fromUploadedFile(
-                        caseReferenceNumber: String,
-                        conversationId: String,
-                        correlationId: String,
-                        applicationName: String,
-                        batchSize: Int,
-                        batchCount: Int,
-                        uploadedFile: UploadedFile
-                      ): FileTransferRequest =
+    caseReferenceNumber: String,
+    conversationId: String,
+    correlationId: String,
+    applicationName: String,
+    batchSize: Int,
+    batchCount: Int,
+    uploadedFile: UploadedFile
+  ): FileTransferRequest =
     FileTransferRequest(
       conversationId = conversationId,
       caseReferenceNumber = caseReferenceNumber,
@@ -62,4 +62,5 @@ object FileTransferRequest {
 
   implicit val validate: Validator.Validate[FileTransferRequest] =
     Validator.always
+
 }

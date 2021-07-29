@@ -60,9 +60,25 @@ class FileTransferActorSpec
     "transfer files" in {
 
       val transferrer = system.actorOf(
-        Props(classOf[FileTransferActor], "my-case-ref", mockFileTransferConnector, mockUuidGenerator, "conv-id", testAuditActorRef)
+        Props(
+          classOf[FileTransferActor],
+          "my-case-ref",
+          mockFileTransferConnector,
+          mockUuidGenerator,
+          "conv-id",
+          testAuditActorRef
+        )
       )
-      val files = Seq(UploadedFile("ups-123", "/upscan/ups-123", ZonedDateTime.now(), "valid", "important-form.pdf", "application/pdf"))
+      val files = Seq(
+        UploadedFile(
+          "ups-123",
+          "/upscan/ups-123",
+          ZonedDateTime.now(),
+          "valid",
+          "important-form.pdf",
+          "application/pdf"
+        )
+      )
 
       transferrer ! FileTransferActor.TransferMultipleFiles(files.zipWithIndex, files.size, mockHeaderCarrier)
 
@@ -74,9 +90,25 @@ class FileTransferActorSpec
         .thenReturn(Future.failed(new Exception("unexpected")))
 
       val transferrer = system.actorOf(
-        Props(classOf[FileTransferActor], "my-case-ref", mockFileTransferConnector, mockUuidGenerator, "conv-id", testAuditActorRef)
+        Props(
+          classOf[FileTransferActor],
+          "my-case-ref",
+          mockFileTransferConnector,
+          mockUuidGenerator,
+          "conv-id",
+          testAuditActorRef
+        )
       )
-      val files = Seq(UploadedFile("ups-123", "/upscan/ups-123", ZonedDateTime.now(), "valid", "important-form.pdf", "application/pdf"))
+      val files = Seq(
+        UploadedFile(
+          "ups-123",
+          "/upscan/ups-123",
+          ZonedDateTime.now(),
+          "valid",
+          "important-form.pdf",
+          "application/pdf"
+        )
+      )
 
       transferrer ! FileTransferActor.TransferMultipleFiles(files.zipWithIndex, files.size, mockHeaderCarrier)
 
@@ -88,9 +120,25 @@ class FileTransferActorSpec
         .thenReturn(Future.failed(new NotFoundException("File not found")))
 
       val transferrer = system.actorOf(
-        Props(classOf[FileTransferActor], "my-case-ref", mockFileTransferConnector, mockUuidGenerator, "conv-id", testAuditActorRef)
+        Props(
+          classOf[FileTransferActor],
+          "my-case-ref",
+          mockFileTransferConnector,
+          mockUuidGenerator,
+          "conv-id",
+          testAuditActorRef
+        )
       )
-      val files = Seq(UploadedFile("ups-123", "/upscan/ups-123",ZonedDateTime.now(), "valid", "important-form.pdf", "application/pdf"))
+      val files = Seq(
+        UploadedFile(
+          "ups-123",
+          "/upscan/ups-123",
+          ZonedDateTime.now(),
+          "valid",
+          "important-form.pdf",
+          "application/pdf"
+        )
+      )
 
       transferrer ! FileTransferActor.TransferMultipleFiles(files.zipWithIndex, files.size, mockHeaderCarrier)
 

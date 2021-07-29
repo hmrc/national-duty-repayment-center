@@ -20,15 +20,12 @@ sealed trait PaymentMethod
 
 object PaymentMethod extends Enumerable.Implicits {
   case object CurrentMonthAmendment extends WithName("01") with PaymentMethod
-  case object BACS extends WithName("02") with PaymentMethod
-  case object PayableOrder extends WithName("03") with PaymentMethod
+  case object BACS                  extends WithName("02") with PaymentMethod
+  case object PayableOrder          extends WithName("03") with PaymentMethod
 
-  val values: Seq[PaymentMethod] = Seq(
-    CurrentMonthAmendment,
-    BACS,
-    PayableOrder
-  )
+  val values: Seq[PaymentMethod] = Seq(CurrentMonthAmendment, BACS, PayableOrder)
 
   implicit val enumerable: Enumerable[PaymentMethod] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }

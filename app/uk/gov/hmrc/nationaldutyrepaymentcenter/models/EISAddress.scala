@@ -19,19 +19,18 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 import play.api.libs.json.{Json, OFormat}
 
 final case class EISAddress(
-                             AddressLine1: String,
-                             AddressLine2: Option[String],
-                             City: String,
-                             Region: Option[String],
-                             CountryCode: String,
-                             PostalCode: Option[String],
-                             TelephoneNumber: Option[String],
-                             EmailAddress: Option[String]
-                           )
+  AddressLine1: String,
+  AddressLine2: Option[String],
+  City: String,
+  Region: Option[String],
+  CountryCode: String,
+  PostalCode: Option[String],
+  TelephoneNumber: Option[String],
+  EmailAddress: Option[String]
+)
 
 object EISAddress {
 
   implicit val format: OFormat[EISAddress] = Json.format[EISAddress]
 
 }
-

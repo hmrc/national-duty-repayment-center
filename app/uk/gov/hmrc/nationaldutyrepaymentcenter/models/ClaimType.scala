@@ -19,14 +19,12 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 sealed trait ClaimType
 
 object ClaimType extends Enumerable.Implicits {
-  case object Single extends WithName("01") with ClaimType
+  case object Single   extends WithName("01") with ClaimType
   case object Multiple extends WithName("02") with ClaimType
 
-  val values: Seq[ClaimType] = Seq(
-    Single,
-    Multiple
-  )
+  val values: Seq[ClaimType] = Seq(Single, Multiple)
 
   implicit val enumerable: Enumerable[ClaimType] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }

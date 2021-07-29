@@ -21,6 +21,8 @@ import play.api.libs.json.Format
 case class SortCode(value: String)
 
 object SortCode {
+
   implicit val format: Format[SortCode] =
     JsonFormatUtils.stringFormat(SortCode.apply)(_.value)
+
 }

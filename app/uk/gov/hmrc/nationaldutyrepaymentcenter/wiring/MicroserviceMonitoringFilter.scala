@@ -34,39 +34,42 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 @Singleton
 class MicroserviceMonitoringFilter @Inject() (metrics: Metrics, routes: Routes)(implicit
-                                                                                ec: ExecutionContext,
-                                                                                val mat: Materializer
+  ec: ExecutionContext,
+  val mat: Materializer
 ) extends MonitoringFilter(metrics.defaultRegistry) {
+
   override def keyToPatternMapping: Seq[(String, String)] =
     KeyToPatternMappingFromRoutes(routes, Set())
+
 }
 
 object KeyToPatternMappingFromRoutes {
+
   def apply(routes: Routes, placeholders: Set[String]): Seq[(String, String)] =
     routes.documentation.map {
       case (method, route, _) =>
         val r = route.replace("<[^/]+>", "")
         val key = r
           .split("/")
-          .map(p =>
-            if (p.startsWith("$")) {
-              val name = p.substring(1)
-              if (placeholders.contains(name)) s"{$name}" else ":"
-            } else p
+          .map(
+            p =>
+              if (p.startsWith("$")) {
+                val name = p.substring(1)
+                if (placeholders.contains(name)) s"{$name}" else ":"
+              } else p
           )
           .mkString("__")
         val pattern = r.replace("$", ":")
         Logger(getClass).info(s"$key-$method -> $pattern")
         (key, pattern)
     }
+
 }
 
 abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: ExecutionContext)
-  extends Filter with MonitoringKeyMatcher {
+    extends Filter with MonitoringKeyMatcher {
 
-  override def apply(
-                      nextFilter: (RequestHeader) => Future[Result]
-                    )(requestHeader: RequestHeader): Future[Result] = {
+  override def apply(nextFilter: (RequestHeader) => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
 
     implicit val hc: HeaderCarrier =
       HeaderCarrierConverter.fromRequest(requestHeader)
@@ -83,20 +86,20 @@ abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: Ex
   }
 
   private def monitor(
-                       serviceName: String
-                     )(function: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+    serviceName: String
+  )(function: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     timer(serviceName) {
       function
     }
 
-  private def timer(serviceName: String)(
-    function: => Future[Result]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+  private def timer(
+    serviceName: String
+  )(function: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     val start = System.nanoTime()
     function.andThen {
       case Success(result) =>
-        val status = result.header.status
-        val timerName = s"Timer-$serviceName"
+        val status      = result.header.status
+        val timerName   = s"Timer-$serviceName"
         val counterName = timerName + "." + status
         kenshooRegistry.getTimers
           .getOrDefault(timerName, kenshooRegistry.timer(timerName))
@@ -115,11 +118,7 @@ abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: Ex
     }
   }
 
-  private def recordFailure(
-                             serviceName: String,
-                             upstreamResponseCode: Int,
-                             startTime: Long
-                           ): Unit = {
+  private def recordFailure(serviceName: String, upstreamResponseCode: Int, startTime: Long): Unit = {
     val timerName = s"Timer-$serviceName"
     val counterName =
       if (upstreamResponseCode >= 500) s"Http5xxErrorCount-$serviceName"
@@ -131,6 +130,7 @@ abstract class MonitoringFilter(kenshooRegistry: MetricRegistry)(implicit ec: Ex
       .getOrDefault(counterName, kenshooRegistry.counter(counterName))
       .inc()
   }
+
 }
 
 trait MonitoringKeyMatcher {
@@ -144,15 +144,13 @@ trait MonitoringKeyMatcher {
     .map { case (k, (p, vs)) => (k, (Pattern.compile(p), vs)) }
 
   def preparePatternAndVariables(p: String): (String, Seq[String]) = {
-    var pattern = p
-    val m = placeholderPattern.matcher(pattern)
+    var pattern   = p
+    val m         = placeholderPattern.matcher(pattern)
     var variables = Seq[String]()
     while (m.find()) {
       val variable = m.group().substring(1)
       if (variables.contains(variable))
-        throw new IllegalArgumentException(
-          s"Duplicated variable name '$variable' in monitoring filter pattern '$p'"
-        )
+        throw new IllegalArgumentException(s"Duplicated variable name '$variable' in monitoring filter pattern '$p'")
       variables = variables :+ variable
     }
     for (v <- variables)
