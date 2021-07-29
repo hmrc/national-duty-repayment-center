@@ -28,7 +28,7 @@ lazy val root = (project in file("."))
     name := "national-duty-repayment-center",
     organization := "uk.gov.hmrc",
     scalaVersion := "2.12.12",
-    PlayKeys.playDefaultPort := 9380,
+    PlayKeys.playDefaultPort := 8451,
     resolvers += "third-party-maven-releases" at "https://artefacts.tax.service.gov.uk/artifactory/third-party-maven-releases/",
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*Routes.*;.*GuiceInjector;" +

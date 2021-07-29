@@ -26,6 +26,7 @@ import scala.util.{Failure, Success}
 trait HttpErrorRateMeter {
   lazy private val logger = Logger(getClass)
   val kenshooRegistry: MetricRegistry
+
   def meterName[T](serviceName: String, statusCode: Int): String =
     if (statusCode >= 500) s"Http5xxErrorCount-$serviceName" else s"Http4xxErrorCount-$serviceName"
 
@@ -42,4 +43,5 @@ trait HttpErrorRateMeter {
     kenshooRegistry.getMeters.getOrDefault(name, kenshooRegistry.meter(name)).mark()
     logger.debug(s"kenshoo-event::meter::$name::recorded")
   }
+
 }

@@ -18,12 +18,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class EISUserDetails(
-                              IsVATRegistered: String,
-                              EORI: EORI,
-                              Name: String,
-                              Address: EISAddress
-                            )
+final case class EISUserDetails(IsVATRegistered: String, EORI: EORI, Name: String, Address: EISAddress)
 
 object EISUserDetails {
   implicit val format: OFormat[EISUserDetails] = Json.format[EISUserDetails]

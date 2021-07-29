@@ -21,6 +21,8 @@ import play.api.libs.json.Format
 case class ApplicationType(value: String)
 
 object ApplicationType {
+
   implicit val format: Format[ApplicationType] =
     JsonFormatUtils.stringFormat(ApplicationType.apply)(_.value)
+
 }

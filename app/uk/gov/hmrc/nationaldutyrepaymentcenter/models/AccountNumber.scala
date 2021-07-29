@@ -21,6 +21,8 @@ import play.api.libs.json.Format
 case class AccountNumber(value: String)
 
 object AccountNumber {
+
   implicit val format: Format[AccountNumber] =
     JsonFormatUtils.stringFormat(AccountNumber.apply)(_.value)
+
 }

@@ -28,16 +28,12 @@ trait ControllerHelper {
 
   type HandleError = (String, String) => Future[Result]
 
-  protected def withPayload[T](
-                                f: T => Future[Result]
-                              )(
-                                handleError: HandleError
-                              )(implicit
-                                request: Request[JsValue],
-                                reads: Reads[T],
-                                validate: Validator.Validate[T],
-                                ec: ExecutionContext
-                              ): Future[Result] =
+  protected def withPayload[T](f: T => Future[Result])(handleError: HandleError)(implicit
+    request: Request[JsValue],
+    reads: Reads[T],
+    validate: Validator.Validate[T],
+    ec: ExecutionContext
+  ): Future[Result] =
     Try(request.body.validate[T]) match {
 
       case Success(JsSuccess(payload, _)) =>
@@ -47,23 +43,18 @@ trait ControllerHelper {
             f(payload)
 
           case Invalid(errs) =>
-            handleError(
-              "ERROR_VALIDATION",
-              s"Invalid payload: Validation failed due to ${errs.mkString(", and ")}."
-            )
+            handleError("ERROR_VALIDATION", s"Invalid payload: Validation failed due to ${errs.mkString(", and ")}.")
         }
 
       case Success(JsError(errs)) =>
         handleError(
           "ERROR_JSON",
-          s"Invalid payload: Parsing failed due to ${
-            errs
-              .map {
-                case (path, errors) =>
-                  s"at path $path with ${errors.map(e => e.messages.mkString(", ")).mkString(", ")}"
-              }
-              .mkString(", and ")
-          }."
+          s"Invalid payload: Parsing failed due to ${errs
+            .map {
+              case (path, errors) =>
+                s"at path $path with ${errors.map(e => e.messages.mkString(", ")).mkString(", ")}"
+            }
+            .mkString(", and ")}."
         )
 
       case Failure(e) => handleError("ERROR_UNKNOWN", s"Could not parse payload due to ${e.getMessage}.")

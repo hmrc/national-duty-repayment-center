@@ -18,10 +18,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class AllBankDetails(
-                           ImporterBankDetails: Option[BankDetails],
-                           AgentBankDetails: Option[BankDetails]
-                         )
+case class AllBankDetails(ImporterBankDetails: Option[BankDetails], AgentBankDetails: Option[BankDetails])
 
 object AllBankDetails {
 

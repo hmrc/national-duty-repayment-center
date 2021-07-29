@@ -20,12 +20,9 @@ sealed trait CustomRegulationType
 
 object CustomRegulationType extends Enumerable.Implicits {
   case object UnionsCustomsCodeRegulation extends WithName("01") with CustomRegulationType
-  case object UKCustomsCodeRegulation extends WithName("02") with CustomRegulationType
+  case object UKCustomsCodeRegulation     extends WithName("02") with CustomRegulationType
 
-  val values: Seq[CustomRegulationType] = Seq(
-    UnionsCustomsCodeRegulation,
-    UKCustomsCodeRegulation
-  )
+  val values: Seq[CustomRegulationType] = Seq(UnionsCustomsCodeRegulation, UKCustomsCodeRegulation)
 
   implicit val enumerable: Enumerable[CustomRegulationType] =
     Enumerable(values.map(v => v.toString -> v): _*)

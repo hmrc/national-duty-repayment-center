@@ -18,10 +18,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class FrontEndUserName(
-                              FistName: String,
-                              LastName: String,
-                            )
+final case class FrontEndUserName(FistName: String, LastName: String)
 
 object FrontEndUserName {
   implicit val format: OFormat[FrontEndUserName] = Json.format[FrontEndUserName]

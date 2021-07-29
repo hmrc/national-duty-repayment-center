@@ -26,12 +26,10 @@ object ClaimedUnderArticleFE extends Enumerable.Implicits {
 
   case object Equity extends WithName("120") with ClaimedUnderArticleFE
 
-  val values: Seq[ClaimedUnderArticleFE] = Seq(
-    OverchargedAmountsOfImportOrExportDuty,
-    ErrorByTheCompetentAuthorities,
-    Equity
-  )
+  val values: Seq[ClaimedUnderArticleFE] =
+    Seq(OverchargedAmountsOfImportOrExportDuty, ErrorByTheCompetentAuthorities, Equity)
 
   implicit val enumerable: Enumerable[ClaimedUnderArticleFE] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }

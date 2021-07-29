@@ -24,23 +24,19 @@ import play.api.libs.json.JsValue
 
 sealed trait EISCreateCaseResponse
 
-case class EISCreateCaseSuccess(
-  CaseID: String,
-  ProcessingDate: String,
-  Status: String,
-  StatusText: String
-) extends EISCreateCaseResponse
+case class EISCreateCaseSuccess(CaseID: String, ProcessingDate: String, Status: String, StatusText: String)
+    extends EISCreateCaseResponse
 
 object EISCreateCaseSuccess {
+
   implicit val formats: Format[EISCreateCaseSuccess] =
     Json.format[EISCreateCaseSuccess]
+
 }
 
-case class EISCreateCaseError(
-  errorDetail: EISCreateCaseError.ErrorDetail
-) extends EISCreateCaseResponse {
+case class EISCreateCaseError(errorDetail: EISCreateCaseError.ErrorDetail) extends EISCreateCaseResponse {
 
-  def errorCode: Option[String] = errorDetail.errorCode
+  def errorCode: Option[String]    = errorDetail.errorCode
   def errorMessage: Option[String] = errorDetail.errorMessage
 
   def isDuplicateCaseError: Boolean =
@@ -48,16 +44,12 @@ case class EISCreateCaseError(
 
   def duplicateCaseID: Option[String] =
     errorDetail.errorMessage.map(_.replace(" ", "").drop(4))
+
 }
 
 object EISCreateCaseError {
 
-  def apply(
-    timestamp: String,
-    correlationId: String,
-    errorCode: String,
-    errorMessage: String
-  ): EISCreateCaseError =
+  def apply(timestamp: String, correlationId: String, errorCode: String, errorMessage: String): EISCreateCaseError =
     EISCreateCaseError(errorDetail =
       ErrorDetail(Some(correlationId), Some(timestamp), Some(errorCode), Some(errorMessage))
     )
@@ -83,6 +75,7 @@ object EISCreateCaseError {
     )
 
     object SourceFaultDetail {
+
       implicit val formats: Format[SourceFaultDetail] =
         Json.format[SourceFaultDetail]
 
@@ -90,6 +83,7 @@ object EISCreateCaseError {
 
     implicit val formats: Format[ErrorDetail] =
       Json.format[ErrorDetail]
+
   }
 
   implicit val formats: Format[EISCreateCaseError] =
@@ -109,6 +103,7 @@ object EISCreateCaseResponse {
 
   implicit def writes: Writes[EISCreateCaseResponse] =
     new Writes[EISCreateCaseResponse] {
+
       override def writes(o: EISCreateCaseResponse): JsValue =
         o match {
           case s: EISCreateCaseSuccess =>
@@ -116,6 +111,7 @@ object EISCreateCaseResponse {
           case e: EISCreateCaseError =>
             EISCreateCaseError.formats.writes(e)
         }
+
     }
 
 }

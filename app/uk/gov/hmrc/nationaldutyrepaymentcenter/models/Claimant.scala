@@ -19,14 +19,12 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 sealed trait Claimant
 
 object Claimant extends Enumerable.Implicits {
-  case object Importer extends WithName("01") with Claimant
+  case object Importer                    extends WithName("01") with Claimant
   case object RepresentativeOfTheImporter extends WithName("02") with Claimant
 
-  val values: Seq[Claimant] = Seq(
-    Importer,
-    RepresentativeOfTheImporter
-  )
+  val values: Seq[Claimant] = Seq(Importer, RepresentativeOfTheImporter)
 
   implicit val enumerable: Enumerable[Claimant] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }

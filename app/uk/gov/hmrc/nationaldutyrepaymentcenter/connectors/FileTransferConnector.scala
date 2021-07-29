@@ -28,32 +28,28 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileTransferConnector @Inject()(
-  val config: AppConfig,
-  val http: HttpPost,
-  val clock: Clock,
-  metrics: Metrics
-) extends HttpAPIMonitor {
+class FileTransferConnector @Inject() (val config: AppConfig, val http: HttpPost, val clock: Clock, metrics: Metrics)
+    extends HttpAPIMonitor {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url: String = config.fileBaseUrl + config.fileBasePath
 
-  final def transferFile(fileTransferRequest: FileTransferRequest)(implicit
-                                                                                          hc: HeaderCarrier,
-                                                                                          ec: ExecutionContext
-  ): Future[FileTransferResult] =
+  final def transferFile(
+    fileTransferRequest: FileTransferRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FileTransferResult] =
     monitor(s"ConsumedAPI-trader-services-transfer-file-api-POST") {
       http
         .POST[FileTransferRequest, HttpResponse](url, fileTransferRequest)
-        .map(response =>
-          FileTransferResult(
-            fileTransferRequest.upscanReference,
-            isSuccess(response),
-            response.status,
-            LocalDateTime.now(clock),
-            None
-          )
+        .map(
+          response =>
+            FileTransferResult(
+              fileTransferRequest.upscanReference,
+              isSuccess(response),
+              response.status,
+              LocalDateTime.now(clock),
+              None
+            )
         )
     }
 

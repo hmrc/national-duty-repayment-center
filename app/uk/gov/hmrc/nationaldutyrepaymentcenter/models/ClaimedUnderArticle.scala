@@ -52,4 +52,5 @@ object ClaimedUnderArticle extends Enumerable.Implicits {
 
   implicit val enumerable: Enumerable[ClaimedUnderArticle] =
     Enumerable(values.map(v => v.toString -> v): _*)
+
 }

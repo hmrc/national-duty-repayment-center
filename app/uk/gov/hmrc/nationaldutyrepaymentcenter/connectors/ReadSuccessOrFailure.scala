@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse, JsValidationException, Upstrea
 import scala.util.Try
 
 abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (Int, String) => A)(implicit
-                                                                                                   mf: Manifest[A]
+  mf: Manifest[A]
 ) {
 
   implicit val readFromJsonSuccessOrFailure: HttpReads[A] =
@@ -70,4 +70,5 @@ abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (
               )
           }
       }
+
 }

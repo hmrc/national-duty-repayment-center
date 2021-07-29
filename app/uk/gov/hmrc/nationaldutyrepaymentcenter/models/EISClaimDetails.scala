@@ -24,25 +24,24 @@ import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsVal
 import scala.util.{Failure, Success, Try}
 
 final case class EISClaimDetails(
-                               FormType: FormType,
-                               CustomRegulationType: CustomRegulationType,
-                               ClaimedUnderArticle: ClaimedUnderArticle,
-                               Claimant: Claimant,
-                               ClaimType: ClaimType,
-                               NoOfEntries: Option[NoOfEntries],
-                               EPU: String,
-                               EntryNumber: String,
-                               EntryDate: LocalDate,
-                               ClaimReason: ClaimReason,
-                               ClaimDescription: ClaimDescription,
-                               DateReceived: LocalDate,
-                               ClaimDate: LocalDate,
-                               PayeeIndicator: PayeeIndicator,
-                               PaymentMethod: PaymentMethod,
-                               DeclarantRefNumber: String,
-                               DeclarantName:String
-
-                                )
+  FormType: FormType,
+  CustomRegulationType: CustomRegulationType,
+  ClaimedUnderArticle: ClaimedUnderArticle,
+  Claimant: Claimant,
+  ClaimType: ClaimType,
+  NoOfEntries: Option[NoOfEntries],
+  EPU: String,
+  EntryNumber: String,
+  EntryDate: LocalDate,
+  ClaimReason: ClaimReason,
+  ClaimDescription: ClaimDescription,
+  DateReceived: LocalDate,
+  ClaimDate: LocalDate,
+  PayeeIndicator: PayeeIndicator,
+  PaymentMethod: PaymentMethod,
+  DeclarantRefNumber: String,
+  DeclarantName: String
+)
 
 object EISClaimDetails {
 
@@ -54,15 +53,15 @@ object EISClaimDetails {
     override def reads(json: JsValue): JsResult[LocalDate] = json match {
       case JsString(s) ⇒
         Try(LocalDate.parse(s, formatter)) match {
-          case Success(date) ⇒ JsSuccess(date)
+          case Success(date)  ⇒ JsSuccess(date)
           case Failure(error) ⇒ JsError(s"Could not parse date as yyyyMMdd: ${error.getMessage}")
         }
 
       case other ⇒ JsError(s"Expected string but got $other")
     }
+
   }
 
   implicit val format: OFormat[EISClaimDetails] = Json.format[EISClaimDetails]
 
 }
-

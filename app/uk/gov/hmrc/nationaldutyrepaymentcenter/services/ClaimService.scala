@@ -24,18 +24,18 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseRes
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClaimService @Inject()(createCaseConnector: CreateCaseConnector,
-                             amendCaseConnector: AmendCaseConnector)(
-  implicit ec: ExecutionContext
+class ClaimService @Inject() (createCaseConnector: CreateCaseConnector, amendCaseConnector: AmendCaseConnector)(implicit
+  ec: ExecutionContext
 ) {
 
-  def createClaim(request: EISCreateCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISCreateCaseResponse] = {
+  def createClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[EISCreateCaseResponse] =
     createCaseConnector.submitClaim(request, correlationId)
-  }
 
-  def amendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit hc: HeaderCarrier): Future[EISAmendCaseResponse] = {
+  def amendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[EISAmendCaseResponse] =
     amendCaseConnector.submitAmendClaim(request, correlationId)
-  }
+
 }
-
-

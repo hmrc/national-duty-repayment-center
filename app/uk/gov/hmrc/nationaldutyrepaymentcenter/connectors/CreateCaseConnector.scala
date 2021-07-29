@@ -22,28 +22,28 @@ import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseResponse, EISCreateCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{
+  EISCreateCaseError,
+  EISCreateCaseResponse,
+  EISCreateCaseSuccess
+}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateCaseConnector @Inject()(
-                                     val config: AppConfig,
-                                     val http: HttpPost,
-                                     metrics: Metrics
-                                   )(
-                                     implicit ec: ExecutionContext
-                                   ) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
-  EISCreateCaseError.fromStatusAndMessage
-) with EISConnector with HttpAPIMonitor {
+class CreateCaseConnector @Inject() (val config: AppConfig, val http: HttpPost, metrics: Metrics)(implicit
+  ec: ExecutionContext
+) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
+      EISCreateCaseError.fromStatusAndMessage
+    ) with EISConnector with HttpAPIMonitor {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url: String = config.eisBaseUrl + config.eisCreateCaseApiPath
 
-
-  def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit hc: HeaderCarrier
-  ): Future[EISCreateCaseResponse] = {
+  def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[EISCreateCaseResponse] =
     monitor(s"ConsumedAPI-eis-pega-create-case-api-POST") {
       http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
         url,
@@ -56,5 +56,5 @@ class CreateCaseConnector @Inject()(
         implicitly[ExecutionContext]
       )
     }
-  }
+
 }

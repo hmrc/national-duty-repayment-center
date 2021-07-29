@@ -21,6 +21,8 @@ import play.api.libs.json.Format
 case class AcknowledgementReference(value: String)
 
 object AcknowledgementReference {
+
   implicit val format: Format[AcknowledgementReference] =
     JsonFormatUtils.stringFormat(AcknowledgementReference.apply)(_.value)
+
 }

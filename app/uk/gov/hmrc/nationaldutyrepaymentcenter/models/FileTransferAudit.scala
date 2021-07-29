@@ -20,8 +20,7 @@ import play.api.libs.json.{Format, Json, Writes}
 
 import java.time.{LocalDateTime, ZonedDateTime}
 
-case class FileTransferAudit(caseReferenceNumber: String, fileTransferResults: Seq[FileTransferResult]
-                            )
+case class FileTransferAudit(caseReferenceNumber: String, fileTransferResults: Seq[FileTransferResult])
 
 object FileTransferAudit {
   implicit val formats: Format[FileTransferAudit] = Json.format[FileTransferAudit]

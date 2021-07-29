@@ -20,76 +20,80 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 
 /**
- * Create specified case in the PEGA system.
- * Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
- *
+  * Create specified case in the PEGA system.
+  * Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
+  *
  * @param AcknowledgementReference Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data records, may be passed to Decision Service, CSG records can be searched using this field etc.
- * @param ApplicationType          Its key value to create the case for respective process.
- * @param OriginatingSystem        “Digital” for all requests originating in Digital
- */
+  * @param ApplicationType          Its key value to create the case for respective process.
+  * @param OriginatingSystem        “Digital” for all requests originating in Digital
+  */
 case class EISCreateCaseRequest(
-                                 AcknowledgementReference: String,
-                                 ApplicationType: String,
-                                 OriginatingSystem: String,
-                                 Content: EISCreateCaseRequest.Content
-                               )
+  AcknowledgementReference: String,
+  ApplicationType: String,
+  OriginatingSystem: String,
+  Content: EISCreateCaseRequest.Content
+)
 
 object EISCreateCaseRequest {
   implicit val formats: Format[EISCreateCaseRequest] = Json.format[EISCreateCaseRequest]
 
   /**
-   * @param ClaimDetails       see ClaimDetails structure.
-   * @param AgentDetails       Agent/Representative of the importer Information (see UserDetails structure).
-   * @param ImporterDetails    see UserDetails structure.
-   * @param BankDetails        bank details of the payee required for BACS payments.
-   * @param DutyTypeTaxDetails XXX.
-   * @param DocumentList       CHIEF entry date in YYYYMMDD format.
-   */
+    * @param ClaimDetails       see ClaimDetails structure.
+    * @param AgentDetails       Agent/Representative of the importer Information (see UserDetails structure).
+    * @param ImporterDetails    see UserDetails structure.
+    * @param BankDetails        bank details of the payee required for BACS payments.
+    * @param DutyTypeTaxDetails XXX.
+    * @param DocumentList       CHIEF entry date in YYYYMMDD format.
+    */
 
   case class Content(
-                      ClaimDetails: EISClaimDetails,
-                      AgentDetails: Option[EISUserDetails],
-                      ImporterDetails: EISUserDetails,
-                      BankDetails: Option[AllBankDetails],
-                      DutyTypeTaxDetails: DutyTypeTaxDetails,
-                      DocumentList: Seq[DocumentList]
-                    )
+    ClaimDetails: EISClaimDetails,
+    AgentDetails: Option[EISUserDetails],
+    ImporterDetails: EISUserDetails,
+    BankDetails: Option[AllBankDetails],
+    DutyTypeTaxDetails: DutyTypeTaxDetails,
+    DocumentList: Seq[DocumentList]
+  )
 
   object Content {
     implicit val formats: Format[Content] = Json.format[Content]
 
-    def from(request: CreateClaimRequest): Content = {
+    def from(request: CreateClaimRequest): Content =
       Content(
         ClaimDetails = getEISClaimDetails(request),
         AgentDetails = request.Content.AgentDetails.isDefined match {
-          case true  => Some(getAgentUserDetails(request))
-          case _ => None
+          case true => Some(getAgentUserDetails(request))
+          case _    => None
         },
         ImporterDetails = getImporterDetails(request),
         BankDetails = request.Content.BankDetails,
         DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
         DocumentList = request.Content.DocumentList
       )
-    }
 
     def getClaimedUnderArticle(request: CreateClaimRequest): ClaimedUnderArticle =
       request.Content.ClaimDetails.ClaimedUnderArticle.isDefined match {
-      case true => request.Content.ClaimDetails.ClaimedUnderArticle match {
-        case Some(ClaimedUnderArticleFE.Equity) => ClaimedUnderArticle.Equity
-        case Some(ClaimedUnderArticleFE.ErrorByTheCompetentAuthorities) => ClaimedUnderArticle.ErrorByTheCompetentAuthorities
-        case Some(ClaimedUnderArticleFE.OverchargedAmountsOfImportOrExportDuty) => ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty
+        case true =>
+          request.Content.ClaimDetails.ClaimedUnderArticle match {
+            case Some(ClaimedUnderArticleFE.Equity) => ClaimedUnderArticle.Equity
+            case Some(ClaimedUnderArticleFE.ErrorByTheCompetentAuthorities) =>
+              ClaimedUnderArticle.ErrorByTheCompetentAuthorities
+            case Some(ClaimedUnderArticleFE.OverchargedAmountsOfImportOrExportDuty) =>
+              ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty
+          }
+        case false =>
+          request.Content.ClaimDetails.ClaimedUnderRegulation match {
+            case Some(ClaimedUnderRegulation.ErrorByCustoms)         => ClaimedUnderArticle.ErrorByCustoms
+            case Some(ClaimedUnderRegulation.LowerRateWasApplicable) => ClaimedUnderArticle.LowerRateWasApplicable
+            case Some(ClaimedUnderRegulation.OverPaymentOfDutyOrVAT) => ClaimedUnderArticle.OverPaymentOfDutyOrVAT
+            case Some(ClaimedUnderRegulation.Rejected)               => ClaimedUnderArticle.Rejected
+            case Some(ClaimedUnderRegulation.SpecialCircumstances)   => ClaimedUnderArticle.SpecialCircumstances
+            case Some(ClaimedUnderRegulation.WithdrawalOfCustomsDeclaration) =>
+              ClaimedUnderArticle.WithdrawalOfCustomsDeclaration
+          }
       }
-      case false => request.Content.ClaimDetails.ClaimedUnderRegulation match {
-        case Some(ClaimedUnderRegulation.ErrorByCustoms) => ClaimedUnderArticle.ErrorByCustoms
-        case Some(ClaimedUnderRegulation.LowerRateWasApplicable) => ClaimedUnderArticle.LowerRateWasApplicable
-        case Some(ClaimedUnderRegulation.OverPaymentOfDutyOrVAT) => ClaimedUnderArticle.OverPaymentOfDutyOrVAT
-        case Some(ClaimedUnderRegulation.Rejected) => ClaimedUnderArticle.Rejected
-        case Some(ClaimedUnderRegulation.SpecialCircumstances) => ClaimedUnderArticle.SpecialCircumstances
-        case Some(ClaimedUnderRegulation.WithdrawalOfCustomsDeclaration) => ClaimedUnderArticle.WithdrawalOfCustomsDeclaration
-      }
-    }
 
-    def getEISClaimDetails(request: CreateClaimRequest) : EISClaimDetails = {
+    def getEISClaimDetails(request: CreateClaimRequest): EISClaimDetails =
       EISClaimDetails(
         FormType = request.Content.ClaimDetails.FormType,
         CustomRegulationType = request.Content.ClaimDetails.CustomRegulationType,
@@ -109,9 +113,8 @@ object EISCreateCaseRequest {
         DeclarantRefNumber = request.Content.ClaimDetails.DeclarantRefNumber,
         DeclarantName = request.Content.ClaimDetails.DeclarantName
       )
-    }
 
-    def getImporterAddress(request: CreateClaimRequest) : EISAddress = {
+    def getImporterAddress(request: CreateClaimRequest): EISAddress =
       EISAddress(
         AddressLine1 = request.Content.ImporterDetails.Address.AddressLine1,
         AddressLine2 = request.Content.ImporterDetails.Address.AddressLine2,
@@ -122,19 +125,16 @@ object EISCreateCaseRequest {
         TelephoneNumber = request.Content.ImporterDetails.TelephoneNumber,
         EmailAddress = request.Content.ImporterDetails.EmailAddress
       )
-    }
 
-    def getImporterDetails( request: CreateClaimRequest) : EISUserDetails = {
-
+    def getImporterDetails(request: CreateClaimRequest): EISUserDetails =
       EISUserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
-        Name =  request.Content.ImporterDetails.Name,
+        Name = request.Content.ImporterDetails.Name,
         Address = getImporterAddress(request)
       )
-    }
 
-    def getAgentAddress(request: CreateClaimRequest) : EISAddress = {
+    def getAgentAddress(request: CreateClaimRequest): EISAddress =
       EISAddress(
         AddressLine1 = request.Content.AgentDetails.get.Address.AddressLine1,
         AddressLine2 = request.Content.AgentDetails.get.Address.AddressLine2,
@@ -145,17 +145,15 @@ object EISCreateCaseRequest {
         TelephoneNumber = request.Content.AgentDetails.get.TelephoneNumber,
         EmailAddress = request.Content.AgentDetails.get.EmailAddress
       )
-    }
 
-
-    def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =  {
-
+    def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =
       EISUserDetails(
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
         EORI = request.Content.AgentDetails.get.EORI,
-        Name =  request.Content.AgentDetails.get.Name,
+        Name = request.Content.AgentDetails.get.Name,
         Address = getAgentAddress(request)
       )
-    }
+
   }
+
 }

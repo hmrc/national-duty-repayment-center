@@ -19,11 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, UploadedFile, Validator}
 
-final case class AmendClaimRequest(
-                                     Content: AmendContent,
-                                     uploadedFiles: Seq[UploadedFile]
-
-                                  )
+final case class AmendClaimRequest(Content: AmendContent, uploadedFiles: Seq[UploadedFile])
 
 object AmendClaimRequest {
 
@@ -32,5 +28,5 @@ object AmendClaimRequest {
 
   implicit val validate: Validator.Validate[AmendClaimRequest] =
     Validator.always
-}
 
+}

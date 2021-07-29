@@ -39,7 +39,16 @@ import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AllBankDetails, ClaimDetails, DocumentList, DutyTypeTaxDetails, FileTransferAudit, FileTransferResult, UploadedFile, UserDetails}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{
+  AllBankDetails,
+  ClaimDetails,
+  DocumentList,
+  DutyTypeTaxDetails,
+  FileTransferAudit,
+  FileTransferResult,
+  UploadedFile,
+  UserDetails
+}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -68,8 +77,8 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
   }
 
   final def auditCreateCaseErrorEvent(
-                                       createResponse: NDRCCaseResponse
-                                     )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] = {
+    createResponse: NDRCCaseResponse
+  )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] = {
     val details: JsValue = pegaResponseToDetails(createResponse)
     auditExtendedEvent(CreateCase, "create-case", details)
   }
@@ -83,25 +92,25 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
   }
 
   final def auditUpdateCaseErrorEvent(
-                                       updateResponse: NDRCCaseResponse
-                                     )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] = {
+    updateResponse: NDRCCaseResponse
+  )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] = {
     val details: JsValue = pegaResponseToDetails(updateResponse)
     auditExtendedEvent(UpdateCase, "update-case", details)
   }
 
-  private def auditExtendedEvent(
-                                  event: NDRCAuditEvent,
-                                  transactionName: String,
-                                  details: JsValue
-                                )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] =
+  private def auditExtendedEvent(event: NDRCAuditEvent, transactionName: String, details: JsValue)(implicit
+    hc: HeaderCarrier,
+    request: Request[Any],
+    ec: ExecutionContext
+  ): Future[Unit] =
     sendExtended(createExtendedEvent(event, transactionName, details))
 
-  private def createExtendedEvent(
-                                   event: NDRCAuditEvent,
-                                   transactionName: String,
-                                   details: JsValue
-                                 )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): ExtendedDataEvent = {
-    val tags = hc.toAuditTags(transactionName, request.path)
+  private def createExtendedEvent(event: NDRCAuditEvent, transactionName: String, details: JsValue)(implicit
+    hc: HeaderCarrier,
+    request: Request[Any],
+    ec: ExecutionContext
+  ): ExtendedDataEvent = {
+    val tags            = hc.toAuditTags(transactionName, request.path)
     implicit val writes = Json.format[ExtendedDataEvent]
     val extendedEvent = ExtendedDataEvent(
       auditSource = "national-duty-repayment-center",
@@ -112,9 +121,7 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
     extendedEvent
   }
 
-  private def sendExtended(
-                            events: ExtendedDataEvent*
-                          )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+  private def sendExtended(events: ExtendedDataEvent*)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     Future {
       events.foreach { event =>
         Try(auditConnector.sendExtendedEvent(event))
@@ -126,43 +133,38 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
 object AuditService {
 
   case class CreateCaseAuditEventDetails(
-                                          success: Boolean,
-                                          caseReferenceNumber: Option[String],
-                                          claimDetails: ClaimDetails,
-                                          agentDetails: Option[UserDetails],
-                                          importerDetails: UserDetails,
-                                          bankDetails: Option[AllBankDetails],
-                                          documentTypeTaxDetails: DutyTypeTaxDetails,
-                                          documentList: Seq[DocumentList],
-                                          numberOfFilesUploaded: Int,
-                                          uploadedFiles: Seq[UploadedFile]
-                                        )
+    success: Boolean,
+    caseReferenceNumber: Option[String],
+    claimDetails: ClaimDetails,
+    agentDetails: Option[UserDetails],
+    importerDetails: UserDetails,
+    bankDetails: Option[AllBankDetails],
+    documentTypeTaxDetails: DutyTypeTaxDetails,
+    documentList: Seq[DocumentList],
+    numberOfFilesUploaded: Int,
+    uploadedFiles: Seq[UploadedFile]
+  )
 
   object CreateCaseAuditEventDetails {
 
-    def from(
-              createRequest: CreateClaimRequest,
-              createResponse: NDRCCaseResponse
-            ): JsValue = {
-      val requestDetails: JsObject = {
-
+    def from(createRequest: CreateClaimRequest, createResponse: NDRCCaseResponse): JsValue = {
+      val requestDetails: JsObject =
         Json
-        .toJson(
-
-              CreateCaseAuditEventDetails(
-                success = true,
-                caseReferenceNumber = createResponse.caseId,
-                claimDetails = createRequest.Content.ClaimDetails,
-                agentDetails = createRequest.Content.AgentDetails,
-                importerDetails = createRequest.Content.ImporterDetails,
-                bankDetails = createRequest.Content.BankDetails,
-                documentTypeTaxDetails = createRequest.Content.DutyTypeTaxDetails,
-                documentList = createRequest.Content.DocumentList,
-                numberOfFilesUploaded = createRequest.uploadedFiles.size,
-                uploadedFiles = createRequest.uploadedFiles
-              ))
-        .as[JsObject]
-      }
+          .toJson(
+            CreateCaseAuditEventDetails(
+              success = true,
+              caseReferenceNumber = createResponse.caseId,
+              claimDetails = createRequest.Content.ClaimDetails,
+              agentDetails = createRequest.Content.AgentDetails,
+              importerDetails = createRequest.Content.ImporterDetails,
+              bankDetails = createRequest.Content.BankDetails,
+              documentTypeTaxDetails = createRequest.Content.DutyTypeTaxDetails,
+              documentList = createRequest.Content.DocumentList,
+              numberOfFilesUploaded = createRequest.uploadedFiles.size,
+              uploadedFiles = createRequest.uploadedFiles
+            )
+          )
+          .as[JsObject]
 
       if (createResponse.isSuccess) requestDetails
       else
@@ -171,23 +173,21 @@ object AuditService {
 
     implicit val formats: Format[CreateCaseAuditEventDetails] =
       Json.format[CreateCaseAuditEventDetails]
+
   }
 
   case class UpdateCaseAuditEventDetails(
-                                          success: Boolean,
-                                          caseId: String,
-                                          action: String,
-                                          description: Option[String],
-                                          numberOfFilesUploaded: Int,
-                                          uploadedFiles: Seq[UploadedFile]
-                                        )
+    success: Boolean,
+    caseId: String,
+    action: String,
+    description: Option[String],
+    numberOfFilesUploaded: Int,
+    uploadedFiles: Seq[UploadedFile]
+  )
 
   object UpdateCaseAuditEventDetails {
 
-    def from(
-              updateRequest: AmendClaimRequest,
-              updateResponse: NDRCCaseResponse
-            ): JsValue = {
+    def from(updateRequest: AmendClaimRequest, updateResponse: NDRCCaseResponse): JsValue = {
       val requestDetails: JsObject = Json
         .toJson(
           UpdateCaseAuditEventDetails(
@@ -208,23 +208,16 @@ object AuditService {
 
     implicit val formats: Format[UpdateCaseAuditEventDetails] =
       Json.format[UpdateCaseAuditEventDetails]
+
   }
 
-  def pegaResponseToDetails(
-                             caseResponse: NDRCCaseResponse
-                           ): JsObject = {Json.obj(
-      "success" -> caseResponse.isSuccess
-    ) ++
-      (if (caseResponse.isSuccess)
-        Json.obj(
-          "caseReferenceNumber" -> caseResponse.caseId
-        )
-      else Json.obj()) ++ caseResponse.error.map(e => Json.obj("errorCode" -> e.errorCode)).getOrElse(Json.obj()) ++
-          caseResponse.error
-            .flatMap(_.errorMessage)
-            .map(m => Json.obj("errorMessage" -> m))
-            .getOrElse(Json.obj())
-  }
+  def pegaResponseToDetails(caseResponse: NDRCCaseResponse): JsObject = Json.obj("success" -> caseResponse.isSuccess) ++
+    (if (caseResponse.isSuccess)
+       Json.obj("caseReferenceNumber" -> caseResponse.caseId)
+     else Json.obj()) ++ caseResponse.error.map(e => Json.obj("errorCode" -> e.errorCode)).getOrElse(Json.obj()) ++
+    caseResponse.error
+      .flatMap(_.errorMessage)
+      .map(m => Json.obj("errorMessage" -> m))
+      .getOrElse(Json.obj())
 
 }
-

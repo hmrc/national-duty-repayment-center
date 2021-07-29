@@ -19,13 +19,13 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 import play.api.libs.json.{Json, OFormat}
 
 final case class Address(
-                          AddressLine1:String,
-                          AddressLine2:Option[String],
-                          City:String,
-                          Region:Option[String],
-                          CountryCode:String,
-                          PostalCode:Option[String]
-                        )
+  AddressLine1: String,
+  AddressLine2: Option[String],
+  City: String,
+  Region: Option[String],
+  CountryCode: String,
+  PostalCode: Option[String]
+)
 
 object Address {
 

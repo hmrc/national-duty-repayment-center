@@ -24,12 +24,14 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.UUIDGenerator
 import scala.concurrent.Future
 
 trait WithCorrelationId { self: Results =>
+
   val missingXCorrelationIdResponse: Result = BadRequest(
     Json.obj(
       "statusCode" -> JsNumber(BadRequest.header.status),
       "message"    -> JsString("Missing header x-correlation-id")
     )
   )
+
   val uuidGenerator: UUIDGenerator
 
   protected def withCorrelationId(f: String => Future[Result])(implicit request: Request[_]): Future[Result] =
