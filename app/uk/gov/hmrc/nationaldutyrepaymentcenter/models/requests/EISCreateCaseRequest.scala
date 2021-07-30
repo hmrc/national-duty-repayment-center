@@ -61,17 +61,14 @@ object EISCreateCaseRequest {
     def from(request: CreateClaimRequest): Content =
       Content(
         ClaimDetails = getEISClaimDetails(request),
-        AgentDetails = request.Content.AgentDetails.isDefined match {
-          case true => Some(getAgentUserDetails(request))
-          case _    => None
-        },
+        AgentDetails = request.Content.AgentDetails.map(_ => getAgentUserDetails(request)),
         ImporterDetails = getImporterDetails(request),
         BankDetails = request.Content.BankDetails,
         DutyTypeTaxDetails = request.Content.DutyTypeTaxDetails,
         DocumentList = request.Content.DocumentList
       )
 
-    def getClaimedUnderArticle(request: CreateClaimRequest): ClaimedUnderArticle =
+    private def getClaimedUnderArticle(request: CreateClaimRequest): ClaimedUnderArticle =
       request.Content.ClaimDetails.ClaimedUnderArticle.isDefined match {
         case true =>
           request.Content.ClaimDetails.ClaimedUnderArticle match {
@@ -93,7 +90,7 @@ object EISCreateCaseRequest {
           }
       }
 
-    def getEISClaimDetails(request: CreateClaimRequest): EISClaimDetails =
+    private def getEISClaimDetails(request: CreateClaimRequest): EISClaimDetails =
       EISClaimDetails(
         FormType = request.Content.ClaimDetails.FormType,
         CustomRegulationType = request.Content.ClaimDetails.CustomRegulationType,
@@ -114,7 +111,7 @@ object EISCreateCaseRequest {
         DeclarantName = request.Content.ClaimDetails.DeclarantName
       )
 
-    def getImporterAddress(request: CreateClaimRequest): EISAddress =
+    private def getImporterAddress(request: CreateClaimRequest): EISAddress =
       EISAddress(
         AddressLine1 = request.Content.ImporterDetails.Address.AddressLine1,
         AddressLine2 = request.Content.ImporterDetails.Address.AddressLine2,
@@ -126,7 +123,7 @@ object EISCreateCaseRequest {
         EmailAddress = request.Content.ImporterDetails.EmailAddress
       )
 
-    def getImporterDetails(request: CreateClaimRequest): EISUserDetails =
+    private def getImporterDetails(request: CreateClaimRequest): EISUserDetails =
       EISUserDetails(
         IsVATRegistered = request.Content.ImporterDetails.IsVATRegistered,
         EORI = request.Content.ImporterDetails.EORI,
@@ -134,7 +131,7 @@ object EISCreateCaseRequest {
         Address = getImporterAddress(request)
       )
 
-    def getAgentAddress(request: CreateClaimRequest): EISAddress =
+    private def getAgentAddress(request: CreateClaimRequest): EISAddress =
       EISAddress(
         AddressLine1 = request.Content.AgentDetails.get.Address.AddressLine1,
         AddressLine2 = request.Content.AgentDetails.get.Address.AddressLine2,
@@ -146,7 +143,7 @@ object EISCreateCaseRequest {
         EmailAddress = request.Content.AgentDetails.get.EmailAddress
       )
 
-    def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =
+    private def getAgentUserDetails(request: CreateClaimRequest): EISUserDetails =
       EISUserDetails(
         IsVATRegistered = request.Content.AgentDetails.get.IsVATRegistered,
         EORI = request.Content.AgentDetails.get.EORI,

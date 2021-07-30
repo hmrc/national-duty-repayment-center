@@ -44,11 +44,6 @@ case class EISAmendCaseError(errorDetail: EISAmendCaseError.ErrorDetail) extends
 
 object EISAmendCaseError {
 
-  def apply(timestamp: String, correlationId: String, errorCode: String, errorMessage: String): EISAmendCaseError =
-    EISAmendCaseError(errorDetail =
-      ErrorDetail(Some(correlationId), Some(timestamp), Some(errorCode), Some(errorMessage))
-    )
-
   def fromStatusAndMessage(status: Int, message: String): EISAmendCaseError =
     EISAmendCaseError(errorDetail = ErrorDetail(None, None, Some(status.toString), Some(message)))
 

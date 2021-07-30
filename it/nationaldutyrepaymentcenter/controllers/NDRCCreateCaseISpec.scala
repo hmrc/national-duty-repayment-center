@@ -90,6 +90,33 @@ class NDRCCreateCaseISpec
         )
         verifyFilesTransferSucceededAudit(1)
       }
+
+      "generate correlationId when none provided" in {
+
+        val correlationId = uuidGenerator.uuid
+        // ensure consistent UUID returned from `WithCorrelationId` trait
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head
+        val fileTransferRequest = FileTransferRequest.fromUploadedFile("PCE201103470D2CC8K0NH3", correlationId, correlationId, "NDRC", 1, 1, uf)
+
+        givenAuditConnector()
+        givenAuthorised()
+        givenPegaCreateCaseRequestSucceeds()
+        givenNdrcFileTransferSucceeds(fileTransferRequest)
+
+        val claimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
+        val result = wsClient
+          .url(s"$url/create-case")
+          // Do not set X-Correlation-ID on header
+          .post(Json.toJson(claimRequest))
+          .futureValue
+
+        result.status mustBe 201
+        val createResponse = result.json.as[NDRCCaseResponse]
+        createResponse.correlationId must be(correlationId)
+      }
+
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
 
         val correlationId = ju.UUID.randomUUID().toString()

@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
@@ -32,32 +35,21 @@ object JsonFormatUtils {
     def writes(o: A): JsValue = JsString(makeString(o))
   }
 
-  def intFormat[A](fromInt: Int => A)(makeInt: A => Int): Format[A] = new Format[A] {
+  val dateFormat: Format[LocalDate] = new Format[LocalDate] {
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
 
-    def reads(json: JsValue): JsResult[A] = json match {
-      case JsNumber(num) =>
-        Try(num.toIntExact) match {
-          case Failure(_)     => JsError("Expected number to be an integer")
-          case Success(value) => JsSuccess(fromInt(value))
+    override def writes(o: LocalDate): JsValue = JsString(o.format(formatter))
+
+    override def reads(json: JsValue): JsResult[LocalDate] = json match {
+      case JsString(s) ⇒
+        Try(LocalDate.parse(s, formatter)) match {
+          case Success(date)  ⇒ JsSuccess(date)
+          case Failure(error) ⇒ JsError(s"Could not parse date as yyyyMMdd: ${error.getMessage}")
         }
-      case _ => JsError("Expected JSON number type")
+
+      case other ⇒ JsError(s"Expected string but got $other")
     }
 
-    def writes(o: A): JsValue = JsNumber(makeInt(o))
-  }
-
-  def longFormat[A](fromLong: Long => A)(makeLong: A => Long): Format[A] = new Format[A] {
-
-    def reads(json: JsValue): JsResult[A] = json match {
-      case JsNumber(num) =>
-        Try(num.toLongExact) match {
-          case Failure(_)     => JsError("Expected number to be a long")
-          case Success(value) => JsSuccess(fromLong(value))
-        }
-      case _ => JsError("Expected JSON number type")
-    }
-
-    def writes(o: A): JsValue = JsNumber(makeLong(o))
   }
 
 }

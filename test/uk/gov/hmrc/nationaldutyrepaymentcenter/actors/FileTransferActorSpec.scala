@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.actors
 
+import java.time.{LocalDateTime, ZonedDateTime}
+
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import org.mockito.ArgumentMatchers.any
@@ -23,13 +25,12 @@ import org.mockito.Mockito.when
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException, UpstreamErrorResponse}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.FileTransferConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferResult, UploadedFile}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.UUIDGenerator
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-import java.time.{LocalDateTime, ZonedDateTime}
 import scala.concurrent.{ExecutionContext, Future}
 
 class FileTransferActorSpec
@@ -118,6 +119,36 @@ class FileTransferActorSpec
 
       when(mockFileTransferConnector.transferFile(any())(any(), any()))
         .thenReturn(Future.failed(new NotFoundException("File not found")))
+
+      val transferrer = system.actorOf(
+        Props(
+          classOf[FileTransferActor],
+          "my-case-ref",
+          mockFileTransferConnector,
+          mockUuidGenerator,
+          "conv-id",
+          testAuditActorRef
+        )
+      )
+      val files = Seq(
+        UploadedFile(
+          "ups-123",
+          "/upscan/ups-123",
+          ZonedDateTime.now(),
+          "valid",
+          "important-form.pdf",
+          "application/pdf"
+        )
+      )
+
+      transferrer ! FileTransferActor.TransferMultipleFiles(files.zipWithIndex, files.size, mockHeaderCarrier)
+
+    }
+
+    "handle upstream error response" in {
+
+      when(mockFileTransferConnector.transferFile(any())(any(), any()))
+        .thenReturn(Future.failed(UpstreamErrorResponse.apply("Some error", 501)))
 
       val transferrer = system.actorOf(
         Props(

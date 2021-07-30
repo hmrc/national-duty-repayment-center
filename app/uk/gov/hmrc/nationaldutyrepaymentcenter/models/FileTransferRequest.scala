@@ -60,7 +60,4 @@ object FileTransferRequest {
   implicit val formats: Format[FileTransferRequest] =
     Json.format[FileTransferRequest]
 
-  implicit val validate: Validator.Validate[FileTransferRequest] =
-    Validator.always
-
 }

@@ -8,7 +8,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.AuthActions
-import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
+import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.{AppConfig, AppConfigImpl}
 
 import scala.concurrent.Future
 
@@ -18,19 +18,9 @@ class AuthActionsISpec extends AppBaseISpec {
 
     override def authConnector: AuthConnector = app.injector.instanceOf[AuthConnector]
 
-    override val appConfig: AppConfig = new AppConfig {
-      override val appName: String = ""
-      override val authBaseUrl: String = ""
-      override val eisBaseUrl: String = ""
-      override val eisCreateCaseApiPath: String = ""
-      override val eisAmendCaseApiPath: String = ""
-      override val eisAuthorizationToken: String = ""
-      override val eisEnvironment: String = ""
-      override val fileBaseUrl: String = ""
-      override val fileBasePath: String = ""
-    }
+    override val appConfig: AppConfig = app.injector.instanceOf[AppConfigImpl]
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc      = HeaderCarrier()
     implicit val request = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
 
     import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,10 +35,7 @@ class AuthActionsISpec extends AppBaseISpec {
   "withAuthorised" should {
 
     "call body when user is authorized" in {
-      stubForAuthAuthorise(
-        "{}",
-        "{}"
-      )
+      stubForAuthAuthorise("{}", "{}")
       val result = TestController.withAuthorised
 
       status(result) mustBe 200

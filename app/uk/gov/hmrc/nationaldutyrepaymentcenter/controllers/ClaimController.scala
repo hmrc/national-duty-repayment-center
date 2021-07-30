@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
@@ -25,7 +26,6 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimServ
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -38,7 +38,7 @@ class ClaimController @Inject() (
   val claimService: ClaimService,
   val auditService: AuditService
 )(implicit ec: ExecutionContext)
-    extends BackendController(cc) with AuthActions with ControllerHelper with WithCorrelationId {
+    extends BackendController(cc) with AuthActions with WithCorrelationId {
 
   private def acknowledgementReferenceFrom(correlationId: String): String =
     correlationId.replace("-", "").takeRight(32)
@@ -46,7 +46,7 @@ class ClaimController @Inject() (
   def submitClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withCorrelationId { correlationId: String =>
       withAuthorised {
-        withPayload[CreateClaimRequest] { createCaseRequest =>
+        withJsonBody[CreateClaimRequest] { createCaseRequest =>
           val eisCreateCaseRequest = EISCreateCaseRequest(
             AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
             ApplicationType = "NDRC",
@@ -78,17 +78,6 @@ class ClaimController @Inject() (
                 .auditCreateCaseEvent(createCaseRequest)(response)
                 .map(_ => BadRequest(Json.toJson(response)))
           }
-        } {
-          // when incoming request's payload validation fails
-          case (errorCode, errorMessage) =>
-            val response = NDRCCaseResponse(
-              correlationId = correlationId,
-              caseId = None,
-              error = Some(ApiError(errorCode, Some(errorMessage)))
-            )
-            auditService
-              .auditCreateCaseErrorEvent(response)
-              .map(_ => BadRequest(Json.toJson(response)))
         }
       }.recoverWith {
         // last resort fallback when request processing fails
@@ -108,7 +97,7 @@ class ClaimController @Inject() (
   def submitAmendClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withCorrelationId { correlationId: String =>
       withAuthorised {
-        withPayload[AmendClaimRequest] { amendCaseRequest =>
+        withJsonBody[AmendClaimRequest] { amendCaseRequest =>
           val eisAmendCaseRequest = EISAmendCaseRequest(
             AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
             ApplicationType = "NDRC",
@@ -137,17 +126,6 @@ class ClaimController @Inject() (
               auditService.auditUpdateCaseEvent(amendCaseRequest)(response)
                 .map(_ => BadRequest(Json.toJson(response)))
           }
-        } {
-          // when incoming request's payload validation fails
-          case (errorCode, errorMessage) =>
-            val response = NDRCCaseResponse(
-              correlationId = correlationId,
-              caseId = None,
-              error = Some(ApiError(errorCode, Some(errorMessage)))
-            )
-            auditService
-              .auditUpdateCaseErrorEvent(response)
-              .map(_ => BadRequest(Json.toJson(response)))
         }
       }.recoverWith {
         // last resort fallback when request processing fails

@@ -54,35 +54,18 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
   override val fileBaseUrl: String = config.baseUrl("file-transfer")
 
   override lazy val fileBasePath: String =
-    config.getConfString(
-      "file-transfer.path",
-      throw new IllegalStateException("Missing [microservice.services.file-transfer.path] configuration property")
-    )
+    config.getString("microservice.services.file-transfer.path")
 
   override val eisCreateCaseApiPath: String =
-    config.getConfString(
-      "eis.createcaseapi.path",
-      throw new IllegalStateException("Missing [microservice.services.eis.createcaseapi.path] configuration property")
-    )
+    config.getString("microservice.services.eis.createcaseapi.path")
 
   override val eisAmendCaseApiPath: String =
-    config.getConfString(
-      "eis.amendcaseapi.path",
-      throw new IllegalStateException("Missing [microservice.services.eis.amendcaseapi.path] configuration property")
-    )
+    config.getString("microservice.services.eis.amendcaseapi.path")
 
   override val eisAuthorizationToken: String =
-    config.getConfString(
-      "eis.createcaseapi.token",
-      throw new IllegalStateException("Missing [microservice.services.eis.createcaseapi.token] configuration property")
-    )
+    config.getString("microservice.services.eis.createcaseapi.token")
 
   override val eisEnvironment: String =
-    config.getConfString(
-      "eis.createcaseapi.environment",
-      throw new IllegalStateException(
-        "Missing [microservice.services.eis.createcaseapi.environment] configuration property"
-      )
-    )
+    config.getString("microservice.services.eis.createcaseapi.environment")
 
 }
