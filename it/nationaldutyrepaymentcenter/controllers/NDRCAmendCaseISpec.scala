@@ -83,6 +83,41 @@ extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers  wi
         )
         verifyFilesTransferSucceededAudit(1)
       }
+
+      "generate correlationId when none provided" in {
+
+        val correlationId = uuidGenerator.uuid
+        // ensure consistent UUID returned from `WithCorrelationId` trait
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head
+        val fileTransferRequest = FileTransferRequest.fromUploadedFile("Risk-2507", correlationId, correlationId, "NDRC", 1, 1, uf)
+
+        givenAuthorised()
+        givenAuditConnector()
+        givenPegaAmendCaseRequestSucceeds(correlationId)
+        givenNdrcFileTransferSucceeds(fileTransferRequest)
+
+        val result = wsClient
+          .url(s"$url/amend-case")
+          // Do not set X-Correlation-ID on header
+          .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status mustBe 201
+        val response = result.json.as[NDRCCaseResponse]
+        response.correlationId must be(correlationId)
+
+        verifyAuditRequestSent(
+          1,
+          NDRCAuditEvent.UpdateCase,
+          Json.obj(
+            "success" -> true
+          ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
+        )
+        verifyFilesTransferSucceededAudit(1)
+      }
+
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
 
         val correlationId = ju.UUID.randomUUID().toString()

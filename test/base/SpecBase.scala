@@ -29,7 +29,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.Furt
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 
-trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
+trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures {
 
   val userAnswersId = "id"
 

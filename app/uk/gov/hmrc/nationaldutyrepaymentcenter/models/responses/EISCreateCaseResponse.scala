@@ -39,20 +39,9 @@ case class EISCreateCaseError(errorDetail: EISCreateCaseError.ErrorDetail) exten
   def errorCode: Option[String]    = errorDetail.errorCode
   def errorMessage: Option[String] = errorDetail.errorMessage
 
-  def isDuplicateCaseError: Boolean =
-    errorDetail.errorMessage.exists(_.replace(" ", "").startsWith("999:"))
-
-  def duplicateCaseID: Option[String] =
-    errorDetail.errorMessage.map(_.replace(" ", "").drop(4))
-
 }
 
 object EISCreateCaseError {
-
-  def apply(timestamp: String, correlationId: String, errorCode: String, errorMessage: String): EISCreateCaseError =
-    EISCreateCaseError(errorDetail =
-      ErrorDetail(Some(correlationId), Some(timestamp), Some(errorCode), Some(errorMessage))
-    )
 
   def fromStatusAndMessage(status: Int, message: String): EISCreateCaseError =
     EISCreateCaseError(errorDetail = ErrorDetail(None, None, Some(status.toString), Some(message)))
