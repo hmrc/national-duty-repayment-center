@@ -39,7 +39,7 @@ class EISAmendCaseResponseSpec extends SpecBase {
                           |    "ProcessingDate": "2020-09-24T10:15:43.995Z"
                           |}""".stripMargin
 
-      val success =
+      val success: EISAmendCaseResponse =
         EISAmendCaseSuccess("Risk-2507", "2020-09-24T10:15:43.995Z", "Success", "Case Updated successfully")
 
       val successFromJson: JsValue           = Json.parse(successJson)
@@ -58,7 +58,7 @@ class EISAmendCaseResponseSpec extends SpecBase {
          |   "errorMessage": "ABC error"
          |}}""".stripMargin
 
-      val error = EISAmendCaseError(
+      val error: EISAmendCaseResponse = EISAmendCaseError(
         ErrorDetail(Some("123123123"), Some("2020-11-03T15:29:28.601Z"), Some("ABC"), Some("ABC error"))
       )
 

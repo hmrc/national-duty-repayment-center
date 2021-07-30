@@ -39,7 +39,7 @@ class EISCreateCaseResponseSpec extends SpecBase {
                                 |    "ProcessingDate": "2020-11-03T15:29:28.601Z"
                                 |}""".stripMargin
 
-      val success =
+      val success: EISCreateCaseResponse =
         EISCreateCaseSuccess("NDRCLHFWER34NKFJN4F3", "2020-11-03T15:29:28.601Z", "Success", "Case created successfully")
 
       val successFromJson: JsValue            = Json.parse(successJson)
@@ -58,7 +58,7 @@ class EISCreateCaseResponseSpec extends SpecBase {
          |   "errorMessage": "ABC error"
          |}}""".stripMargin
 
-      val error = EISCreateCaseError(
+      val error: EISCreateCaseResponse = EISCreateCaseError(
         ErrorDetail(Some("123123123"), Some("2020-11-03T15:29:28.601Z"), Some("ABC"), Some("ABC error"))
       )
 
