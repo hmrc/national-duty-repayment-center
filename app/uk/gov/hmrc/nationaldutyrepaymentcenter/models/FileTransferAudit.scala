@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
-import play.api.libs.json.{Format, Json, Writes}
-
-import java.time.{LocalDateTime, ZonedDateTime}
+import play.api.libs.json.{Format, Json}
 
 case class FileTransferAudit(caseReferenceNumber: String, fileTransferResults: Seq[FileTransferResult])
 

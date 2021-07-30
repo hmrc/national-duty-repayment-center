@@ -17,10 +17,8 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import play.api.libs.json._
 
-import scala.util.{Failure, Success, Try}
+import play.api.libs.json._
 
 final case class ClaimDetails(
   FormType: FormType,
@@ -43,22 +41,7 @@ final case class ClaimDetails(
 
 object ClaimDetails {
 
-  implicit val dateFormat: Format[LocalDate] = new Format[LocalDate] {
-    val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-
-    override def writes(o: LocalDate): JsValue = JsString(o.format(formatter))
-
-    override def reads(json: JsValue): JsResult[LocalDate] = json match {
-      case JsString(s) ⇒
-        Try(LocalDate.parse(s, formatter)) match {
-          case Success(date)  ⇒ JsSuccess(date)
-          case Failure(error) ⇒ JsError(s"Could not parse date as yyyyMMdd: ${error.getMessage}")
-        }
-
-      case other ⇒ JsError(s"Expected string but got $other")
-    }
-
-  }
+  implicit val dateFormat: Format[LocalDate] = JsonFormatUtils.dateFormat
 
   implicit val format: OFormat[ClaimDetails] = Json.format[ClaimDetails]
 

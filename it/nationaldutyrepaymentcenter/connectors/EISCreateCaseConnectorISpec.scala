@@ -2,15 +2,13 @@ package nationaldutyrepaymentcenter.connectors
 
 import java.time.LocalDate
 
-import play.api.Application
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, _}
 import nationaldutyrepaymentcenter.stubs.CreateCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
+import play.api.Application
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{CreateCaseConnector, PegaCaseError, PegaCaseSuccess}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class EISCreateCaseConnectorISpec extends EISCreateCaseConnectorISpecSetup {
 
@@ -87,12 +85,14 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     AcknowledgementReference = "XYZ123",
     ApplicationType = "ndrc",
     OriginatingSystem = "Digital",
-    Content = EISCreateCaseRequest.Content(eisClaimDetails,
+    Content = EISCreateCaseRequest.Content(
+      eisClaimDetails,
       AgentDetails = Some(eisUserDetails),
       ImporterDetails = eisUserDetails,
       BankDetails = Some(bankDetails),
       DutyTypeTaxDetails = dutyTypeTaxDetails,
-      DocumentList = documentList)
+      DocumentList = documentList
+    )
   )
 
   val eisClaimDetails = EISClaimDetails(
@@ -115,7 +115,8 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     DeclarantName = "DummyData"
   )
 
-  val eisAddress = EISAddress(AddressLine1 = "line 1",
+  val eisAddress = EISAddress(
+    AddressLine1 = "line 1",
     AddressLine2 = Some("line 2"),
     City = "city",
     Region = Some("region"),
@@ -125,7 +126,8 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
     EmailAddress = Some("example@example.com")
   )
 
-  val eisUserDetails = EISUserDetails(IsVATRegistered = "true",
+  val eisUserDetails = EISUserDetails(
+    IsVATRegistered = "true",
     EORI = EORI("GB123456789123456"),
     Name = "Joe Bloggs",
     Address = eisAddress
@@ -145,10 +147,9 @@ trait EISCreateCaseConnectorISpecSetup extends AppBaseISpec with CreateCaseStubs
   val documentList = Seq(
     DocumentList(DocumentUploadType.CopyOfC88, Some(DocumentDescription("this is a copy of c88"))),
     DocumentList(DocumentUploadType.Invoice, Some(DocumentDescription("this is an invoice"))),
-    DocumentList(DocumentUploadType.PackingList, Some(DocumentDescription("this is a packing list"))),
+    DocumentList(DocumentUploadType.PackingList, Some(DocumentDescription("this is a packing list")))
   )
 
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
-
 
 }
