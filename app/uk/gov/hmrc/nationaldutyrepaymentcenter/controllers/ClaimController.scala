@@ -55,8 +55,8 @@ class ClaimController @Inject() (
           )
           claimService.createClaim(eisCreateCaseRequest, correlationId).flatMap {
             case success: EISCreateCaseSuccess =>
-              fileTransferService.transferFiles(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
-                .flatMap { fileTransferResults =>
+              fileTransferService.transferMultipleFiles(success.CaseID, correlationId, createCaseRequest.uploadedFiles)
+                .flatMap { _ =>
                   val response = NDRCCaseResponse(caseId = Some(success.CaseID), correlationId = correlationId)
                   auditService.auditCreateCaseEvent(createCaseRequest)(response)
                     .map(_ => Created(Json.toJson(response)))
@@ -106,8 +106,8 @@ class ClaimController @Inject() (
           )
           claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
             case success: EISAmendCaseSuccess =>
-              fileTransferService.transferFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
-                .flatMap { fileTransferResults =>
+              fileTransferService.transferMultipleFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
+                .flatMap { _ =>
                   val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
                   auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(_ => Created(Json.toJson(response)))
                 }

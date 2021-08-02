@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.nationaldutyrepaymentcenter.models
+package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 
-import java.time.LocalDateTime
+import base.SpecBase
 
-import play.api.libs.json.{Format, Json}
+class UUIDGeneratorSpec extends SpecBase {
 
-final case class FileTransferResult(
-  upscanReference: String,
-  checksum: String,
-  fileName: String,
-  fileMimeType: String,
-  success: Boolean,
-  httpStatus: Int,
-  transferredAt: LocalDateTime,
-  correlationId: String,
-  error: Option[String] = None
-)
+  "UUIDGenerator" should {
+    "generate valid uuid" in {
 
-object FileTransferResult {
+      val uuidGenerator = app.injector.instanceOf[UUIDGenerator]
 
-  implicit val formats: Format[FileTransferResult] =
-    Json.format[FileTransferResult]
-
+      uuidGenerator.uuid.length mustBe 36
+    }
+  }
 }

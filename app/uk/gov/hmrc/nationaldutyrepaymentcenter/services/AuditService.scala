@@ -33,27 +33,18 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.services
  */
 
 import com.google.inject.Singleton
+import javax.inject.Inject
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{
-  AllBankDetails,
-  ClaimDetails,
-  DocumentList,
-  DutyTypeTaxDetails,
-  FileTransferAudit,
-  FileTransferResult,
-  UploadedFile,
-  UserDetails
-}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -97,6 +88,16 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
     val details: JsValue = pegaResponseToDetails(updateResponse)
     auditExtendedEvent(UpdateCase, "update-case", details)
   }
+
+  final def auditFileTransferResults(caseReferenceNumber: String, results: Seq[FileTransferResult])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Unit = auditConnector
+    .sendExplicitAudit("FilesTransferred", FileTransferAudit(caseReferenceNumber, results))(
+      hc,
+      ec,
+      Json.writes[FileTransferAudit]
+    )
 
   private def auditExtendedEvent(event: NDRCAuditEvent, transactionName: String, details: JsValue)(implicit
     hc: HeaderCarrier,

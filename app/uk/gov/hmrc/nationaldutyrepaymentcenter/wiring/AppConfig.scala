@@ -41,6 +41,8 @@ trait AppConfig {
 
   val fileBasePath: String
 
+  val internalBaseUrl: String
+
 }
 
 class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
@@ -67,5 +69,8 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
 
   override val eisEnvironment: String =
     config.getString("microservice.services.eis.createcaseapi.environment")
+
+  override val internalBaseUrl: String =
+    config.getString("urls.callback.internal")
 
 }

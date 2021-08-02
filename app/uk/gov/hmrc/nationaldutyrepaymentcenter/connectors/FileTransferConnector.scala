@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
+import java.time.Clock
+
 import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferRequest, FileTransferResult}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.MultiFileTransferRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
-import java.time.{Clock, LocalDateTime}
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -35,25 +36,13 @@ class FileTransferConnector @Inject() (val config: AppConfig, val http: HttpPost
 
   val url: String = config.fileBaseUrl + config.fileBasePath
 
-  final def transferFile(
-    fileTransferRequest: FileTransferRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[FileTransferResult] =
+  final def transferMultipleFiles(
+    multiFileTransferRequest: MultiFileTransferRequest
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
     monitor(s"ConsumedAPI-trader-services-transfer-file-api-POST") {
       http
-        .POST[FileTransferRequest, HttpResponse](url, fileTransferRequest)
-        .map(
-          response =>
-            FileTransferResult(
-              fileTransferRequest.upscanReference,
-              isSuccess(response),
-              response.status,
-              LocalDateTime.now(clock),
-              None
-            )
-        )
-    }
+        .POST[MultiFileTransferRequest, HttpResponse](url, multiFileTransferRequest)
 
-  private def isSuccess(response: HttpResponse): Boolean =
-    response.status >= 200 && response.status < 300
+    }
 
 }

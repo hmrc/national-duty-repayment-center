@@ -3,3 +3,5 @@
 POST     /create-case                @uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.ClaimController.submitClaim
 
 POST     /amend-case                @uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.ClaimController.submitAmendClaim
+
+POST     /file-transfer-callback    @uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.FileTransferController.callback
