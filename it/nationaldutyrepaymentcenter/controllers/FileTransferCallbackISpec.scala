@@ -44,24 +44,44 @@ class FileTransferCallbackISpec
 
   "FileTransferController" when {
     "POST /file-transfer-callback" should {
-      "return 201 and audit the file transfer results" in {
+      "return 201 and audit the file transfer results when transfer successful" in {
 
         val correlationId = ju.UUID.randomUUID().toString()
         when(uuidGenerator.uuid).thenReturn(correlationId)
 
-        val fileTransferRequest = multiFileResponse(correlationId)
+        val fileTransferResult = multiFileResponse(correlationId, success = true)
 
         givenAuditConnector()
 
         val result = wsClient
           .url(s"$url/file-transfer-callback")
           .withHttpHeaders("X-Correlation-ID" -> correlationId)
-          .post(Json.toJson(fileTransferRequest))
+          .post(Json.toJson(fileTransferResult))
           .futureValue
 
         result.status mustBe 201
 
         verifyFilesTransferSucceededAudit(1)
+      }
+
+      "return 201 and audit the file transfer results when transfer failed" in {
+
+        val correlationId = ju.UUID.randomUUID().toString()
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        val fileTransferResult = multiFileResponse(correlationId, success = false)
+
+        givenAuditConnector()
+
+        val result = wsClient
+          .url(s"$url/file-transfer-callback")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .post(Json.toJson(fileTransferResult))
+          .futureValue
+
+        result.status mustBe 201
+
+        verifyFilesTransferFailedAudit(1)
       }
 
     }

@@ -58,7 +58,7 @@ trait FileTransferStubs {
               |}""".stripMargin)
     .as[MultiFileTransferRequest]
 
-  def multiFileResponse(conversationId: String = conversationId): MultiFileTransferResult = Json
+  def multiFileResponse(conversationId: String = conversationId, success: Boolean = true): MultiFileTransferResult = Json
     .parse(s"""{
               |"conversationId": "$conversationId",
               |    "caseReferenceNumber": "NDRC000A00AB0ABCABC0AB0",
@@ -70,7 +70,7 @@ trait FileTransferStubs {
               |            "fileMimeType": "image/jpeg",
               |            "checksum":     "a38d7dd155b1ec9703e5f19f839922ad5a1b0aa4f255c6c2b03e61535997d75",
               |            "fileSize":12345,
-              |            "success":true,
+              |            "success":$success,
               |            "httpStatus":202,
               |            "transferredAt":"2021-07-11T12:53:46",
               |            "correlationId":"07b8090f-69c8-4708-bfc4-bf1731d4b4a8",

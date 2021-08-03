@@ -17,6 +17,7 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
 import javax.inject.{Inject, Singleton}
+import play.api.Logger
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.MultiFileTransferResult
@@ -30,8 +31,16 @@ class FileTransferController @Inject() (val cc: ControllerComponents, val auditS
   ec: ExecutionContext
 ) extends BackendController(cc) {
 
+  lazy private val logger = Logger(getClass)
+
   def callback(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withJsonBody[MultiFileTransferResult] { result =>
+      val numberOfFailures: Int = result.results.count(file => !file.success)
+      if (numberOfFailures > 0)
+        logger.warn(
+          s"MultiFileTransferResult contained failures.  ${numberOfFailures}/${result.results.size} file(s) failed for ${result.conversationId}"
+        )
+
       auditService.auditFileTransferResults(result)
 
       Future.successful(Created)
