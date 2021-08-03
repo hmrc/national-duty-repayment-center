@@ -23,7 +23,7 @@ case class MultiFileTransferRequest(
   caseReferenceNumber: String,
   applicationName: String,
   files: Seq[FileTransferData],
-  callbackUrl: Option[String] = None
+  callbackUrl: Option[String]
 )
 
 case class FileTransferData(

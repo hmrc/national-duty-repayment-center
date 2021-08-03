@@ -32,7 +32,7 @@ class FileTransferController @Inject() (val cc: ControllerComponents, val auditS
 
   def callback(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withJsonBody[MultiFileTransferResult] { result =>
-      auditService.auditFileTransferResults(result.caseReferenceNumber, result.results)
+      auditService.auditFileTransferResults(result)
 
       Future.successful(Created)
     }

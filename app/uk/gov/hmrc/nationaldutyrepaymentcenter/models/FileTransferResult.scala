@@ -29,6 +29,7 @@ final case class FileTransferResult(
   httpStatus: Int,
   transferredAt: LocalDateTime,
   correlationId: String,
+  durationMillis: Int,
   error: Option[String] = None
 )
 

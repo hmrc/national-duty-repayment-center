@@ -18,7 +18,12 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
 import play.api.libs.json.{Format, Json}
 
-case class FileTransferAudit(caseReferenceNumber: String, fileTransferResults: Seq[FileTransferResult])
+case class FileTransferAudit(
+  caseReferenceNumber: String,
+  conversationId: String,
+  totalDurationMillis: Int,
+  fileTransferResults: Seq[FileTransferResult]
+)
 
 object FileTransferAudit {
   implicit val formats: Format[FileTransferAudit] = Json.format[FileTransferAudit]

@@ -89,15 +89,13 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
     auditExtendedEvent(UpdateCase, "update-case", details)
   }
 
-  final def auditFileTransferResults(caseReferenceNumber: String, results: Seq[FileTransferResult])(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Unit = auditConnector
-    .sendExplicitAudit("FilesTransferred", FileTransferAudit(caseReferenceNumber, results))(
-      hc,
-      ec,
-      Json.writes[FileTransferAudit]
-    )
+  final def auditFileTransferResults(
+    result: MultiFileTransferResult
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = auditConnector
+    .sendExplicitAudit(
+      "FilesTransferred",
+      FileTransferAudit(result.caseReferenceNumber, result.conversationId, result.totalDurationMillis, result.results)
+    )(hc, ec, Json.writes[FileTransferAudit])
 
   private def auditExtendedEvent(event: NDRCAuditEvent, transactionName: String, details: JsValue)(implicit
     hc: HeaderCarrier,
@@ -134,6 +132,7 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
 object AuditService {
 
   case class CreateCaseAuditEventDetails(
+    correlationId: String,
     success: Boolean,
     caseReferenceNumber: Option[String],
     claimDetails: ClaimDetails,
@@ -153,6 +152,7 @@ object AuditService {
         Json
           .toJson(
             CreateCaseAuditEventDetails(
+              correlationId = createResponse.correlationId,
               success = true,
               caseReferenceNumber = createResponse.caseId,
               claimDetails = createRequest.Content.ClaimDetails,
@@ -178,6 +178,7 @@ object AuditService {
   }
 
   case class UpdateCaseAuditEventDetails(
+    correlationId: String,
     success: Boolean,
     caseId: String,
     action: String,
@@ -192,6 +193,7 @@ object AuditService {
       val requestDetails: JsObject = Json
         .toJson(
           UpdateCaseAuditEventDetails(
+            correlationId = updateResponse.correlationId,
             success = true,
             caseId = updateRequest.Content.CaseID,
             action = updateRequest.Content.selectedAmendments,
