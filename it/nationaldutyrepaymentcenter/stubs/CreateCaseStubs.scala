@@ -6,7 +6,7 @@ import nationaldutyrepaymentcenter.support.WireMockSupport
 trait CreateCaseStubs {
   me: WireMockSupport =>
 
-  def givenPegaCreateCaseRequestSucceeds(): Unit =
+  def givenPegaCreateCaseRequestSucceeds(caseRef: String = "PCE201103470D2CC8K0NH3"): Unit =
     stubForPostWithResponse(
       200,
       """{
@@ -110,10 +110,10 @@ trait CreateCaseStubs {
         |    ]
         |    }
         |}""".stripMargin,
-      """{
+      s"""{
         |    "Status": "Success",
         |    "StatusText": "Case created successfully",
-        |    "CaseID": "PCE201103470D2CC8K0NH3",
+        |    "CaseID": "$caseRef",
         |    "ProcessingDate": "2020-11-03T15:29:28.601Z"
         |}""".stripMargin
     )

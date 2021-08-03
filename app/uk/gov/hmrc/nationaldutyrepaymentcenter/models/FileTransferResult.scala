@@ -16,15 +16,20 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
 import java.time.LocalDateTime
+
+import play.api.libs.json.{Format, Json}
 
 final case class FileTransferResult(
   upscanReference: String,
+  checksum: String,
+  fileName: String,
+  fileMimeType: String,
   success: Boolean,
   httpStatus: Int,
   transferredAt: LocalDateTime,
+  correlationId: String,
+  durationMillis: Int,
   error: Option[String] = None
 )
 

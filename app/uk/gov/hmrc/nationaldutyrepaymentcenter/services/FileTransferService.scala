@@ -16,47 +16,81 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.nationaldutyrepaymentcenter.actors.{FileTransferActor, FileTransferAuditActor}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.FileTransferConnector
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferResult, UploadedFile}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import java.time.LocalDateTime
 
 import javax.inject.Inject
+import play.api.Logger
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.FileTransferConnector
+import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.routes
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
+import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class FileTransferService @Inject() (
   fileTransferConnector: FileTransferConnector,
-  uuidGenerator: UUIDGenerator,
-  auditConnector: AuditConnector,
-  actorSystem: ActorSystem
+  appConfig: AppConfig,
+  auditService: AuditService
 ) {
 
-  def transferFiles(caseReferenceNumber: String, conversationId: String, uploadedFiles: Seq[UploadedFile])(implicit
-    hc: HeaderCarrier,
-    executionContext: ExecutionContext
-  ): Future[Seq[FileTransferResult]] = {
+  lazy private val logger = Logger(getClass)
 
-    val auditActor: ActorRef = actorSystem.actorOf(
-      Props(classOf[FileTransferAuditActor], caseReferenceNumber, auditConnector, hc, executionContext)
+  def transferMultipleFiles(
+    caseReferenceNumber: String,
+    conversationId: String,
+    uploadedFiles: Seq[UploadedFile]
+  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[Unit] = {
+    val request = MultiFileTransferRequest(
+      conversationId,
+      caseReferenceNumber,
+      "NDRC",
+      uploadedFiles.map(FileTransferData.fromUploadedFile),
+      Some(appConfig.internalBaseUrl + routes.FileTransferController.callback().url)
     )
 
-    // Single-use actor responsible for transferring files batch to PEGA
-    val fileTransferActor: ActorRef =
-      actorSystem.actorOf(
-        Props(
-          classOf[FileTransferActor],
-          caseReferenceNumber,
-          fileTransferConnector,
-          uuidGenerator,
-          conversationId,
-          auditActor
-        )
-      )
+    fileTransferConnector.transferMultipleFiles(request)
+      .recover {
+        case error =>
+          HttpResponse.apply(500, error.getMessage)
+      }
+      .map { result =>
+        if (result.status != 202) {
+          val errorMessage = s"TransferMultipleFiles failed [${result.status}] ${result.body}"
+          logger.error(s"$errorMessage [$conversationId]")
+          auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, conversationId))
+        }
+      }
+  }
 
-    fileTransferActor ! FileTransferActor.TransferMultipleFiles(uploadedFiles.zipWithIndex, uploadedFiles.size, hc)
-    Future.successful(Seq.empty)
+  private def buildErrorResult(
+    request: MultiFileTransferRequest,
+    errorMessage: String,
+    conversationId: String
+  ): MultiFileTransferResult = {
+    val timeStamp = LocalDateTime.now()
+
+    MultiFileTransferResult(
+      request.conversationId,
+      request.caseReferenceNumber,
+      request.applicationName,
+      0,
+      request.files.map(
+        file =>
+          FileTransferResult(
+            file.upscanReference,
+            file.checksum,
+            file.fileName,
+            file.fileMimeType,
+            success = false,
+            0,
+            timeStamp,
+            conversationId,
+            0,
+            Some(errorMessage)
+          )
+      )
+    )
   }
 
 }

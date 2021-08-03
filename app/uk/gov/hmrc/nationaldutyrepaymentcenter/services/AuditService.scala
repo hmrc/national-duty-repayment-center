@@ -33,27 +33,18 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.services
  */
 
 import com.google.inject.Singleton
+import javax.inject.Inject
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, CreateClaimRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{
-  AllBankDetails,
-  ClaimDetails,
-  DocumentList,
-  DutyTypeTaxDetails,
-  FileTransferAudit,
-  FileTransferResult,
-  UploadedFile,
-  UserDetails
-}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -98,6 +89,14 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
     auditExtendedEvent(UpdateCase, "update-case", details)
   }
 
+  final def auditFileTransferResults(
+    result: MultiFileTransferResult
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = auditConnector
+    .sendExplicitAudit(
+      "FilesTransferred",
+      FileTransferAudit(result.caseReferenceNumber, result.conversationId, result.totalDurationMillis, result.results)
+    )(hc, ec, Json.writes[FileTransferAudit])
+
   private def auditExtendedEvent(event: NDRCAuditEvent, transactionName: String, details: JsValue)(implicit
     hc: HeaderCarrier,
     request: Request[Any],
@@ -133,6 +132,7 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
 object AuditService {
 
   case class CreateCaseAuditEventDetails(
+    correlationId: String,
     success: Boolean,
     caseReferenceNumber: Option[String],
     claimDetails: ClaimDetails,
@@ -152,6 +152,7 @@ object AuditService {
         Json
           .toJson(
             CreateCaseAuditEventDetails(
+              correlationId = createResponse.correlationId,
               success = true,
               caseReferenceNumber = createResponse.caseId,
               claimDetails = createRequest.Content.ClaimDetails,
@@ -177,6 +178,7 @@ object AuditService {
   }
 
   case class UpdateCaseAuditEventDetails(
+    correlationId: String,
     success: Boolean,
     caseId: String,
     action: String,
@@ -191,6 +193,7 @@ object AuditService {
       val requestDetails: JsObject = Json
         .toJson(
           UpdateCaseAuditEventDetails(
+            correlationId = updateResponse.correlationId,
             success = true,
             caseId = updateRequest.Content.CaseID,
             action = updateRequest.Content.selectedAmendments,

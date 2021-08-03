@@ -41,6 +41,8 @@ trait AppConfig {
 
   val fileBasePath: String
 
+  val internalBaseUrl: String
+
 }
 
 class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
@@ -54,7 +56,7 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
   override val fileBaseUrl: String = config.baseUrl("file-transfer")
 
   override lazy val fileBasePath: String =
-    config.getString("microservice.services.file-transfer.path")
+    config.getString("microservice.services.file-transfer.path-multiple")
 
   override val eisCreateCaseApiPath: String =
     config.getString("microservice.services.eis.createcaseapi.path")
@@ -67,5 +69,8 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
 
   override val eisEnvironment: String =
     config.getString("microservice.services.eis.createcaseapi.environment")
+
+  override val internalBaseUrl: String =
+    config.getString("urls.callback.internal")
 
 }
