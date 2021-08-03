@@ -17,7 +17,6 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 
 import java.time.LocalDateTime
-import java.util.UUID
 
 import javax.inject.Inject
 import play.api.Logger
@@ -57,10 +56,9 @@ class FileTransferService @Inject() (
       }
       .map { result =>
         if (result.status != 202) {
-          val errorId      = UUID.randomUUID().toString
           val errorMessage = s"TransferMultipleFiles failed [${result.status}] ${result.body}"
-          logger.error(s"$errorMessage [$errorId]")
-          auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, errorId))
+          logger.error(s"$errorMessage [$conversationId]")
+          auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, conversationId))
         }
       }
   }
@@ -68,7 +66,7 @@ class FileTransferService @Inject() (
   private def buildErrorResult(
     request: MultiFileTransferRequest,
     errorMessage: String,
-    errorId: String
+    conversationId: String
   ): MultiFileTransferResult = {
     val timeStamp = LocalDateTime.now()
 
@@ -87,7 +85,7 @@ class FileTransferService @Inject() (
             success = false,
             0,
             timeStamp,
-            errorId,
+            conversationId,
             0,
             Some(errorMessage)
           )
