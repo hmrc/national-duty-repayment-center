@@ -42,7 +42,10 @@ class FileTransferConnector @Inject() (val config: AppConfig, val http: HttpPost
     monitor(s"ConsumedAPI-trader-services-transfer-file-api-POST") {
       http
         .POST[MultiFileTransferRequest, HttpResponse](url, multiFileTransferRequest)
-
+        .recover {
+          case error =>
+            HttpResponse.apply(500, error.getMessage)
+        }
     }
 
 }

@@ -62,7 +62,7 @@ class NDRCCreateCaseISpec
         val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head
         val fileTransferRequest = MultiFileTransferRequest(
           correlationId,
-          "Risk-2507",
+          "NDRC000A00AB0ABCABC0AB0",
           "NDRC",
           Seq(FileTransferData(uf.upscanReference, uf.downloadUrl, uf.checksum, uf.fileName, uf.fileMimeType, None)),
           Some("http://localhost:8451/file-transfer-callback")
@@ -70,7 +70,7 @@ class NDRCCreateCaseISpec
 
         givenAuditConnector()
         givenAuthorised()
-        givenPegaCreateCaseRequestSucceeds()
+        givenPegaCreateCaseRequestSucceeds("NDRC000A00AB0ABCABC0AB0")
         givenFileTransmissionsMultipleSucceeds(fileTransferRequest)
 
         val claimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
@@ -91,9 +91,11 @@ class NDRCCreateCaseISpec
           NDRCAuditEvent.CreateCase,
           Json.obj(
             "success" -> true,
-            "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
+            "caseReferenceNumber" -> "NDRC000A00AB0ABCABC0AB0"
           ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString)
         )
+
+        verifyFilesTransferredAudit(0)
       }
 
       "generate correlationId when none provided" in {
@@ -165,6 +167,8 @@ class NDRCCreateCaseISpec
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
           ) ++ TestData.createRequestDetailsWithFileTransferFailures(wireMockBaseUrlAsString)
         )
+
+        verifyFilesTransferFailedAudit(1, "TransferMultipleFiles failed")
       }
 
       "audit when incoming validation fails" in {

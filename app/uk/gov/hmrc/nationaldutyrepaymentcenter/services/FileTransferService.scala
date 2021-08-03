@@ -16,30 +16,83 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 
+import java.time.LocalDateTime
+import java.util.UUID
+
 import javax.inject.Inject
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.Logger
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.FileTransferConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.routes
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{FileTransferData, MultiFileTransferRequest, UploadedFile}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FileTransferService @Inject() (fileTransferConnector: FileTransferConnector, appConfig: AppConfig) {
+class FileTransferService @Inject() (
+  fileTransferConnector: FileTransferConnector,
+  appConfig: AppConfig,
+  auditService: AuditService
+) {
+
+  lazy private val logger = Logger(getClass)
 
   def transferMultipleFiles(
     caseReferenceNumber: String,
     conversationId: String,
     uploadedFiles: Seq[UploadedFile]
-  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[Unit] =
-    fileTransferConnector.transferMultipleFiles(
-      MultiFileTransferRequest(
-        conversationId,
-        caseReferenceNumber,
-        "NDRC",
-        uploadedFiles.map(FileTransferData.fromUploadedFile),
-        Some(appConfig.internalBaseUrl + routes.FileTransferController.callback().url)
+  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[Unit] = {
+    val request = MultiFileTransferRequest(
+      conversationId,
+      caseReferenceNumber,
+      "NDRC",
+      uploadedFiles.map(FileTransferData.fromUploadedFile),
+      Some(appConfig.internalBaseUrl + routes.FileTransferController.callback().url)
+    )
+
+    fileTransferConnector.transferMultipleFiles(request)
+      .recover {
+        case error =>
+          HttpResponse.apply(500, error.getMessage)
+      }
+      .map { result =>
+        if (result.status != 202) {
+          val errorId      = UUID.randomUUID().toString
+          val errorMessage = s"TransferMultipleFiles failed [${result.status}] ${result.body}"
+          logger.error(s"$errorMessage [$errorId]")
+          auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, errorId))
+        }
+      }
+  }
+
+  private def buildErrorResult(
+    request: MultiFileTransferRequest,
+    errorMessage: String,
+    errorId: String
+  ): MultiFileTransferResult = {
+    val timeStamp = LocalDateTime.now()
+
+    MultiFileTransferResult(
+      request.conversationId,
+      request.caseReferenceNumber,
+      request.applicationName,
+      0,
+      request.files.map(
+        file =>
+          FileTransferResult(
+            file.upscanReference,
+            file.checksum,
+            file.fileName,
+            file.fileMimeType,
+            success = false,
+            0,
+            timeStamp,
+            errorId,
+            0,
+            Some(errorMessage)
+          )
       )
-    ).map(_ => ())
+    )
+  }
 
 }

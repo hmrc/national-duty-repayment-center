@@ -82,6 +82,8 @@ class NDRCAmendCaseISpec
           NDRCAuditEvent.UpdateCase,
           Json.obj("success" -> true) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+
+        verifyFilesTransferredAudit(0)
       }
 
       "generate correlationId when none provided" in {
@@ -119,11 +121,13 @@ class NDRCAmendCaseISpec
           NDRCAuditEvent.UpdateCase,
           Json.obj("success" -> true) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+
+        verifyFilesTransferredAudit(0)
       }
 
       "return 201 with CaseID and fileResults should have error if file upload fails" in {
 
-        val correlationId = uuidGenerator.uuid
+        val correlationId = ju.UUID.randomUUID().toString()
         when(uuidGenerator.uuid).thenReturn(correlationId)
 
         val uf = TestData.uploadedFiles(wireMockBaseUrlAsString).head
@@ -155,6 +159,8 @@ class NDRCAmendCaseISpec
           NDRCAuditEvent.UpdateCase,
           Json.obj("success" -> true) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
+
+        verifyFilesTransferFailedAudit(1, "TransferMultipleFiles failed")
       }
 
       "audit when payload validation fails" in {

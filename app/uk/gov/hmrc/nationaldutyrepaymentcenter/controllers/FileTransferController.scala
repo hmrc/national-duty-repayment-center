@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileTransferController @Inject() (val cc: ControllerComponents, val auditService: AuditService)(implicit
+class FileTransferController @Inject() (val cc: ControllerComponents, auditService: AuditService)(implicit
   ec: ExecutionContext
 ) extends BackendController(cc) {
 

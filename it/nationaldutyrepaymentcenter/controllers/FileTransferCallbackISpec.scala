@@ -49,7 +49,7 @@ class FileTransferCallbackISpec
         val correlationId = ju.UUID.randomUUID().toString()
         when(uuidGenerator.uuid).thenReturn(correlationId)
 
-        val fileTransferResult = multiFileResponse(correlationId, success = true)
+        val fileTransferResult = multiFileResponse(correlationId)
 
         givenAuditConnector()
 
@@ -69,19 +69,23 @@ class FileTransferCallbackISpec
         val correlationId = ju.UUID.randomUUID().toString()
         when(uuidGenerator.uuid).thenReturn(correlationId)
 
-        val fileTransferResult = multiFileResponse(correlationId, success = false)
+        val fileTransferResult = multiFileResponse(correlationId)
+
+        val failedFileTransferResult = fileTransferResult.copy(results =
+          fileTransferResult.results.map(r => r.copy(success = false, error = Some("SomeError")))
+        )
 
         givenAuditConnector()
 
         val result = wsClient
           .url(s"$url/file-transfer-callback")
           .withHttpHeaders("X-Correlation-ID" -> correlationId)
-          .post(Json.toJson(fileTransferResult))
+          .post(Json.toJson(failedFileTransferResult))
           .futureValue
 
         result.status mustBe 201
 
-        verifyFilesTransferFailedAudit(1)
+        verifyFilesTransferFailedAudit(1, "SomeError")
       }
 
     }

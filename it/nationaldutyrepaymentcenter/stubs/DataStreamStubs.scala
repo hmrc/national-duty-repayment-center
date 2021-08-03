@@ -48,10 +48,11 @@ trait DataStreamStubs extends Eventually {
       .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].success", containing("true")))
     ))
 
-  def verifyFilesTransferFailedAudit(times: Int) =
+  def verifyFilesTransferFailedAudit(times: Int, containingError: String) =
     eventually(verify(times, postRequestedFor(urlPathMatching(auditUrl))
       .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
       .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].success", containing("false")))
+      .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].error", containing(containingError)))
     ))
 
   def verifyAuditRequestNotSent(event: NDRCAuditEvent): Unit =
