@@ -16,9 +16,13 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.wiring
 
+import java.util.concurrent.TimeUnit
+
 import com.google.inject.ImplementedBy
 import javax.inject.Inject
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import scala.concurrent.duration.FiniteDuration
 
 @ImplementedBy(classOf[AppConfigImpl])
 trait AppConfig {
@@ -42,6 +46,8 @@ trait AppConfig {
   val fileBasePath: String
 
   val internalBaseUrl: String
+
+  val retryDurations: Seq[FiniteDuration]
 
 }
 
@@ -72,5 +78,8 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
 
   override val internalBaseUrl: String =
     config.getString("urls.callback.internal")
+
+  val retryDurations: Seq[FiniteDuration] =
+    config.getString("retry.duration.seconds").split(",").map(secs => FiniteDuration(secs.trim.toInt, TimeUnit.SECONDS))
 
 }

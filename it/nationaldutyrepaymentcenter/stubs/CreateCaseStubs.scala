@@ -1,10 +1,15 @@
 package nationaldutyrepaymentcenter.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.stubbing.Scenario
 import nationaldutyrepaymentcenter.support.WireMockSupport
+import play.mvc.Http.MimeTypes
 
 trait CreateCaseStubs {
   me: WireMockSupport =>
+
+  private val CREATE_CASE_URL = "/cpr/caserequest/ndrc/create/v1"
+
 
   def givenPegaCreateCaseRequestSucceeds(caseRef: String = "PCE201103470D2CC8K0NH3"): Unit =
     stubForPostWithResponse(
@@ -118,7 +123,7 @@ trait CreateCaseStubs {
         |}""".stripMargin
     )
 
-  def givenPegaCreateCaseRequestFails(status: Int, errorCode: String, errorMessage: String = ""): Unit =
+  def givenPegaCreateCaseRequestFails(status: Int, errorCode: String, errorMessage: String = "", correlationId: String = "123123123"): Unit =
     stubForPostWithResponse(
       status,
       """{
@@ -127,16 +132,48 @@ trait CreateCaseStubs {
         |  "Content": {}
         |}""".stripMargin,
       s"""{"errorDetail":{
-         |   "timestamp": "2020-11-03T15:29:28.601Z", 
-         |   "correlationId": "123123123", 
+         |   "timestamp": "2020-11-03T15:29:28.601Z",
+         |   "correlationId": "$correlationId",
          |   "errorCode": "$errorCode"
          |   ${if (errorMessage.nonEmpty) s""","errorMessage": "$errorMessage"""" else ""}
          |}}""".stripMargin
     )
 
+  def givenPegaCreateCaseRequestSucceedsAfterTwoRetryResponses(caseRef: String): Unit = {
+
+    stubFor(
+      post(urlEqualTo(CREATE_CASE_URL))
+        .inScenario("retry")
+        .whenScenarioStateIs(Scenario.STARTED)
+        .willSetStateTo("stllno")
+        .willReturn(aResponse().withStatus(429).withHeader("Retry-After", "300"))
+    )
+
+    stubFor(
+      post(urlEqualTo(CREATE_CASE_URL))
+        .inScenario("retry")
+        .whenScenarioStateIs("stllno")
+        .willSetStateTo("oknow")
+        .willReturn(aResponse().withStatus(429).withHeader("Retry-After", "300"))
+    )
+
+    stubFor(
+      post(urlEqualTo(CREATE_CASE_URL))
+        .inScenario("retry")
+        .whenScenarioStateIs("oknow")
+        .willSetStateTo(Scenario.STARTED)
+        .willReturn(aResponse().withStatus(200).withBody(s"""{
+                                                            |    "Status": "Success",
+                                                            |    "StatusText": "Case created successfully",
+                                                            |    "CaseID": "$caseRef",
+                                                            |    "ProcessingDate": "2020-11-03T15:29:28.601Z"
+                                                            |}""".stripMargin).withHeader("Content-Type", MimeTypes.JSON))
+    )
+  }
+
   def stubForPostWithResponse(status: Int, payload: String, responseBody: String): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/ndrc/create/v1"))
+      post(urlEqualTo(CREATE_CASE_URL))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
@@ -155,7 +192,7 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestRespondsWithHtml(): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/ndrc/create/v1"))
+      post(urlEqualTo(CREATE_CASE_URL))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
@@ -175,7 +212,7 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestRespondsWith403WithoutContent(): Unit =
     stubFor(
-      post(urlEqualTo("/cpr/caserequest/ndrc/create/v1"))
+      post(urlEqualTo(CREATE_CASE_URL))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
         .withHeader("CustomProcessesHost", equalTo("Digital"))
         .withHeader("date", matching("[A-Za-z0-9,: ]{29}"))
