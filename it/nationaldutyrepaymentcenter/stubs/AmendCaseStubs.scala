@@ -11,40 +11,37 @@ trait AmendCaseStubs {
   private val UPDATE_CASE_URL = "/cpr/caserequest/ndrc/update/v1"
 
   def givenPegaAmendCaseRequestSucceeds(correlationId: String, caseRef: String = "Risk-2507"): Unit =
-    stubForPostWithResponse(
-      200,
-      s"""{
+    stubForPostWithResponse(200, s"""{
         |"AcknowledgementReference" : "${correlationId.replace("-", "")}",
         |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
         |  "Content": {
-        |       "CaseID":"Risk-2507",
+        |       "CaseID":"$caseRef",
         |       "Description":"update request for Risk-2507: Value £199.99"
         |    }
-        |}""".stripMargin,
-      s"""{
+        |}""".stripMargin, s"""{
         |    "Status": "Success",
         |    "StatusText": "Case Updated successfully",
         |    "CaseID": "$caseRef",
         |    "ProcessingDate": "2020-09-24T10:15:43.995Z"
-        |}""".stripMargin
-    )
+        |}""".stripMargin)
 
-  def givenPegaAmendCaseRequestFails(status: Int, errorCode: String, errorMessage: String = "", correlationId: String = "324244343"): Unit =
-    stubForPostWithResponse(
-      status,
-      """{
+  def givenPegaAmendCaseRequestFails(
+    status: Int,
+    errorCode: String,
+    errorMessage: String = "",
+    correlationId: String = "324244343"
+  ): Unit =
+    stubForPostWithResponse(status, """{
         |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
         |  "Content": {}
-        |}""".stripMargin,
-      s"""{"errorDetail":{
+        |}""".stripMargin, s"""{"errorDetail":{
          |   "timestamp": "2020-09-19T12:12:23.000Z",
          |   "correlationId": "$correlationId",
          |   "errorCode": "$errorCode"
          |   ${if (errorMessage.nonEmpty) s""","errorMessage": "$errorMessage"""" else ""}
-         |}}""".stripMargin
-    )
+         |}}""".stripMargin)
 
   def givenPegaAmendCaseRequestSucceedsAfterTwoRetryResponses(caseRef: String): Unit = {
 
@@ -69,12 +66,17 @@ trait AmendCaseStubs {
         .inScenario("retry")
         .whenScenarioStateIs("oknow")
         .willSetStateTo(Scenario.STARTED)
-        .willReturn(aResponse().withStatus(200).withBody(s"""{
+        .willReturn(
+          aResponse().withStatus(200).withBody(s"""{
                                                             |    "Status": "Success",
                                                             |    "StatusText": "Case Updated successfully",
                                                             |    "CaseID": "$caseRef",
                                                             |    "ProcessingDate": "2020-11-03T15:29:28.601Z"
-                                                            |}""".stripMargin).withHeader("Content-Type", MimeTypes.JSON))
+                                                            |}""".stripMargin).withHeader(
+            "Content-Type",
+            MimeTypes.JSON
+          )
+        )
     )
   }
 

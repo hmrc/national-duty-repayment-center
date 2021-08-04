@@ -205,10 +205,10 @@ object AmendTestData {
     )
   )
 
-  def testAmendCaseRequest(wireMockBaseUrlAsString: String) =
+  def testAmendCaseRequest(wireMockBaseUrlAsString: String, caseId: String = "Risk-2507") =
     AmendClaimRequest(
       AmendContent(
-        CaseID = "Risk-2507",
+        CaseID = caseId,
         Description = "update request for Risk-2507: Value £199.99",
         TypeOfAmendments = Seq(FurtherInformation, SupportingDocuments)
       ),

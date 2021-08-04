@@ -18,15 +18,10 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
     "submitAmendClaim" should {
       "return EISCreateCaseSuccess if success" in {
 
-        givenPegaAmendCaseRequestSucceeds(correlationId, "NDRC000A00AB0ABCABC0AB0")
+        givenPegaAmendCaseRequestSucceeds(correlationId, caseId)
 
         val result = await(connector.submitAmendClaim(eisAmendCaseRequest, correlationId))
-        result mustBe EISAmendCaseSuccess(
-          "NDRC000A00AB0ABCABC0AB0",
-          "2020-09-24T10:15:43.995Z",
-          "Success",
-          "Case Updated successfully"
-        )
+        result mustBe EISAmendCaseSuccess(caseId, "2020-09-24T10:15:43.995Z", "Success", "Case Updated successfully")
       }
 
       "return EISCreateCaseError if fails" in {
@@ -56,15 +51,10 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
 
       "retry if response is 429 (Too Many Requests)" in {
 
-        givenPegaAmendCaseRequestSucceedsAfterTwoRetryResponses("NDRC000A00AB0ABCABC0AB0")
+        givenPegaAmendCaseRequestSucceedsAfterTwoRetryResponses(caseId)
 
         val result = await(connector.submitAmendClaim(eisAmendCaseRequest, correlationId))
-        result mustBe EISAmendCaseSuccess(
-          "NDRC000A00AB0ABCABC0AB0",
-          "2020-11-03T15:29:28.601Z",
-          "Success",
-          "Case Updated successfully"
-        )
+        result mustBe EISAmendCaseSuccess(caseId, "2020-11-03T15:29:28.601Z", "Success", "Case Updated successfully")
       }
     }
   }
@@ -79,7 +69,9 @@ trait AmendCaseConnectorISpecSetup extends AppBaseISpec {
   lazy val connector: AmendCaseConnector =
     app.injector.instanceOf[AmendCaseConnector]
 
-  val amendClaimRequest: AmendClaimRequest = AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)
+  val caseId = "NDRC000A00AB0ABCABC0AB0"
+
+  val amendClaimRequest: AmendClaimRequest = AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString, caseId)
 
   val correlationId = UUID.randomUUID().toString
 
