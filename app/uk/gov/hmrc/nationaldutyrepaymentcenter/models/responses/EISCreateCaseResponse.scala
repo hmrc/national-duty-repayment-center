@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 
-import play.api.libs.json.{Format, Json}
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsValue
+import java.util.concurrent.TimeUnit
+
+import play.api.libs.json._
+import uk.gov.hmrc.http.TooManyRequestException
+
+import scala.concurrent.duration.FiniteDuration
+import scala.util.{Failure, Try}
 
 sealed trait EISCreateCaseResponse
 
@@ -101,6 +103,27 @@ object EISCreateCaseResponse {
             EISCreateCaseError.formats.writes(e)
         }
 
+    }
+
+  final def shouldRetry(response: Try[EISCreateCaseResponse]): Boolean =
+    response match {
+      case Failure(e: TooManyRequestException) => true
+      case _                                   => false
+    }
+
+  final def errorMessage(response: Try[EISCreateCaseResponse]): String =
+    response match {
+      case Failure(e: TooManyRequestException) => "Too Many Requests"
+      case _                                   => ""
+    }
+
+  final def delayInterval(response: Try[EISCreateCaseResponse]): Option[FiniteDuration] =
+    response match {
+      case Failure(e: TooManyRequestException) =>
+        try Some(FiniteDuration(e.getMessage().toLong, TimeUnit.MILLISECONDS))
+        catch {
+          case e: NumberFormatException => None
+        }
     }
 
 }

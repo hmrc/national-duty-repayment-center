@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
+import akka.actor.ActorSystem
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import com.kenshoo.play.metrics.Metrics
@@ -31,11 +32,15 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateCaseConnector @Inject() (val config: AppConfig, val http: HttpPost, metrics: Metrics)(implicit
-  ec: ExecutionContext
-) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
+class CreateCaseConnector @Inject() (
+  val config: AppConfig,
+  val http: HttpPost,
+  val actorSystem: ActorSystem,
+  metrics: Metrics
+)(implicit ec: ExecutionContext)
+    extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
       EISCreateCaseError.fromStatusAndMessage
-    ) with EISConnector with HttpAPIMonitor {
+    ) with EISConnector with HttpAPIMonitor with Retry {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
@@ -44,17 +49,23 @@ class CreateCaseConnector @Inject() (val config: AppConfig, val http: HttpPost, 
   def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
     hc: HeaderCarrier
   ): Future[EISCreateCaseResponse] =
-    monitor(s"ConsumedAPI-eis-pega-create-case-api-POST") {
-      http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
-        url,
-        request,
-        eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
-      )(
-        implicitly[Writes[EISCreateCaseRequest]],
-        readFromJsonSuccessOrFailure,
-        hc.copy(authorization = None),
-        implicitly[ExecutionContext]
-      )
+    retry(config.retryDurations: _*)(
+      EISCreateCaseResponse.shouldRetry,
+      EISCreateCaseResponse.errorMessage,
+      EISCreateCaseResponse.delayInterval
+    ) {
+      monitor(s"ConsumedAPI-eis-pega-create-case-api-POST") {
+        http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
+          url,
+          request,
+          eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
+        )(
+          implicitly[Writes[EISCreateCaseRequest]],
+          readFromJsonSuccessOrFailure,
+          hc.copy(authorization = None),
+          implicitly[ExecutionContext]
+        )
+      }
     }
 
 }
