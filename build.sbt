@@ -3,9 +3,11 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 
+val silencerVersion = "1.7.0"
+
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "5.3.0",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "5.9.0",
   "com.kenshoo"        %% "metrics-play"              % "2.6.19_0.7.0",
   "com.github.blemale" %% "scaffeine"                 % "3.1.0",
   "org.typelevel"      %% "cats-core"                 % "2.2.0",
@@ -14,7 +16,7 @@ lazy val compileDeps = Seq(
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "5.3.0"          % scope,
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "5.9.0"          % scope,
     "org.scalatest"          %% "scalatest"               % "3.2.9"          % scope,
     "org.scalatestplus"      %% "mockito-3-4"            % "3.2.9.0"         % scope,
     "com.vladsch.flexmark"    % "flexmark-all"            % "0.36.8"         % scope,
@@ -38,7 +40,15 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageHighlighting := true,
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
     publishingSettings,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
+    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
+    // ***************
+    // Use the silencer plugin to suppress warnings
+    scalacOptions += "-P:silencer:pathFilters=routes",
+    libraryDependencies ++= Seq(
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+    )
+    // ***************
   )
   .configs(IntegrationTest)
   .settings(

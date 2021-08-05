@@ -69,16 +69,13 @@ object EISCreateCaseRequest {
       )
 
     private def getClaimedUnderArticle(request: CreateClaimRequest): ClaimedUnderArticle =
-      request.Content.ClaimDetails.ClaimedUnderArticle.isDefined match {
-        case true =>
-          request.Content.ClaimDetails.ClaimedUnderArticle match {
-            case Some(ClaimedUnderArticleFE.Equity) => ClaimedUnderArticle.Equity
-            case Some(ClaimedUnderArticleFE.ErrorByTheCompetentAuthorities) =>
-              ClaimedUnderArticle.ErrorByTheCompetentAuthorities
-            case Some(ClaimedUnderArticleFE.OverchargedAmountsOfImportOrExportDuty) =>
-              ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty
-          }
-        case false =>
+      request.Content.ClaimDetails.ClaimedUnderArticle match {
+        case Some(ClaimedUnderArticleFE.Equity) => ClaimedUnderArticle.Equity
+        case Some(ClaimedUnderArticleFE.ErrorByTheCompetentAuthorities) =>
+          ClaimedUnderArticle.ErrorByTheCompetentAuthorities
+        case Some(ClaimedUnderArticleFE.OverchargedAmountsOfImportOrExportDuty) =>
+          ClaimedUnderArticle.OverchargedAmountsOfImportOrExportDuty
+        case None =>
           request.Content.ClaimDetails.ClaimedUnderRegulation match {
             case Some(ClaimedUnderRegulation.ErrorByCustoms)         => ClaimedUnderArticle.ErrorByCustoms
             case Some(ClaimedUnderRegulation.LowerRateWasApplicable) => ClaimedUnderArticle.LowerRateWasApplicable
@@ -87,6 +84,7 @@ object EISCreateCaseRequest {
             case Some(ClaimedUnderRegulation.SpecialCircumstances)   => ClaimedUnderArticle.SpecialCircumstances
             case Some(ClaimedUnderRegulation.WithdrawalOfCustomsDeclaration) =>
               ClaimedUnderArticle.WithdrawalOfCustomsDeclaration
+            case None => throw new IllegalStateException("cannot determine value for ClaimedUnderArticle")
           }
       }
 

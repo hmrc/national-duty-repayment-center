@@ -106,11 +106,9 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
 
   private def createExtendedEvent(event: NDRCAuditEvent, transactionName: String, details: JsValue)(implicit
     hc: HeaderCarrier,
-    request: Request[Any],
-    ec: ExecutionContext
+    request: Request[Any]
   ): ExtendedDataEvent = {
-    val tags            = hc.toAuditTags(transactionName, request.path)
-    implicit val writes = Json.format[ExtendedDataEvent]
+    val tags = hc.toAuditTags(transactionName, request.path)
     val extendedEvent = ExtendedDataEvent(
       auditSource = "national-duty-repayment-center",
       auditType = event.toString,

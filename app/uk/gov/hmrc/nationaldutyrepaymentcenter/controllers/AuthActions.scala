@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Result
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -30,7 +30,7 @@ trait AuthActions extends AuthorisedFunctions {
 
   protected def withAuthorised[A](
     body: => Future[Result]
-  )(implicit request: Request[A], hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     authorised(AuthProviders(GovernmentGateway))(body)
 
 }

@@ -125,6 +125,7 @@ object EISAmendCaseResponse {
         catch {
           case e: NumberFormatException => None
         }
+      case _ => None
     }
 
 }

@@ -1,6 +1,5 @@
 package nationaldutyrepaymentcenter.support
 
-import com.codahale.metrics.MetricRegistry
 import com.kenshoo.play.metrics.Metrics
 import org.scalatest.Suite
 import org.scalatest.matchers.must.Matchers
@@ -13,8 +12,6 @@ trait MetricsTestSupport {
 
   def app: Application
 
-  private var metricsRegistry: MetricRegistry = _
-
   def givenCleanMetricRegistry(): Unit = {
     val registry = app.injector.instanceOf[Metrics].defaultRegistry
     for (
@@ -22,7 +19,6 @@ trait MetricsTestSupport {
         .asScalaIterator[String](registry.getMetrics.keySet().iterator())
     )
       registry.remove(metric)
-    metricsRegistry = registry
   }
 
 }
