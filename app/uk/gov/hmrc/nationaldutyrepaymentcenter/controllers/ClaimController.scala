@@ -19,6 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
+import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
@@ -85,7 +86,7 @@ class ClaimController @Inject() (
           val response = NDRCCaseResponse(
             correlationId = correlationId,
             caseId = None,
-            error = Some(ApiError("500", Some(e.getMessage)))
+            error = Some(ApiError("500", Some(messageForError(e))))
           )
           auditService
             .auditCreateCaseErrorEvent(response)
@@ -133,7 +134,7 @@ class ClaimController @Inject() (
           val response = NDRCCaseResponse(
             correlationId = correlationId,
             caseId = None,
-            error = Some(ApiError("500", Some(e.getMessage)))
+            error = Some(ApiError("500", Some(messageForError(e))))
           )
           auditService
             .auditUpdateCaseErrorEvent(response)
@@ -141,5 +142,9 @@ class ClaimController @Inject() (
       }
     }
   }
+
+  private def messageForError(e: Throwable) = if (e.isInstanceOf[TooManyRequestException])
+    s"Failed after ${appConfig.retryDurations.size} retries"
+  else e.getMessage
 
 }
