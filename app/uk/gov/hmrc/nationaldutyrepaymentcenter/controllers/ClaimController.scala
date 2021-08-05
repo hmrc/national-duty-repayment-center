@@ -83,11 +83,7 @@ class ClaimController @Inject() (
       }.recoverWith {
         // last resort fallback when request processing fails
         case e =>
-          val response = NDRCCaseResponse(
-            correlationId = correlationId,
-            caseId = None,
-            error = Some(ApiError("500", Some(messageForError(e))))
-          )
+          val response = responseForError(e, correlationId)
           auditService
             .auditCreateCaseErrorEvent(response)
             .map(_ => InternalServerError(Json.toJson(response)))
@@ -131,11 +127,7 @@ class ClaimController @Inject() (
       }.recoverWith {
         // last resort fallback when request processing fails
         case e =>
-          val response = NDRCCaseResponse(
-            correlationId = correlationId,
-            caseId = None,
-            error = Some(ApiError("500", Some(messageForError(e))))
-          )
+          val response = responseForError(e, correlationId)
           auditService
             .auditUpdateCaseErrorEvent(response)
             .map(_ => InternalServerError(Json.toJson(response)))
@@ -143,8 +135,13 @@ class ClaimController @Inject() (
     }
   }
 
-  private def messageForError(e: Throwable) = if (e.isInstanceOf[TooManyRequestException])
-    s"Failed after ${appConfig.retryDurations.size} retries"
-  else e.getMessage
+  private def responseForError(e: Throwable, correlationId: String): NDRCCaseResponse = {
+    val message =
+      if (e.isInstanceOf[TooManyRequestException])
+        s"Failed after ${appConfig.retryDurations.size} retries"
+      else e.getMessage
+
+    NDRCCaseResponse(correlationId = correlationId, caseId = None, error = Some(ApiError("500", Some(message))))
+  }
 
 }
