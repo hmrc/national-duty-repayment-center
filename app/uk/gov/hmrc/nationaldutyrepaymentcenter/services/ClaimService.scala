@@ -22,11 +22,9 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.{AmendCaseConnector, C
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseResponse, EISCreateCaseResponse}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class ClaimService @Inject() (createCaseConnector: CreateCaseConnector, amendCaseConnector: AmendCaseConnector)(implicit
-  ec: ExecutionContext
-) {
+class ClaimService @Inject() (createCaseConnector: CreateCaseConnector, amendCaseConnector: AmendCaseConnector) {
 
   def createClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
     hc: HeaderCarrier

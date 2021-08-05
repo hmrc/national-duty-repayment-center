@@ -8,7 +8,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
@@ -17,9 +17,8 @@ abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport 
 
   def app: Application
 
-  override def commonStubs(): Unit = {
+  override def commonStubs(): Unit =
     givenCleanMetricRegistry()
-  }
 
   implicit val defaultTimeout: FiniteDuration = 5 seconds
 
@@ -34,6 +33,6 @@ abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport 
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
 
   implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
 }
