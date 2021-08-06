@@ -31,7 +31,7 @@ abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (
     HttpReads[HttpResponse]
       .flatMap { response =>
         response.status match {
-          case 429 => throw new TooManyRequestException(response.header("Retry-After").getOrElse("DEFAULT"))
+          case 429 => throw new TooManyRequestException(response.header("Retry-After").getOrElse(""))
           case status =>
             if (response.body.isEmpty())
               HttpReads.pure(fallback(status, "Error: empty response"))

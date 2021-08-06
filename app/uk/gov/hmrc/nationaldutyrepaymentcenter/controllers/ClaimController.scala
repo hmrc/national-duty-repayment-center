@@ -19,6 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
+import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
@@ -82,11 +83,7 @@ class ClaimController @Inject() (
       }.recoverWith {
         // last resort fallback when request processing fails
         case e =>
-          val response = NDRCCaseResponse(
-            correlationId = correlationId,
-            caseId = None,
-            error = Some(ApiError("500", Some(e.getMessage)))
-          )
+          val response = responseForError(e, correlationId)
           auditService
             .auditCreateCaseErrorEvent(response)
             .map(_ => InternalServerError(Json.toJson(response)))
@@ -130,16 +127,21 @@ class ClaimController @Inject() (
       }.recoverWith {
         // last resort fallback when request processing fails
         case e =>
-          val response = NDRCCaseResponse(
-            correlationId = correlationId,
-            caseId = None,
-            error = Some(ApiError("500", Some(e.getMessage)))
-          )
+          val response = responseForError(e, correlationId)
           auditService
             .auditUpdateCaseErrorEvent(response)
             .map(_ => InternalServerError(Json.toJson(response)))
       }
     }
+  }
+
+  private def responseForError(e: Throwable, correlationId: String): NDRCCaseResponse = {
+    val message =
+      if (e.isInstanceOf[TooManyRequestException])
+        s"Failed after ${appConfig.retryDurations.size} retries"
+      else e.getMessage
+
+    NDRCCaseResponse(correlationId = correlationId, caseId = None, error = Some(ApiError("500", Some(message))))
   }
 
 }
