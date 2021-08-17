@@ -81,14 +81,14 @@ class NDRCAmendCaseISpec
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
 
-        verifyAmendCaseSentWithEORI("GB345356852357")
+//        verifyAmendCaseSentWithEORI("GB345356852357")
+        verifyAmendCaseSent()
 
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
-          Json.obj("success" -> true) ++ Json.obj("EORI" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(
-            wireMockBaseUrlAsString
-          )
+//          Json.obj("success" -> true) ++ Json.obj("EORI" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(
+          Json.obj("success" -> true) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
 
         verifyFilesTransferredAudit(0)
