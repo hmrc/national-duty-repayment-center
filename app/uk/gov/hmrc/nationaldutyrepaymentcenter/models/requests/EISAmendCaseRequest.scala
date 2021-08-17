@@ -17,6 +17,7 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.EORI
 
 /**
   * Create specified case in the PEGA system.
@@ -36,13 +37,13 @@ case class EISAmendCaseRequest(
 object EISAmendCaseRequest {
   implicit val formats: Format[EISAmendCaseRequest] = Json.format[EISAmendCaseRequest]
 
-  case class Content(CaseID: String, Description: String)
+  case class Content(CaseID: String, Description: String, EORI: Option[EORI])
 
   object Content {
     implicit val formats: Format[Content] = Json.format[Content]
 
     def from(request: AmendClaimRequest): Content =
-      Content(CaseID = request.Content.CaseID, Description = request.Content.Description)
+      Content(CaseID = request.Content.CaseID, Description = request.Content.Description, EORI = request.EORI)
 
   }
 

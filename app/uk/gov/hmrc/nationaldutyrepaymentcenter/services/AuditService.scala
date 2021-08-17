@@ -180,6 +180,7 @@ object AuditService {
     success: Boolean,
     caseId: String,
     action: String,
+    EORI: Option[EORI],
     description: Option[String],
     numberOfFilesUploaded: Int,
     uploadedFiles: Seq[UploadedFile]
@@ -195,6 +196,7 @@ object AuditService {
             success = true,
             caseId = updateRequest.Content.CaseID,
             action = updateRequest.Content.selectedAmendments,
+            EORI = updateRequest.EORI,
             description = Option(updateRequest.Content.Description),
             numberOfFilesUploaded = updateRequest.uploadedFiles.size,
             uploadedFiles = updateRequest.uploadedFiles

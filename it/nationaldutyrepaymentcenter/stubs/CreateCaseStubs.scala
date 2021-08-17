@@ -171,6 +171,12 @@ trait CreateCaseStubs {
     )
   }
 
+  def givenTooManyPegaCreateCaseRequest(): Unit =
+    stubFor(
+      post(urlEqualTo(CREATE_CASE_URL))
+        .willReturn(aResponse().withStatus(429).withHeader("Retry-After", "300"))
+    )
+
   def stubForPostWithResponse(status: Int, payload: String, responseBody: String): Unit =
     stubFor(
       post(urlEqualTo(CREATE_CASE_URL))

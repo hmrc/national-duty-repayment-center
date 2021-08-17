@@ -198,6 +198,49 @@ class NDRCCreateCaseISpec
         verifyFilesTransferredAudit(0)
       }
 
+      "audit when too many requests received" in {
+
+        val correlationId = uuidGenerator.uuid
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        givenAuthorised()
+        givenAuditConnector()
+        givenTooManyPegaCreateCaseRequest()
+
+        val claimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
+        val result = wsClient
+          .url(s"$url/create-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .post(Json.toJson(claimRequest))
+          .futureValue
+
+        result.status mustBe 500
+
+        verifyAuditRequestSent(1, NDRCAuditEvent.CreateCase, Json.obj("errorMessage" -> "Failed after 3 retries"))
+        verifyFilesTransferredAudit(0)
+      }
+
+      "not audit when authorisation fails" in {
+
+        val correlationId = uuidGenerator.uuid
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        givenUnauthorisedWith("MissingBearerToken")
+        givenAuditConnector()
+
+        val result = wsClient
+          .url(s"$url/create-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status mustBe 401
+
+        verifyAuditRequestNotSent(NDRCAuditEvent.CreateCase)
+
+        verifyFilesTransferredAudit(0)
+      }
+
     }
   }
 }

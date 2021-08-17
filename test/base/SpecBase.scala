@@ -116,7 +116,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       Description = "update request for Risk-2507: Value £199.99",
       TypeOfAmendments = Seq(FurtherInformation)
     ),
-    Nil
+    Nil,
+    EORI = Some(EORI("GB345356852357"))
   )
 
   val amendJson = Json.obj(

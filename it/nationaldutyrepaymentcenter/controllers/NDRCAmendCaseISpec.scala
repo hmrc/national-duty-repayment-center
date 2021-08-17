@@ -13,9 +13,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGenerator}
 
 class NDRCAmendCaseISpec
@@ -70,17 +70,25 @@ class NDRCAmendCaseISpec
         val result = wsClient
           .url(s"$url/amend-case")
           .withHttpHeaders("X-Correlation-ID" -> correlationId)
-          .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
+          .post(
+            Json.toJson(
+              AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString, eori = Some(EORI("GB345356852357")))
+            )
+          )
           .futureValue
 
         result.status mustBe 201
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
 
+        verifyAmendCaseSentWithEORI("GB345356852357")
+
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
-          Json.obj("success" -> true) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
+          Json.obj("success" -> true) ++ Json.obj("EORI" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(
+            wireMockBaseUrlAsString
+          )
         )
 
         verifyFilesTransferredAudit(0)
@@ -188,6 +196,48 @@ class NDRCAmendCaseISpec
         verifyFilesTransferredAudit(0)
       }
 
+      "audit when too many requests received" in {
+
+        val correlationId = uuidGenerator.uuid
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        givenAuthorised()
+        givenAuditConnector()
+        givenTooManyPegaAmendCaseRequest()
+
+        val result = wsClient
+          .url(s"$url/amend-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status mustBe 500
+
+        verifyAuditRequestSent(1, NDRCAuditEvent.UpdateCase, Json.obj("errorMessage" -> "Failed after 3 retries"))
+        verifyFilesTransferredAudit(0)
+      }
+
+      "not audit when authorisation fails" in {
+
+        val correlationId = uuidGenerator.uuid
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        givenUnauthorisedWith("MissingBearerToken")
+        givenAuditConnector()
+
+        val result = wsClient
+          .url(s"$url/amend-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status mustBe 401
+
+        verifyAuditRequestNotSent(NDRCAuditEvent.UpdateCase)
+
+        verifyFilesTransferredAudit(0)
+      }
+
     }
   }
 }
@@ -205,14 +255,15 @@ object AmendTestData {
     )
   )
 
-  def testAmendCaseRequest(wireMockBaseUrlAsString: String, caseId: String = "Risk-2507") =
+  def testAmendCaseRequest(wireMockBaseUrlAsString: String, caseId: String = "Risk-2507", eori: Option[EORI] = None) =
     AmendClaimRequest(
       AmendContent(
         CaseID = caseId,
         Description = "update request for Risk-2507: Value £199.99",
         TypeOfAmendments = Seq(FurtherInformation, SupportingDocuments)
       ),
-      uploadedFiles(wireMockBaseUrlAsString)
+      uploadedFiles(wireMockBaseUrlAsString),
+      eori
     )
 
   def createAuditEventRequest(baseUrl: String): JsObject =

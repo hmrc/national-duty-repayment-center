@@ -18,7 +18,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
@@ -27,7 +27,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimServ
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ClaimController @Inject() (
@@ -79,14 +79,14 @@ class ClaimController @Inject() (
                 .auditCreateCaseEvent(createCaseRequest)(response)
                 .map(_ => BadRequest(Json.toJson(response)))
           }
+        }.recoverWith {
+          // last resort fallback when request processing fails
+          case e =>
+            val response = responseForError(e, correlationId)
+            auditService
+              .auditCreateCaseErrorEvent(response)
+              .map(_ => InternalServerError(Json.toJson(response)))
         }
-      }.recoverWith {
-        // last resort fallback when request processing fails
-        case e =>
-          val response = responseForError(e, correlationId)
-          auditService
-            .auditCreateCaseErrorEvent(response)
-            .map(_ => InternalServerError(Json.toJson(response)))
       }
     }
   }
@@ -94,46 +94,56 @@ class ClaimController @Inject() (
   def submitAmendClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withCorrelationId { correlationId: String =>
       withAuthorised {
-        withJsonBody[AmendClaimRequest] { amendCaseRequest =>
-          val eisAmendCaseRequest = EISAmendCaseRequest(
-            AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
-            ApplicationType = "NDRC",
-            OriginatingSystem = "Digital",
-            Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
-          )
-          claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
-            case success: EISAmendCaseSuccess =>
-              fileTransferService.transferMultipleFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
-                .flatMap { _ =>
-                  val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
-                  auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(_ => Created(Json.toJson(response)))
-                }
-            // when request to the upstream api returns an error
-            case error: EISAmendCaseError =>
-              val response = NDRCCaseResponse(
-                correlationId = correlationId,
-                caseId = None,
-                error = Some(
-                  ApiError(
-                    errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
-                    errorMessage = error.errorMessage
+        withJsonBody[AmendClaimRequest] {
+          withAmendClaimRequestEORI { amendCaseRequest =>
+            val eisAmendCaseRequest = EISAmendCaseRequest(
+              AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
+              ApplicationType = "NDRC",
+              OriginatingSystem = "Digital",
+              Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
+            )
+            claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
+              case success: EISAmendCaseSuccess =>
+                fileTransferService.transferMultipleFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
+                  .flatMap { _ =>
+                    val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
+                    auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(
+                      _ => Created(Json.toJson(response))
+                    )
+                  }
+              // when request to the upstream api returns an error
+              case error: EISAmendCaseError =>
+                val response = NDRCCaseResponse(
+                  correlationId = correlationId,
+                  caseId = None,
+                  error = Some(
+                    ApiError(
+                      errorCode = error.errorCode.getOrElse("ERROR_UPSTREAM_UNDEFINED"),
+                      errorMessage = error.errorMessage
+                    )
                   )
                 )
-              )
-              auditService.auditUpdateCaseEvent(amendCaseRequest)(response)
-                .map(_ => BadRequest(Json.toJson(response)))
+                auditService.auditUpdateCaseEvent(amendCaseRequest)(response)
+                  .map(_ => BadRequest(Json.toJson(response)))
+            }
           }
+        }.recoverWith {
+          // last resort fallback when request processing fails
+          case e =>
+            val response = responseForError(e, correlationId)
+            auditService
+              .auditUpdateCaseErrorEvent(response)
+              .map(_ => InternalServerError(Json.toJson(response)))
         }
-      }.recoverWith {
-        // last resort fallback when request processing fails
-        case e =>
-          val response = responseForError(e, correlationId)
-          auditService
-            .auditUpdateCaseErrorEvent(response)
-            .map(_ => InternalServerError(Json.toJson(response)))
       }
     }
   }
+
+  def withAmendClaimRequestEORI(f: AmendClaimRequest => Future[Result])(request: AmendClaimRequest): Future[Result] =
+    if (appConfig.submitEORIOnAmend)
+      f(request)
+    else
+      f(request.copy(EORI = None))
 
   private def responseForError(e: Throwable, correlationId: String): NDRCCaseResponse = {
     val message =
