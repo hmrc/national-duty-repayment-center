@@ -40,27 +40,29 @@ class FileTransferService @Inject() (
     caseReferenceNumber: String,
     conversationId: String,
     uploadedFiles: Seq[UploadedFile]
-  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[Unit] = {
-    val request = MultiFileTransferRequest(
-      conversationId,
-      caseReferenceNumber,
-      "NDRC",
-      uploadedFiles.map(FileTransferData.fromUploadedFile),
-      Some(appConfig.internalBaseUrl + routes.FileTransferController.callback().url)
-    )
+  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[Unit] = uploadedFiles match {
+    case files if files.nonEmpty =>
+      val request = MultiFileTransferRequest(
+        conversationId,
+        caseReferenceNumber,
+        "NDRC",
+        files.map(FileTransferData.fromUploadedFile),
+        Some(appConfig.internalBaseUrl + routes.FileTransferController.callback().url)
+      )
 
-    fileTransferConnector.transferMultipleFiles(request)
-      .recover {
-        case error =>
-          HttpResponse.apply(500, error.getMessage)
-      }
-      .map { result =>
-        if (result.status != 202) {
-          val errorMessage = s"TransferMultipleFiles failed [${result.status}] ${result.body}"
-          logger.error(s"$errorMessage [$conversationId]")
-          auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, conversationId))
+      fileTransferConnector.transferMultipleFiles(request)
+        .recover {
+          case error =>
+            HttpResponse.apply(500, error.getMessage)
         }
-      }
+        .map { result =>
+          if (result.status != 202) {
+            val errorMessage = s"TransferMultipleFiles failed [${result.status}] ${result.body}"
+            logger.error(s"$errorMessage [$conversationId]")
+            auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, conversationId))
+          }
+        }
+    case _ => Future.successful(())
   }
 
   private def buildErrorResult(
