@@ -33,7 +33,12 @@ class ClaimService @Inject() (createCaseConnector: CreateCaseConnector, amendCas
 
   def amendClaim(request: EISAmendCaseRequest, correlationId: String)(implicit
     hc: HeaderCarrier
-  ): Future[EISAmendCaseResponse] =
+  ): Future[EISAmendCaseResponse] = {
+
+    println("AMEND CLAIM")
+    println(request)
+    println("AMEND CLAIM")
     amendCaseConnector.submitAmendClaim(request, correlationId)
+  }
 
 }

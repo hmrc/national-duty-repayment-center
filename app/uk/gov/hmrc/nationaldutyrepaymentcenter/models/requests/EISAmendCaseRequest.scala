@@ -42,8 +42,8 @@ object EISAmendCaseRequest {
   object Content {
     implicit val formats: Format[Content] = Json.format[Content]
 
-    def from(request: AmendClaimRequest): Content =
-      Content(CaseID = request.Content.CaseID, Description = request.Content.Description, EORI = request.EORI)
+    def from(request: AmendClaimRequest, eori: Option[EORI]): Content =
+      Content(CaseID = request.Content.CaseID, Description = request.Content.Description, EORI = eori)
 
   }
 

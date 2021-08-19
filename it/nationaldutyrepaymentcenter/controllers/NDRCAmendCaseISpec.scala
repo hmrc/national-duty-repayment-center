@@ -63,7 +63,7 @@ class NDRCAmendCaseISpec
           Some("http://localhost:8451/file-transfer-callback")
         )
 
-        givenAuthorised()
+        givenAuthorisedAsValidTrader("GB345356852357")
         givenAuditConnector()
         givenPegaAmendCaseRequestSucceeds(correlationId)
         givenFileTransmissionsMultipleSucceeds(multiFileTransferRequest = fileTransferRequest)
@@ -73,7 +73,7 @@ class NDRCAmendCaseISpec
           .withHttpHeaders("X-Correlation-ID" -> correlationId)
           .post(
             Json.toJson(
-              AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString, eori = Some(EORI("GB345356852357")))
+              AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)
             )
           )
           .futureValue
@@ -87,7 +87,7 @@ class NDRCAmendCaseISpec
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
-          Json.obj("success" -> true) ++ Json.obj("EORI" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(
+          Json.obj("success" -> true) ++ Json.obj("eori" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(
             wireMockBaseUrlAsString
           )
         )
@@ -256,15 +256,14 @@ object AmendTestData {
     )
   )
 
-  def testAmendCaseRequest(wireMockBaseUrlAsString: String, caseId: String = "Risk-2507", eori: Option[EORI] = None) =
+  def testAmendCaseRequest(wireMockBaseUrlAsString: String, caseId: String = "Risk-2507") =
     AmendClaimRequest(
       AmendContent(
         CaseID = caseId,
         Description = "update request for Risk-2507: Value £199.99",
         TypeOfAmendments = Seq(FurtherInformation, SupportingDocuments)
       ),
-      uploadedFiles(wireMockBaseUrlAsString),
-      eori
+      uploadedFiles(wireMockBaseUrlAsString)
     )
 
   def createAuditEventRequest(baseUrl: String): JsObject =

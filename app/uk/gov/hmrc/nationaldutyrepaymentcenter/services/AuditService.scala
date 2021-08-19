@@ -59,11 +59,13 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
   import AuditService._
   import NDRCAuditEvent._
 
-  final def auditCreateCaseEvent(createRequest: CreateClaimRequest)(
-    createResponse: NDRCCaseResponse
+  final def auditCreateCaseEvent(
+    createRequest: CreateClaimRequest,
+    createResponse: NDRCCaseResponse,
+    eori: Option[EORI]
   )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] = {
     val details: JsValue =
-      CreateCaseAuditEventDetails.from(createRequest, createResponse)
+      CreateCaseAuditEventDetails.from(createRequest, createResponse, eori)
     auditExtendedEvent(CreateCase, "create-case", details)
   }
 
@@ -74,11 +76,17 @@ class AuditService @Inject() (val auditConnector: AuditConnector) {
     auditExtendedEvent(CreateCase, "create-case", details)
   }
 
-  final def auditUpdateCaseEvent(updateRequest: AmendClaimRequest)(
-    updateResponse: NDRCCaseResponse
+  final def auditUpdateCaseEvent(
+    updateRequest: AmendClaimRequest,
+    updateResponse: NDRCCaseResponse,
+    eori: Option[EORI]
   )(implicit hc: HeaderCarrier, request: Request[Any], ec: ExecutionContext): Future[Unit] = {
     val details: JsValue =
-      UpdateCaseAuditEventDetails.from(updateRequest, updateResponse)
+      UpdateCaseAuditEventDetails.from(updateRequest, updateResponse, eori)
+
+    println("AUDIT UPDATE")
+    println(details)
+    println("AUDIT UPDATE")
     auditExtendedEvent(UpdateCase, "update-case", details)
   }
 
@@ -132,6 +140,7 @@ object AuditService {
   case class CreateCaseAuditEventDetails(
     correlationId: String,
     success: Boolean,
+    eori: Option[EORI],
     caseReferenceNumber: Option[String],
     claimDetails: ClaimDetails,
     agentDetails: Option[UserDetails],
@@ -145,13 +154,14 @@ object AuditService {
 
   object CreateCaseAuditEventDetails {
 
-    def from(createRequest: CreateClaimRequest, createResponse: NDRCCaseResponse): JsValue = {
+    def from(createRequest: CreateClaimRequest, createResponse: NDRCCaseResponse, eori: Option[EORI]): JsValue = {
       val requestDetails: JsObject =
         Json
           .toJson(
             CreateCaseAuditEventDetails(
               correlationId = createResponse.correlationId,
               success = true,
+              eori = eori,
               caseReferenceNumber = createResponse.caseId,
               claimDetails = createRequest.Content.ClaimDetails,
               agentDetails = createRequest.Content.AgentDetails,
@@ -178,9 +188,9 @@ object AuditService {
   case class UpdateCaseAuditEventDetails(
     correlationId: String,
     success: Boolean,
+    eori: Option[EORI],
     caseId: String,
     action: String,
-    EORI: Option[EORI],
     description: Option[String],
     numberOfFilesUploaded: Int,
     uploadedFiles: Seq[UploadedFile]
@@ -188,15 +198,15 @@ object AuditService {
 
   object UpdateCaseAuditEventDetails {
 
-    def from(updateRequest: AmendClaimRequest, updateResponse: NDRCCaseResponse): JsValue = {
+    def from(updateRequest: AmendClaimRequest, updateResponse: NDRCCaseResponse, eori: Option[EORI]): JsValue = {
       val requestDetails: JsObject = Json
         .toJson(
           UpdateCaseAuditEventDetails(
             correlationId = updateResponse.correlationId,
             success = true,
+            eori = eori,
             caseId = updateRequest.Content.CaseID,
             action = updateRequest.Content.selectedAmendments,
-            EORI = updateRequest.EORI,
             description = Option(updateRequest.Content.Description),
             numberOfFilesUploaded = updateRequest.uploadedFiles.size,
             uploadedFiles = updateRequest.uploadedFiles

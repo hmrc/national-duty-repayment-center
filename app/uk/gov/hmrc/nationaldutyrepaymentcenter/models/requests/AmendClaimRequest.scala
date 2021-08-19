@@ -17,9 +17,9 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, EORI, UploadedFile}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{AmendContent, UploadedFile}
 
-final case class AmendClaimRequest(Content: AmendContent, uploadedFiles: Seq[UploadedFile], EORI: Option[EORI])
+final case class AmendClaimRequest(Content: AmendContent, uploadedFiles: Seq[UploadedFile])
 
 object AmendClaimRequest {
 

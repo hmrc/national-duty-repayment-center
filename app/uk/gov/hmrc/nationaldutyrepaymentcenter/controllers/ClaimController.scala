@@ -18,7 +18,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, Result}
+import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests._
@@ -27,7 +27,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimServ
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ClaimController @Inject() (
@@ -64,7 +64,7 @@ class ClaimController @Inject() (
                 )
                   .flatMap { _ =>
                     val response = NDRCCaseResponse(caseId = Some(success.CaseID), correlationId = correlationId)
-                    auditService.auditCreateCaseEvent(createCaseRequest)(response)
+                    auditService.auditCreateCaseEvent(createCaseRequest, response, maybeEORI)
                       .map(_ => Created(Json.toJson(response)))
                   }
 
@@ -81,7 +81,7 @@ class ClaimController @Inject() (
                   )
                 )
                 auditService
-                  .auditCreateCaseEvent(createCaseRequest)(response)
+                  .auditCreateCaseEvent(createCaseRequest, response, maybeEORI)
                   .map(_ => BadRequest(Json.toJson(response)))
             }
           }.recoverWith {
@@ -106,14 +106,15 @@ class ClaimController @Inject() (
               AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
               ApplicationType = "NDRC",
               OriginatingSystem = "Digital",
-              Content = EISAmendCaseRequest.Content.from(amendCaseRequest)
+              Content =
+                EISAmendCaseRequest.Content.from(amendCaseRequest, if (appConfig.submitEORIOnAmend) maybeEORI else None)
             )
             claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
               case success: EISAmendCaseSuccess =>
                 fileTransferService.transferMultipleFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
                   .flatMap { _ =>
                     val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
-                    auditService.auditUpdateCaseEvent(amendCaseRequest)(response).map(
+                    auditService.auditUpdateCaseEvent(amendCaseRequest, response, maybeEORI).map(
                       _ => Created(Json.toJson(response))
                     )
                   }
@@ -129,7 +130,7 @@ class ClaimController @Inject() (
                     )
                   )
                 )
-                auditService.auditUpdateCaseEvent(amendCaseRequest)(response)
+                auditService.auditUpdateCaseEvent(amendCaseRequest, response, maybeEORI)
                   .map(_ => BadRequest(Json.toJson(response)))
             }
           }
