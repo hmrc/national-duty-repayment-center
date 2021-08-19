@@ -7,17 +7,32 @@ import nationaldutyrepaymentcenter.support.WireMockSupport
 trait AuthStubs {
   me: WireMockSupport =>
 
-  def givenAuthorised() =
+  case class Enrolment(serviceName: String, identifierName: String, identifierValue: String)
+
+  def givenAuthorised(): Unit =
+    givenAuthorisedWithEnrolment(Enrolment("ENROLMENT", "IDENTIFIER", "Value"))
+
+  def givenAuthorisedAsValidTrader(eori: String): Unit =
+    givenAuthorisedWithEnrolment(Enrolment("HMRC-CTS-ORG", "EORINumber", eori))
+
+  private def givenAuthorisedWithEnrolment(enrolment: Enrolment): Unit =
     stubForAuthAuthorise(
       s"""
          |{
-         |  "authorise": [
-         |    { "authProviders": ["GovernmentGateway"] }
-         |  ]
+         |"authorisedEnrolments": [
+         |  { "key":"${enrolment.serviceName}", "identifiers": [
+         |    {"key":"${enrolment.identifierName}", "value": "${enrolment.identifierValue}"}
+         |  ]}
+         |],
+         |"allEnrolments": [
+         |  { "key":"${enrolment.serviceName}", "identifiers": [
+         |    {"key":"${enrolment.identifierName}", "value": "${enrolment.identifierValue}"}
+         |  ]}
+         |]
          |}
-           """.stripMargin,
-      "{}"
+          """.stripMargin
     )
+
 
   def givenUnauthorisedWith(mdtpDetail: String): Unit =
     stubFor(
@@ -29,11 +44,10 @@ trait AuthStubs {
         )
     )
 
-  def stubForAuthAuthorise(payload: String, responseBody: String): Unit = {
+  def stubForAuthAuthorise(responseBody: String): Unit = {
     stubFor(
       post(urlEqualTo("/auth/authorise"))
         .atPriority(1)
-        .withRequestBody(equalToJson(payload, true, true))
         .willReturn(
           aResponse()
             .withStatus(200)

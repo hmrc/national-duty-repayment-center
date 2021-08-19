@@ -69,7 +69,7 @@ class NDRCCreateCaseISpec
         )
 
         givenAuditConnector()
-        givenAuthorised()
+        givenAuthorisedAsValidTrader("GB345356852357")
         givenPegaCreateCaseRequestSucceeds("NDRC000A00AB0ABCABC0AB0")
         givenFileTransmissionsMultipleSucceeds(fileTransferRequest)
 
@@ -91,6 +91,7 @@ class NDRCCreateCaseISpec
           NDRCAuditEvent.CreateCase,
           Json.obj(
             "success" -> true,
+            "claimantEORI" -> "GB345356852357",
             "caseReferenceNumber" -> "NDRC000A00AB0ABCABC0AB0"
           ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString)
         )

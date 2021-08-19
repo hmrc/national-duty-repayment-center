@@ -35,7 +35,7 @@ class AuthActionsISpec extends AppBaseISpec {
   "withAuthorised" should {
 
     "call body when user is authorized" in {
-      stubForAuthAuthorise("{}", "{}")
+      stubForAuthAuthorise("{}")
       val result = TestController.withAuthorised
 
       status(result) mustBe 200
