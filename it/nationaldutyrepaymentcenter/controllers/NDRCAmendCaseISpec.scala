@@ -39,7 +39,8 @@ class NDRCAmendCaseISpec
         "auditing.consumer.baseUri.host"                      -> wireMockHost,
         "auditing.consumer.baseUri.port"                      -> wireMockPort,
         "microservice.services.file-transfer.host"            -> wireMockHost,
-        "microservice.services.file-transfer.port"            -> wireMockPort
+        "microservice.services.file-transfer.port"            -> wireMockPort,
+        "features.submitEORIOnAmend" -> true
       ).overrides(bind[Clock].toInstance(clock), bind[UUIDGenerator].toInstance(uuidGeneratorMock))
 
   override lazy val app = appBuilder.build()
@@ -62,7 +63,7 @@ class NDRCAmendCaseISpec
           Some("http://localhost:8451/file-transfer-callback")
         )
 
-        givenAuthorised()
+        givenAuthorisedAsValidTrader("GB345356852357")
         givenAuditConnector()
         givenPegaAmendCaseRequestSucceeds(correlationId)
         givenFileTransmissionsMultipleSucceeds(multiFileTransferRequest = fileTransferRequest)
@@ -77,10 +78,12 @@ class NDRCAmendCaseISpec
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
 
+        verifyAmendCaseSentWithEORI("GB345356852357")
+
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
-          Json.obj("success" -> true) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
+          Json.obj("success" -> true) ++ Json.obj("claimantEORI" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
 
         verifyFilesTransferredAudit(0)

@@ -49,6 +49,8 @@ trait AppConfig {
 
   val retryDurations: Seq[FiniteDuration]
 
+  val submitEORIOnAmend: Boolean
+
 }
 
 class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
@@ -78,6 +80,8 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
 
   override val internalBaseUrl: String =
     config.getString("urls.callback.internal")
+
+  override val submitEORIOnAmend: Boolean = config.getBoolean("features.submitEORIOnAmend")
 
   val retryDurations: Seq[FiniteDuration] =
     config.getString("retry.duration.seconds").split(",").map(secs => FiniteDuration(secs.trim.toInt, TimeUnit.SECONDS))

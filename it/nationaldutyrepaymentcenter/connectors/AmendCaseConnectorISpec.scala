@@ -8,6 +8,7 @@ import nationaldutyrepaymentcenter.support.AppBaseISpec
 import play.api.Application
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.AmendCaseConnector
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.EORI
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, EISAmendCaseRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISAmendCaseError.ErrorDetail
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseError, EISAmendCaseSuccess}
@@ -73,13 +74,15 @@ trait AmendCaseConnectorISpecSetup extends AppBaseISpec {
 
   val amendClaimRequest: AmendClaimRequest = AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString, caseId)
 
+  val eori = EORI("GB9807575898645")
+
   val correlationId = UUID.randomUUID().toString
 
   val eisAmendCaseRequest = EISAmendCaseRequest(
     AcknowledgementReference = correlationId.replace("-", "").takeRight(32),
     ApplicationType = "NDRC",
     OriginatingSystem = "Digital",
-    Content = EISAmendCaseRequest.Content.from(amendClaimRequest)
+    Content = EISAmendCaseRequest.Content.from(amendClaimRequest, Some(eori))
   )
 
 }

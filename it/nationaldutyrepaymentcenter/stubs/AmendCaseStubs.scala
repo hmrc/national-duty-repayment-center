@@ -3,6 +3,7 @@ package nationaldutyrepaymentcenter.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import nationaldutyrepaymentcenter.support.WireMockSupport
+import org.scalatest.concurrent.Eventually.eventually
 import play.mvc.Http.MimeTypes
 
 trait AmendCaseStubs {
@@ -134,5 +135,28 @@ trait AmendCaseStubs {
             .withStatus(403)
         )
     )
+
+  def verifyAmendCaseSentWithEORI(
+                                   eori: String,
+                                   caseId: String = "Risk-2507",
+                                   description: String = "update request for Risk-2507: Value £199.99"
+                                 ) = {
+
+    val json = s"""{
+                  |  "Content": {
+                  |       "CaseID":"$caseId",
+                  |       "Description":"$description",
+                  |       "EORI":"$eori"
+                  |    }
+                  |}""".stripMargin
+
+    eventually(
+      verify(
+        1,
+        postRequestedFor(urlPathMatching(UPDATE_CASE_URL))
+          .withRequestBody(equalToJson(json.stripMargin, true, true))
+      )
+    )
+  }
 
 }
