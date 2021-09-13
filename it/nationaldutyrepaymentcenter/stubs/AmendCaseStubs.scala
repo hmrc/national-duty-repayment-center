@@ -136,17 +136,15 @@ trait AmendCaseStubs {
         )
     )
 
-  def verifyAmendCaseSentWithEORI(
-                                   eori: String,
-                                   caseId: String = "Risk-2507",
-                                   description: String = "update request for Risk-2507: Value £199.99"
-                                 ) = {
+  def verifyAmendCaseSent(
+    caseId: String = "Risk-2507",
+    description: String = "update request for Risk-2507: Value £199.99"
+  ) = {
 
     val json = s"""{
                   |  "Content": {
                   |       "CaseID":"$caseId",
-                  |       "Description":"$description",
-                  |       "EORI":"$eori"
+                  |       "Description":"$description"
                   |    }
                   |}""".stripMargin
 

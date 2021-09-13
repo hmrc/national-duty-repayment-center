@@ -106,7 +106,7 @@ class ClaimController @Inject() (
               AcknowledgementReference = acknowledgementReferenceFrom(correlationId),
               ApplicationType = "NDRC",
               OriginatingSystem = "Digital",
-              EISAmendCaseRequest.Content.from(amendCaseRequest, if (appConfig.submitEORIOnAmend) maybeEORI else None)
+              EISAmendCaseRequest.Content.from(amendCaseRequest)
             )
             claimService.amendClaim(eisAmendCaseRequest, correlationId).flatMap {
               case success: EISAmendCaseSuccess =>
