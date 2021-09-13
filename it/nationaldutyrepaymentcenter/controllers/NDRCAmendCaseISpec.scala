@@ -13,9 +13,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGenerator}
 
 class NDRCAmendCaseISpec
@@ -39,8 +39,7 @@ class NDRCAmendCaseISpec
         "auditing.consumer.baseUri.host"                      -> wireMockHost,
         "auditing.consumer.baseUri.port"                      -> wireMockPort,
         "microservice.services.file-transfer.host"            -> wireMockHost,
-        "microservice.services.file-transfer.port"            -> wireMockPort,
-        "features.submitEORIOnAmend" -> true
+        "microservice.services.file-transfer.port"            -> wireMockPort
       ).overrides(bind[Clock].toInstance(clock), bind[UUIDGenerator].toInstance(uuidGeneratorMock))
 
   override lazy val app = appBuilder.build()
@@ -78,12 +77,14 @@ class NDRCAmendCaseISpec
         val response = result.json.as[NDRCCaseResponse]
         response.correlationId must be(correlationId)
 
-        verifyAmendCaseSentWithEORI("GB345356852357")
+        verifyAmendCaseSent()
 
         verifyAuditRequestSent(
           1,
           NDRCAuditEvent.UpdateCase,
-          Json.obj("success" -> true) ++ Json.obj("claimantEORI" -> "GB345356852357") ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
+          Json.obj("success" -> true) ++ Json.obj(
+            "claimantEORI"   -> "GB345356852357"
+          ) ++ AmendTestData.createAuditEventRequest(wireMockBaseUrlAsString)
         )
 
         verifyFilesTransferredAudit(0)
