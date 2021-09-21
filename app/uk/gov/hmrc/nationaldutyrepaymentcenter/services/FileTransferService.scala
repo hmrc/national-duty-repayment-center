@@ -57,7 +57,8 @@ class FileTransferService @Inject() (
         }
         .map { result =>
           if (result.status != 202) {
-            val errorMessage = s"TransferMultipleFiles failed [${result.status}] ${result.body}"
+            val errorMessage =
+              s"TransferMultipleFiles failed caseReferenceNumber:[${caseReferenceNumber}] for ${conversationId} [${result.status}] ${result.body} "
             logger.error(s"$errorMessage [$conversationId]")
             auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, conversationId))
           }

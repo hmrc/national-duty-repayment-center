@@ -38,7 +38,11 @@ class FileTransferController @Inject() (val cc: ControllerComponents, auditServi
       val numberOfFailures: Int = result.results.count(file => !file.success)
       if (numberOfFailures > 0)
         logger.warn(
-          s"MultiFileTransferResult contained failures.  ${numberOfFailures}/${result.results.size} file(s) failed for ${result.conversationId}"
+          s"MultiFileTransferResult contained failures, caseReferenceNumber:[${result.caseReferenceNumber}]  ${numberOfFailures}/${result.results.size} file(s) failed for ${result.conversationId}"
+        )
+      else
+        logger.info(
+          s"MultiFileTransferResult success, caseReferenceNumber:[${result.caseReferenceNumber}]  ${result.results.size} file(s) for ${result.conversationId}"
         )
 
       auditService.auditFileTransferResults(result)
