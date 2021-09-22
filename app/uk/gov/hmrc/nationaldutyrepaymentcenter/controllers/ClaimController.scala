@@ -69,7 +69,7 @@ class ClaimController @Inject() (
                   .flatMap { _ =>
                     val response = NDRCCaseResponse(caseId = Some(success.CaseID), correlationId = correlationId)
                     logger.info(
-                      s"CreateCaseEvent success, caseReferenceNumber:[${response.caseId}] correlationId:[$correlationId]"
+                      s"CreateCaseEvent success, caseReferenceNumber:[${success.CaseID}] correlationId:[$correlationId]"
                     )
                     auditService.auditCreateCaseEvent(createCaseRequest, response, maybeEORI)
                       .map(_ => Created(Json.toJson(response)))
