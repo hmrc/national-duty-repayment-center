@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
+import play.api.Logger
+
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
@@ -41,6 +43,8 @@ class ClaimController @Inject() (
 )(implicit ec: ExecutionContext)
     extends BackendController(cc) with AuthActions with WithCorrelationId with WithEORINumber {
 
+  lazy private val logger = Logger(getClass)
+
   private def acknowledgementReferenceFrom(correlationId: String): String =
     correlationId.replace("-", "").takeRight(32)
 
@@ -64,6 +68,9 @@ class ClaimController @Inject() (
                 )
                   .flatMap { _ =>
                     val response = NDRCCaseResponse(caseId = Some(success.CaseID), correlationId = correlationId)
+                    logger.info(
+                      s"CreateCaseEvent success, caseReferenceNumber:[${response.caseId}] correlationId:[$correlationId]"
+                    )
                     auditService.auditCreateCaseEvent(createCaseRequest, response, maybeEORI)
                       .map(_ => Created(Json.toJson(response)))
                   }
@@ -80,6 +87,9 @@ class ClaimController @Inject() (
                     )
                   )
                 )
+                logger.info(
+                  s"CreateCaseEvent failed with bad request, caseReferenceNumber:[] correlationId:[$correlationId]"
+                )
                 auditService
                   .auditCreateCaseEvent(createCaseRequest, response, maybeEORI)
                   .map(_ => BadRequest(Json.toJson(response)))
@@ -89,6 +99,9 @@ class ClaimController @Inject() (
           // last resort fallback when request processing fails
           case e =>
             val response = responseForError(e, correlationId)
+            logger.info(
+              s"CreateCaseEvent failed with internal server error, caseReferenceNumber:[] correlationId:[$correlationId]"
+            )
             auditService
               .auditCreateCaseErrorEvent(response)
               .map(_ => InternalServerError(Json.toJson(response)))
@@ -113,6 +126,9 @@ class ClaimController @Inject() (
                 fileTransferService.transferMultipleFiles(success.CaseID, correlationId, amendCaseRequest.uploadedFiles)
                   .flatMap { _ =>
                     val response = NDRCCaseResponse(correlationId = correlationId, caseId = Some(success.CaseID))
+                    logger.info(
+                      s"UpdateCaseEvent success, caseReferenceNumber:[${eisAmendCaseRequest.Content.CaseID}] correlationId:[$correlationId]"
+                    )
                     auditService.auditUpdateCaseEvent(amendCaseRequest, response, maybeEORI).map(
                       _ => Created(Json.toJson(response))
                     )
@@ -129,6 +145,9 @@ class ClaimController @Inject() (
                     )
                   )
                 )
+                logger.info(
+                  s"UpdateCaseEvent failed with bad request, caseReferenceNumber:[${eisAmendCaseRequest.Content.CaseID}] correlationId:[$correlationId]"
+                )
                 auditService.auditUpdateCaseEvent(amendCaseRequest, response, maybeEORI)
                   .map(_ => BadRequest(Json.toJson(response)))
             }
@@ -137,6 +156,9 @@ class ClaimController @Inject() (
           // last resort fallback when request processing fails
           case e =>
             val response = responseForError(e, correlationId)
+            logger.info(
+              s"UpdateCaseEvent failed with internal server error, caseReferenceNumber:[] correlationId:[$correlationId]"
+            )
             auditService
               .auditUpdateCaseErrorEvent(response)
               .map(_ => InternalServerError(Json.toJson(response)))
