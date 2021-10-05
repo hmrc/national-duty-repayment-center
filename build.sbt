@@ -9,7 +9,6 @@ lazy val compileDeps = Seq(
   ws,
   "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "5.13.0",
   "com.kenshoo"        %% "metrics-play"              % "2.6.19_0.7.0",
-  "org.typelevel"      %% "cats-core"                 % "2.2.0",
   ws
 )
 
