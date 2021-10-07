@@ -85,7 +85,7 @@ object EISAmendCaseError {
 
 object EISAmendCaseResponse {
 
-  implicit def reads: Reads[EISAmendCaseResponse] =
+  implicit lazy val reads: Reads[EISAmendCaseResponse] =
     Reads {
       case jsObject: JsObject if (jsObject \ "CaseID").isDefined =>
         EISAmendCaseSuccess.formats.reads(jsObject)
@@ -93,7 +93,7 @@ object EISAmendCaseResponse {
         EISAmendCaseError.formats.reads(jsValue)
     }
 
-  implicit def writes: Writes[EISAmendCaseResponse] =
+  implicit lazy val writes: Writes[EISAmendCaseResponse] =
     new Writes[EISAmendCaseResponse] {
 
       override def writes(o: EISAmendCaseResponse): JsValue =

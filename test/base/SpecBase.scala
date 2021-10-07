@@ -40,7 +40,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
 
   def fakeRequest = FakeRequest("", "")
 
-  implicit def messages: Messages = messagesApi.preferred(fakeRequest)
+  implicit lazy val messages: Messages = messagesApi.preferred(fakeRequest)
 
   val claimDetails = ClaimDetails(
     FormType = FormType("01"),

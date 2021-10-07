@@ -24,11 +24,11 @@ abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport 
 
   def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
 
-  protected implicit def materializer: Materializer = app.materializer
+  protected implicit lazy val materializer: Materializer = app.materializer
 
   private lazy val messagesApi = app.injector.instanceOf[MessagesApi]
 
-  private implicit def messages: Messages = messagesApi.preferred(Seq.empty[Lang])
+  private implicit lazy val messages: Messages = messagesApi.preferred(Seq.empty[Lang])
 
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
 
