@@ -46,6 +46,14 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
         )
       }
 
+      "return GatewayTimeoutException if EIS call fails" in {
+
+        givenPegaCreateCaseRequestFails(499, "errorCode", "error message", correlationId)
+
+        val result = await(connector.submitClaim(eisCreateCaseRequest, correlationId))
+        result mustBe new GatewayTimeoutException("")
+      }
+
       "return EISCreateCaseError if no body in response" in {
 
         givenPegaCreateCaseRequestRespondsWith403WithoutContent()
@@ -72,7 +80,7 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
   }
 }
 
-trait CreateCaseConnectorISpecSetup extends AppBaseISpec  {
+trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -81,15 +89,21 @@ trait CreateCaseConnectorISpecSetup extends AppBaseISpec  {
   lazy val connector: CreateCaseConnector =
     app.injector.instanceOf[CreateCaseConnector]
 
-  val createClaimRequest: CreateClaimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
+  val createClaimRequest: CreateClaimRequest =
+    TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
 
-  val correlationId = UUID.randomUUID().toString
+  val correlationId: String =
+    UUID
+      .randomUUID()
+      .toString
+      .replace("-", "")
+      .takeRight(32)
 
-  val eisCreateCaseRequest = EISCreateCaseRequest(
-    AcknowledgementReference = correlationId.replace("-", "").takeRight(32),
-    ApplicationType = "NDRC",
-    OriginatingSystem = "Digital",
-    Content = EISCreateCaseRequest.Content.from(createClaimRequest)
-  )
-
+  val eisCreateCaseRequest: EISCreateCaseRequest =
+    EISCreateCaseRequest(
+      AcknowledgementReference = correlationId,
+      ApplicationType = "NDRC",
+      OriginatingSystem = "Digital",
+      Content = EISCreateCaseRequest.Content.from(createClaimRequest)
+    )
 }
