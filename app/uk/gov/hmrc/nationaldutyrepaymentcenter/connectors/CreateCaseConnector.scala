@@ -32,21 +32,15 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateCaseConnector @Inject()(
+class CreateCaseConnector @Inject() (
   val config: AppConfig,
   val http: HttpPost,
   val actorSystem: ActorSystem,
   metrics: Metrics
-)(
-  implicit ec: ExecutionContext
-) extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
-  EISCreateCaseError.fromStatusAndMessage
-)(
-  config.eisBaseUrl + config.eisCreateCaseApiPath
-)
-  with EISConnector
-  with HttpAPIMonitor
-  with Retry {
+)(implicit ec: ExecutionContext)
+    extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
+      EISCreateCaseError.fromStatusAndMessage
+    ) with EISConnector with HttpAPIMonitor with Retry {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
@@ -66,10 +60,10 @@ class CreateCaseConnector @Inject()(
           request,
           eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
         )(
-          wts = implicitly[Writes[EISCreateCaseRequest]],
-          rds = readFromJsonSuccessOrFailure,
-          hc = hc.copy(authorization = None),
-          ec = implicitly[ExecutionContext]
+          implicitly[Writes[EISCreateCaseRequest]],
+          readFromJsonSuccessOrFailure,
+          hc.copy(authorization = None),
+          implicitly[ExecutionContext]
         )
       }
     }

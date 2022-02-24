@@ -1,16 +1,18 @@
 package nationaldutyrepaymentcenter.connectors
 
-import java.util.UUID
-
 import nationaldutyrepaymentcenter.controllers.TestData
 import nationaldutyrepaymentcenter.stubs.CreateCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
+import org.scalatest.RecoverMethods.recoverToExceptionIf
 import play.api.Application
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{CreateClaimRequest, EISCreateCaseRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseError.ErrorDetail
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseSuccess}
+
+import java.util.UUID
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with CreateCaseStubs {
 
@@ -46,12 +48,20 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
         )
       }
 
-      "return GatewayTimeoutException if EIS call fails" in {
+      "return GatewayTimeoutException if EIS call times out" in {
 
-        givenPegaCreateCaseRequestFails(499, "errorCode", "error message", correlationId)
+        givenEISTimeout()
 
-        val result = await(connector.submitClaim(eisCreateCaseRequest, correlationId))
-        result mustBe new GatewayTimeoutException("")
+//        val result = await(connector.submitClaim(eisCreateCaseRequest, correlationId))
+//
+//        result mustBe an[HttpException]
+
+        recoverToExceptionIf[HttpException](connector.submitClaim(eisCreateCaseRequest, correlationId)) map {
+          ex =>
+            ex.responseCode mustBe 499
+            ex.message mustBe "Blah blah blah"
+//            ex.message mustBe "Timeout from EIS with status: 499"
+        }
       }
 
       "return EISCreateCaseError if no body in response" in {
@@ -80,7 +90,7 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
   }
 }
 
-trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
+trait CreateCaseConnectorISpecSetup extends AppBaseISpec  {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -89,21 +99,15 @@ trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
   lazy val connector: CreateCaseConnector =
     app.injector.instanceOf[CreateCaseConnector]
 
-  val createClaimRequest: CreateClaimRequest =
-    TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
+  val createClaimRequest: CreateClaimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
 
-  val correlationId: String =
-    UUID
-      .randomUUID()
-      .toString
-      .replace("-", "")
-      .takeRight(32)
+  val correlationId = UUID.randomUUID().toString
 
-  val eisCreateCaseRequest: EISCreateCaseRequest =
-    EISCreateCaseRequest(
-      AcknowledgementReference = correlationId,
-      ApplicationType = "NDRC",
-      OriginatingSystem = "Digital",
-      Content = EISCreateCaseRequest.Content.from(createClaimRequest)
-    )
+  val eisCreateCaseRequest = EISCreateCaseRequest(
+    AcknowledgementReference = correlationId.replace("-", "").takeRight(32),
+    ApplicationType = "NDRC",
+    OriginatingSystem = "Digital",
+    Content = EISCreateCaseRequest.Content.from(createClaimRequest)
+  )
+
 }

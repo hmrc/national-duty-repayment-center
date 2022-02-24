@@ -32,18 +32,15 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmendCaseConnector @Inject()(
+class AmendCaseConnector @Inject() (
   val config: AppConfig,
   val http: HttpPost,
   val actorSystem: ActorSystem,
   metrics: Metrics
-)(
-  implicit ec: ExecutionContext
-) extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
-  EISAmendCaseError.fromStatusAndMessage
-)(
-  config.eisBaseUrl + config.eisAmendCaseApiPath
-) with EISConnector with HttpAPIMonitor with Retry {
+)(implicit ec: ExecutionContext)
+    extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
+      EISAmendCaseError.fromStatusAndMessage
+    ) with EISConnector with HttpAPIMonitor with Retry {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 

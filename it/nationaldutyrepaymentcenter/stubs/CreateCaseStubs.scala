@@ -10,6 +10,15 @@ trait CreateCaseStubs {
 
   private val CREATE_CASE_URL = "/cpr/caserequest/ndrc/create/v1"
 
+  def givenEISTimeout(): Unit =
+    stubFor(
+      post(
+        urlEqualTo(CREATE_CASE_URL)
+      ).willReturn(
+        aResponse()
+          .withStatus(499)
+      )
+    )
 
   def givenPegaCreateCaseRequestSucceeds(caseRef: String = "PCE201103470D2CC8K0NH3"): Unit =
     stubForPostWithResponse(
@@ -125,18 +134,20 @@ trait CreateCaseStubs {
 
   def givenPegaCreateCaseRequestFails(status: Int, errorCode: String, errorMessage: String = "", correlationId: String = "123123123"): Unit =
     stubForPostWithResponse(
-      status,
-      """{
-        |  "ApplicationType" : "NDRC",
-        |  "OriginatingSystem" : "Digital",
-        |  "Content": {}
-        |}""".stripMargin,
-      s"""{"errorDetail":{
-         |   "timestamp": "2020-11-03T15:29:28.601Z",
-         |   "correlationId": "$correlationId",
-         |   "errorCode": "$errorCode"
-         |   ${if (errorMessage.nonEmpty) s""","errorMessage": "$errorMessage"""" else ""}
-         |}}""".stripMargin
+      status = status,
+      payload =
+        """{
+          |  "ApplicationType" : "NDRC",
+          |  "OriginatingSystem" : "Digital",
+          |  "Content": {}
+          |}""".stripMargin,
+      responseBody =
+        s"""{"errorDetail":{
+           |   "timestamp": "2020-11-03T15:29:28.601Z",
+           |   "correlationId": "$correlationId",
+           |   "errorCode": "$errorCode"
+           |   ${if (errorMessage.nonEmpty) s""","errorMessage": "$errorMessage"""" else ""}
+           |}}""".stripMargin
     )
 
   def givenPegaCreateCaseRequestSucceedsAfterTwoRetryResponses(caseRef: String): Unit = {
