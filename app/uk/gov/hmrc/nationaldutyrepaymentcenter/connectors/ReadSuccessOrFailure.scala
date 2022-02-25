@@ -33,7 +33,7 @@ abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (
           case 429 =>
             throw new TooManyRequestException(response.header("Retry-After").getOrElse(""))
           case 499 =>
-            throw new HttpException(s"Timeout from EIS with status: ${response.status}", 499)
+            throw new HttpException(s"Timeout from EIS with status: ${response.status}", response.status)
           case status =>
             if (response.body.isEmpty)
               HttpReads.pure(fallback(status, "Error: empty response"))

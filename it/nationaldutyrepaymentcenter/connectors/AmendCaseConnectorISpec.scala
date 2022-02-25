@@ -1,16 +1,18 @@
 package nationaldutyrepaymentcenter.connectors
 
-import java.util.UUID
-
 import nationaldutyrepaymentcenter.controllers.AmendTestData
 import nationaldutyrepaymentcenter.stubs.AmendCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
+import org.scalatest.RecoverMethods.recoverToExceptionIf
 import play.api.Application
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.AmendCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, EISAmendCaseRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISAmendCaseError.ErrorDetail
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseError, EISAmendCaseSuccess}
+
+import java.util.UUID
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCaseStubs {
 
@@ -39,6 +41,17 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
             None
           )
         )
+      }
+
+      "return GatewayTimeoutException if EIS call times out" in {
+
+        givenEISTimeout()
+
+        val ex: HttpException =
+          await(recoverToExceptionIf[HttpException](connector.submitAmendClaim(eisAmendCaseRequest, correlationId)))
+
+        ex.responseCode mustBe 499
+        ex.getMessage mustBe "Timeout from EIS with status: 499"
       }
 
       "return EISCreateCaseError if no body in response" in {

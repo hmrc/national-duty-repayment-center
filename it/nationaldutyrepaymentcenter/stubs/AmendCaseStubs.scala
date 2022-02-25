@@ -11,6 +11,16 @@ trait AmendCaseStubs {
 
   private val UPDATE_CASE_URL = "/cpr/caserequest/ndrc/update/v1"
 
+  def givenEISTimeout(): Unit =
+    stubFor(
+      post(
+        urlEqualTo(UPDATE_CASE_URL)
+      ).willReturn(
+        aResponse()
+          .withStatus(499)
+      )
+    )
+
   def givenPegaAmendCaseRequestSucceeds(correlationId: String, caseRef: String = "Risk-2507"): Unit =
     stubForPostWithResponse(200, s"""{
         |"AcknowledgementReference" : "${correlationId.replace("-", "")}",

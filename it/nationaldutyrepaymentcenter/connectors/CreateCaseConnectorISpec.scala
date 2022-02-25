@@ -3,7 +3,7 @@ package nationaldutyrepaymentcenter.connectors
 import nationaldutyrepaymentcenter.controllers.TestData
 import nationaldutyrepaymentcenter.stubs.CreateCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
-import org.scalatest.RecoverMethods.recoverToExceptionIf
+import org.scalatest.RecoverMethods._
 import play.api.Application
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
@@ -52,16 +52,11 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
 
         givenEISTimeout()
 
-//        val result = await(connector.submitClaim(eisCreateCaseRequest, correlationId))
-//
-//        result mustBe an[HttpException]
+        val ex: HttpException =
+          await(recoverToExceptionIf[HttpException](connector.submitClaim(eisCreateCaseRequest, correlationId)))
 
-        recoverToExceptionIf[HttpException](connector.submitClaim(eisCreateCaseRequest, correlationId)) map {
-          ex =>
-            ex.responseCode mustBe 499
-            ex.message mustBe "Blah blah blah"
-//            ex.message mustBe "Timeout from EIS with status: 499"
-        }
+        ex.responseCode mustBe 499
+        ex.getMessage mustBe "Timeout from EIS with status: 499"
       }
 
       "return EISCreateCaseError if no body in response" in {
@@ -90,7 +85,7 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
   }
 }
 
-trait CreateCaseConnectorISpecSetup extends AppBaseISpec  {
+trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
