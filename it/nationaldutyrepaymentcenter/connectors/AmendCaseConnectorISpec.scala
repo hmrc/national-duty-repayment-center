@@ -43,7 +43,7 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
         )
       }
 
-      "return GatewayTimeoutException if EIS call times out" in {
+      "return HttpException and response code if EIS call times out" in {
 
         givenEISTimeout()
 

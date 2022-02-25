@@ -48,7 +48,7 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
         )
       }
 
-      "return GatewayTimeoutException if EIS call times out" in {
+      "return HttpException and response code if EIS call times out" in {
 
         givenEISTimeout()
 
