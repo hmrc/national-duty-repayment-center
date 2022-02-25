@@ -23,24 +23,20 @@ import com.kenshoo.play.metrics.Metrics
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{
-  EISAmendCaseError,
-  EISAmendCaseResponse,
-  EISAmendCaseSuccess
-}
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmendCaseConnector @Inject() (
+class AmendCaseConnector @Inject()(
   val config: AppConfig,
   val http: HttpPost,
   val actorSystem: ActorSystem,
   metrics: Metrics
 )(implicit ec: ExecutionContext)
-    extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
-      EISAmendCaseError.fromStatusAndMessage
-    ) with EISConnector with HttpAPIMonitor with Retry {
+  extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
+    EISAmendCaseError.fromStatusAndMessage
+  ) with EISConnector with HttpAPIMonitor with Retry {
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 

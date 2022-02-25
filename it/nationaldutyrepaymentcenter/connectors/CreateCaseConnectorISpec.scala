@@ -1,16 +1,18 @@
 package nationaldutyrepaymentcenter.connectors
 
-import java.util.UUID
-
 import nationaldutyrepaymentcenter.controllers.TestData
 import nationaldutyrepaymentcenter.stubs.CreateCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
+import org.scalatest.RecoverMethods._
 import play.api.Application
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.CreateCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{CreateClaimRequest, EISCreateCaseRequest}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISCreateCaseError.ErrorDetail
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseError, EISCreateCaseSuccess}
+
+import java.util.UUID
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with CreateCaseStubs {
 
@@ -46,6 +48,17 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
         )
       }
 
+      "return HttpException and response code if EIS call times out" in {
+
+        givenEISTimeout()
+
+        val ex: HttpException =
+          await(recoverToExceptionIf[HttpException](connector.submitClaim(eisCreateCaseRequest, correlationId)))
+
+        ex.responseCode mustBe 499
+        ex.getMessage mustBe "Timeout from EIS with status: 499"
+      }
+
       "return EISCreateCaseError if no body in response" in {
 
         givenPegaCreateCaseRequestRespondsWith403WithoutContent()
@@ -72,7 +85,7 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
   }
 }
 
-trait CreateCaseConnectorISpecSetup extends AppBaseISpec  {
+trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
