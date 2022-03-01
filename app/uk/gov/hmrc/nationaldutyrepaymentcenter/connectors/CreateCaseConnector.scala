@@ -20,6 +20,7 @@ import akka.actor.ActorSystem
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import com.kenshoo.play.metrics.Metrics
+import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
@@ -36,11 +37,17 @@ class CreateCaseConnector @Inject()(
 )(implicit ec: ExecutionContext)
   extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
     EISCreateCaseError.fromStatusAndMessage
-  ) with EISConnector with HttpAPIMonitor with Retry {
+  ) with EISConnector
+    with HttpAPIMonitor
+    with Retry {
+
+  lazy private val logger = Logger(getClass)
 
   override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url: String = config.eisBaseUrl + config.eisCreateCaseApiPath
+
+  val serviceName: String = "ConsumedAPI-eis-pega-create-case-api-POST"
 
   def submitClaim(request: EISCreateCaseRequest, correlationId: String)(implicit
     hc: HeaderCarrier
@@ -50,7 +57,7 @@ class CreateCaseConnector @Inject()(
       EISCreateCaseResponse.errorMessage,
       EISCreateCaseResponse.delayInterval
     ) {
-      monitor(s"ConsumedAPI-eis-pega-create-case-api-POST") {
+      monitor(serviceName) {
         http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
           url,
           request,
@@ -62,6 +69,13 @@ class CreateCaseConnector @Inject()(
           implicitly[ExecutionContext]
         )
       }
+    } recoverWith {
+      case e: GatewayTimeoutException =>
+        logger.error(s"$serviceName to $url failed with status: ${e.responseCode}")
+        throw new GatewayTimeoutException(e.getMessage)
+      case e =>
+        logger.error(s"$serviceName to $url failed with unexpected response")
+        throw new Exception(e.getMessage)
     }
 
 }
