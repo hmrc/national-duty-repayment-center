@@ -13,6 +13,8 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISCreateCaseEr
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.language.postfixOps
 
 class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with CreateCaseStubs {
 
@@ -48,15 +50,28 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
         )
       }
 
-      "return HttpException and response code if EIS call times out" in {
+      "return GatewayTimeoutException and response code if EIS call times out" in {
 
         givenEISTimeout()
 
-        val ex: HttpException =
-          await(recoverToExceptionIf[HttpException](connector.submitClaim(eisCreateCaseRequest, correlationId)))
+        implicit val defaultTimeout: FiniteDuration = 25 seconds
 
-        ex.responseCode mustBe 499
-        ex.getMessage mustBe "Timeout from EIS with status: 499"
+        val ex: GatewayTimeoutException =
+          await(recoverToExceptionIf[GatewayTimeoutException](connector.submitClaim(eisCreateCaseRequest, correlationId)))
+
+        ex mustBe an[GatewayTimeoutException]
+        ex.responseCode mustBe 504
+        ex.getMessage contains "/cpr/caserequest/ndrc/create/v1" mustBe true
+      }
+
+      "return Exception if EIS call fails unexpectedly" in {
+
+        givenEISCallFailsUnexpectedly()
+
+        val ex: Exception =
+          await(recoverToExceptionIf[Exception](connector.submitClaim(eisCreateCaseRequest, correlationId)))
+
+        ex mustBe an[Exception]
       }
 
       "return EISCreateCaseError if no body in response" in {
@@ -96,13 +111,12 @@ trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
 
   val createClaimRequest: CreateClaimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
 
-  val correlationId = UUID.randomUUID().toString
+  val correlationId: String = UUID.randomUUID().toString
 
-  val eisCreateCaseRequest = EISCreateCaseRequest(
+  val eisCreateCaseRequest: EISCreateCaseRequest = EISCreateCaseRequest(
     AcknowledgementReference = correlationId.replace("-", "").takeRight(32),
     ApplicationType = "NDRC",
     OriginatingSystem = "Digital",
     Content = EISCreateCaseRequest.Content.from(createClaimRequest)
   )
-
 }

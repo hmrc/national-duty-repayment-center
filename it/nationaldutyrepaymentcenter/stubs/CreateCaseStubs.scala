@@ -1,6 +1,7 @@
 package nationaldutyrepaymentcenter.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import nationaldutyrepaymentcenter.support.WireMockSupport
 import play.mvc.Http.MimeTypes
@@ -16,7 +17,17 @@ trait CreateCaseStubs {
         urlEqualTo(CREATE_CASE_URL)
       ).willReturn(
         aResponse()
-          .withStatus(499)
+          .withFixedDelay(25000)
+      )
+    )
+
+  def givenEISCallFailsUnexpectedly(): Unit =
+    stubFor(
+      post(
+        urlEqualTo(CREATE_CASE_URL)
+      ).willReturn(
+        aResponse()
+          .withFault(Fault.CONNECTION_RESET_BY_PEER)
       )
     )
 

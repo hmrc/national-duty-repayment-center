@@ -16,28 +16,22 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
-import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Reads}
 import play.mvc.Http.{HeaderNames, MimeTypes}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HttpException, HttpReads, HttpResponse, JsValidationException, TooManyRequestException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HttpReads, HttpResponse, JsValidationException, TooManyRequestException, UpstreamErrorResponse}
 
 import scala.util.Try
 
 abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (Int, String) => A)
   (implicit mf: Manifest[A]) {
 
-  lazy private val logger = Logger(getClass)
-
   implicit val readFromJsonSuccessOrFailure: HttpReads[A] =
-    HttpReads[HttpResponse]
-      .flatMap { response =>
+    HttpReads[HttpResponse].flatMap {
+      response =>
         response.status match {
           case 429 =>
             throw new TooManyRequestException(response.header("Retry-After").getOrElse(""))
-          case 499 =>
-            logger.error(s"Timeout from EIS with status: ${response.status}")
-            throw new HttpException(s"Timeout from EIS with status: ${response.status}", response.status)
           case status =>
             if (response.body.isEmpty)
               HttpReads.pure(fallback(status, "Error: empty response"))

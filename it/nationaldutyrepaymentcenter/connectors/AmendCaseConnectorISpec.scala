@@ -13,6 +13,8 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.{EISAmendCaseErr
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.language.postfixOps
 
 class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCaseStubs {
 
@@ -43,15 +45,28 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
         )
       }
 
-      "return HttpException and response code if EIS call times out" in {
+      "return GatewayTimeoutException and response code if EIS call times out" in {
 
         givenEISTimeout()
 
-        val ex: HttpException =
-          await(recoverToExceptionIf[HttpException](connector.submitAmendClaim(eisAmendCaseRequest, correlationId)))
+        implicit val defaultTimeout: FiniteDuration = 25 seconds
 
-        ex.responseCode mustBe 499
-        ex.getMessage mustBe "Timeout from EIS with status: 499"
+        val ex: GatewayTimeoutException =
+          await(recoverToExceptionIf[GatewayTimeoutException](connector.submitAmendClaim(eisAmendCaseRequest, correlationId)))
+
+        ex mustBe an[GatewayTimeoutException]
+        ex.responseCode mustBe 504
+        ex.getMessage contains "/cpr/caserequest/ndrc/update/v1" mustBe true
+      }
+
+      "return Exception if EIS call fails unexpectedly" in {
+
+        givenEISCallFailsUnexpectedly()
+
+        val ex: Exception =
+          await(recoverToExceptionIf[Exception](connector.submitAmendClaim(eisAmendCaseRequest, correlationId)))
+
+        ex mustBe an[Exception]
       }
 
       "return EISCreateCaseError if no body in response" in {
@@ -86,9 +101,9 @@ trait AmendCaseConnectorISpecSetup extends AppBaseISpec {
 
   val amendClaimRequest: AmendClaimRequest = AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString, caseId)
 
-  val correlationId = UUID.randomUUID().toString
+  val correlationId: String = UUID.randomUUID().toString
 
-  val eisAmendCaseRequest = EISAmendCaseRequest(
+  val eisAmendCaseRequest: EISAmendCaseRequest = EISAmendCaseRequest(
     AcknowledgementReference = correlationId.replace("-", "").takeRight(32),
     ApplicationType = "NDRC",
     OriginatingSystem = "Digital",
