@@ -99,7 +99,7 @@ class ClaimController @Inject() (
           // last resort fallback when request processing fails
           case e =>
             val response = responseForError(e, correlationId)
-            logger.info(
+            logger.error(
               s"CreateCaseEvent failed with internal server error, caseReferenceNumber:[] correlationId:[$correlationId]"
             )
             auditService
@@ -156,7 +156,7 @@ class ClaimController @Inject() (
           // last resort fallback when request processing fails
           case e =>
             val response = responseForError(e, correlationId)
-            logger.info(
+            logger.error(
               s"UpdateCaseEvent failed with internal server error, caseReferenceNumber:[] correlationId:[$correlationId]"
             )
             auditService
