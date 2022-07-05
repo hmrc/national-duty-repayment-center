@@ -9,6 +9,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.AuthActions
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.{AppConfig, AppConfigImpl}
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.Future
 
@@ -20,8 +21,8 @@ class AuthActionsISpec extends AppBaseISpec {
 
     override val appConfig: AppConfig = app.injector.instanceOf[AppConfigImpl]
 
-    implicit val hc      = HeaderCarrier()
-    implicit val request = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
+    implicit val request = FakeRequest().withHeaders("Authorisation" -> "dummy-bearer-token").withSession(SessionKeys.authToken -> "Bearer XYZ")
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     import scala.concurrent.ExecutionContext.Implicits.global
 

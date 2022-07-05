@@ -112,6 +112,7 @@ class NDRCAmendCaseISpec
 
         val result = wsClient
           .url(s"$url/amend-case")
+          .withHttpHeaders("Authorisation" -> "dummy-bearer-token")
           // Do not set X-Correlation-ID on header
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue

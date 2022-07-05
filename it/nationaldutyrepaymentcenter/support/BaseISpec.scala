@@ -32,7 +32,10 @@ abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport 
 
   protected def htmlEscapedMessage(key: String): String = HtmlFormat.escape(Messages(key)).toString
 
-  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier =
-    HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  implicit def hc(implicit request: FakeRequest[_]): HeaderCarrier = {
+    val authorisedRequest = request.withHeaders("Authorisation" -> "dummy-bearer-token")
+
+    HeaderCarrierConverter.fromRequestAndSession(authorisedRequest, authorisedRequest.session)
+  }
 
 }
