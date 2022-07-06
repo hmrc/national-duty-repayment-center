@@ -2,7 +2,6 @@ package nationaldutyrepaymentcenter.controllers
 
 import java.time.{Clock, ZoneId, ZonedDateTime}
 import java.{util => ju}
-
 import nationaldutyrepaymentcenter.stubs.{AmendCaseStubs, AuthStubs, DataStreamStubs, FileTransferStubs}
 import nationaldutyrepaymentcenter.support.{JsonMatchers, ServerBaseISpec}
 import org.mockito.Mockito.when
@@ -46,6 +45,8 @@ class NDRCAmendCaseISpec
   val wsClient          = app.injector.instanceOf[WSClient]
   val uuidGenerator     = app.injector.instanceOf[UUIDGenerator]
 
+  private val bearerToken = "Bearer XYZ"
+
   "ClaimController" when {
     "POST /amend-case" should {
       "return 201 with CaseID as a result if successful PEGA API call" in {
@@ -69,7 +70,7 @@ class NDRCAmendCaseISpec
 
         val result = wsClient
           .url(s"$url/amend-case")
-          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
@@ -112,6 +113,7 @@ class NDRCAmendCaseISpec
 
         val result = wsClient
           .url(s"$url/amend-case")
+          .withHttpHeaders("Authorization" -> bearerToken)
           // Do not set X-Correlation-ID on header
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
@@ -150,7 +152,7 @@ class NDRCAmendCaseISpec
 
         val result = wsClient
           .url(s"$url/amend-case")
-          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
@@ -178,7 +180,7 @@ class NDRCAmendCaseISpec
 
         val result = wsClient
           .url(s"$url/amend-case")
-          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
           .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 

@@ -52,6 +52,8 @@ class NDRCCreateCaseISpec
   val wsClient = app.injector.instanceOf[WSClient]
   val uuidGenerator: UUIDGenerator = app.injector.instanceOf[UUIDGenerator]
 
+  private val bearerToken = "Bearer XYZ"
+
   "ClaimController" when {
     "POST /create-case" should {
       "return 201 with CaseID as a result if successful PEGA API call" in {
@@ -76,7 +78,7 @@ class NDRCCreateCaseISpec
         val claimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
         val result = wsClient
           .url(s"$url/create-case")
-          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
           .post(Json.toJson(claimRequest))
           .futureValue
 
@@ -122,6 +124,7 @@ class NDRCCreateCaseISpec
         val claimRequest = TestData.testCreateCaseRequest(wireMockBaseUrlAsString)
         val result = wsClient
           .url(s"$url/create-case")
+          .withHttpHeaders("Authorization" -> bearerToken)
           // Do not set X-Correlation-ID on header
           .post(Json.toJson(claimRequest))
           .futureValue
@@ -152,7 +155,7 @@ class NDRCCreateCaseISpec
 
         val result = wsClient
           .url(s"$url/create-case")
-          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
           .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
@@ -183,7 +186,7 @@ class NDRCCreateCaseISpec
 
         val result = wsClient
           .url(s"$url/create-case")
-          .withHttpHeaders("X-Correlation-ID" -> correlationId)
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
           .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
           .futureValue
 
