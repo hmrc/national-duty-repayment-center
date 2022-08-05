@@ -7,14 +7,14 @@ val silencerVersion = "1.7.9"
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "5.24.0",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "6.4.0",
   "com.kenshoo"        %% "metrics-play"              % "2.7.3_0.8.2",
   ws
 )
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "5.24.0"    % scope,
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "6.4.0"    % scope,
     "org.scalatest"          %% "scalatest"               % "3.2.9"     % scope,
     "org.scalatestplus"      %% "mockito-3-4"             % "3.2.9.0"   % scope,
     "com.vladsch.flexmark"    % "flexmark-all"            % "0.36.8"    % scope,
