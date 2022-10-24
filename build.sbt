@@ -12,12 +12,12 @@ lazy val compileDeps = Seq(
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "6.4.0"    % scope,
-    "org.scalatest"          %% "scalatest"               % "3.2.14"     % scope,
-    "org.scalatestplus"      %% "mockito-3-4"             % "3.2.10.0"   % scope,
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "7.8.0"     % scope,
+    "org.scalatest"          %% "scalatest"               % "3.2.14"    % scope,
+    "org.scalatestplus"      %% "mockito-3-4"             % "3.2.10.0"  % scope,
     "com.vladsch.flexmark"    % "flexmark-all"            % "0.62.2"    % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0"     % scope,
-    "com.github.tomakehurst"  % "wiremock-standalone"     % "2.27.2"
+    "com.github.tomakehurst"  % "wiremock-standalone"     % "2.26.3"    % scope
   )
 
 lazy val root = (project in file("."))
