@@ -80,6 +80,6 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
     config.getString("urls.callback.internal")
 
   val retryDurations: Seq[FiniteDuration] =
-    config.getString("retry.duration.seconds").split(",").map(secs => FiniteDuration(secs.trim.toInt, TimeUnit.SECONDS))
+    config.getString("retry.duration.seconds").split(",").map(secs => FiniteDuration(secs.trim.toInt, TimeUnit.SECONDS)).toIndexedSeq
 
 }

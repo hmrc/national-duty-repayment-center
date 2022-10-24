@@ -3,11 +3,9 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 
-val silencerVersion = "1.7.9"
-
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "6.4.0",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "7.8.0",
   "com.kenshoo"        %% "metrics-play"              % "2.7.3_0.8.2",
   ws
 )
@@ -15,18 +13,18 @@ lazy val compileDeps = Seq(
 def testDeps(scope: String) =
   Seq(
     "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "6.4.0"    % scope,
-    "org.scalatest"          %% "scalatest"               % "3.2.9"     % scope,
-    "org.scalatestplus"      %% "mockito-3-4"             % "3.2.9.0"   % scope,
-    "com.vladsch.flexmark"    % "flexmark-all"            % "0.36.8"    % scope,
+    "org.scalatest"          %% "scalatest"               % "3.2.14"     % scope,
+    "org.scalatestplus"      %% "mockito-3-4"             % "3.2.10.0"   % scope,
+    "com.vladsch.flexmark"    % "flexmark-all"            % "0.62.2"    % scope,
     "org.scalatestplus.play" %% "scalatestplus-play"      % "5.1.0"     % scope,
-    "com.github.tomakehurst"  % "wiremock-jre8"           % "2.26.3"    % scope
+    "com.github.tomakehurst"  % "wiremock-standalone"     % "2.27.2"
   )
 
 lazy val root = (project in file("."))
   .settings(
     name := "national-duty-repayment-center",
     organization := "uk.gov.hmrc",
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.13.10",
     PlayKeys.playDefaultPort := 8451,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*Routes.*;.*GuiceInjector;" +
@@ -39,14 +37,16 @@ lazy val root = (project in file("."))
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     // ***************
     // Use the silencer plugin to suppress warnings
-    scalacOptions += "-P:silencer:pathFilters=routes",
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-    )
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
+
     // ***************
   )
   .configs(IntegrationTest)
+  .settings(
+    // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
+    libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
+  )
   .settings(
     IntegrationTest / Keys.fork := false,
     Defaults.itSettings,
