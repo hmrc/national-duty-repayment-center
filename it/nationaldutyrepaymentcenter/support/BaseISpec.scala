@@ -12,6 +12,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport with MetricsTestSupport {
 
@@ -20,7 +21,7 @@ abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport 
   override def commonStubs(): Unit =
     givenCleanMetricRegistry()
 
-  implicit val defaultTimeout: FiniteDuration = 5.seconds
+  implicit val defaultTimeout: FiniteDuration = 5 seconds
 
   def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
 

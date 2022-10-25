@@ -35,12 +35,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
     publishingSettings,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
-    // ***************
-    // Use the silencer plugin to suppress warnings
-    scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
-
-    // ***************
+    scalacOptions += "-Wconf:src=routes/.*:s"
   )
   .configs(IntegrationTest)
   .settings(
