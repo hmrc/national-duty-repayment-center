@@ -68,7 +68,7 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
 
         givenEISCallFailsUnexpectedly()
 
-        implicit val defaultTimeout: FiniteDuration = 15 seconds
+        implicit val defaultTimeout: FiniteDuration = 20 seconds
 
         val ex: Exception =
           await(recoverToExceptionIf[Exception](connector.submitClaim(eisCreateCaseRequest, correlationId)))
