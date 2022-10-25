@@ -63,7 +63,7 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
 
         givenEISCallFailsUnexpectedly()
 
-        implicit val defaultTimeout: FiniteDuration = 25 seconds
+        implicit val defaultTimeout: FiniteDuration = 10 seconds
 
         val ex: Exception =
           await(recoverToExceptionIf[Exception](connector.submitAmendClaim(eisAmendCaseRequest, correlationId)))
