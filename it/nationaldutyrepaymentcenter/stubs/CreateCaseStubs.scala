@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.http.Fault
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import nationaldutyrepaymentcenter.support.WireMockSupport
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.mvc.Http.MimeTypes
 
 trait CreateCaseStubs {
@@ -27,7 +28,8 @@ trait CreateCaseStubs {
         urlEqualTo(CREATE_CASE_URL)
       ).willReturn(
         aResponse()
-          .withFault(Fault.CONNECTION_RESET_BY_PEER)
+          .withStatus(INTERNAL_SERVER_ERROR)
+          .withFault(Fault.MALFORMED_RESPONSE_CHUNK)
       )
     )
 
