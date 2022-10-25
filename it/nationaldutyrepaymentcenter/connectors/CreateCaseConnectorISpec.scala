@@ -104,7 +104,7 @@ trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override def fakeApplication: Application = appBuilder.build()
+  override def fakeApplication(): Application = appBuilder.build()
 
   lazy val connector: CreateCaseConnector =
     app.injector.instanceOf[CreateCaseConnector]

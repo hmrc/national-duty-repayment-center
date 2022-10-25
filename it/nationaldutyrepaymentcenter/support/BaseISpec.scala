@@ -12,6 +12,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.duration.{Duration, DurationInt, FiniteDuration}
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 abstract class BaseISpec extends AnyWordSpec with Matchers with WireMockSupport with MetricsTestSupport {
 
