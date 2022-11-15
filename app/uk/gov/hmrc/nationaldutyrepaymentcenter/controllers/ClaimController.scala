@@ -129,8 +129,8 @@ class ClaimController @Inject() (
                     logger.info(
                       s"UpdateCaseEvent success, caseReferenceNumber:[${eisAmendCaseRequest.Content.CaseID}] correlationId:[$correlationId]"
                     )
-                    auditService.auditUpdateCaseEvent(amendCaseRequest, response, maybeEORI).map(
-                      _ => Created(Json.toJson(response))
+                    auditService.auditUpdateCaseEvent(amendCaseRequest, response, maybeEORI).map(_ =>
+                      Created(Json.toJson(response))
                     )
                   }
               // when request to the upstream api returns an error

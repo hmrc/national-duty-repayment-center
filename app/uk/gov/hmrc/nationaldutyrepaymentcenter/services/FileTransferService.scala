@@ -78,20 +78,19 @@ class FileTransferService @Inject() (
       request.caseReferenceNumber,
       request.applicationName,
       0,
-      request.files.map(
-        file =>
-          FileTransferResult(
-            file.upscanReference,
-            file.checksum,
-            file.fileName,
-            file.fileMimeType,
-            success = false,
-            0,
-            timeStamp,
-            conversationId,
-            0,
-            Some(errorMessage)
-          )
+      request.files.map(file =>
+        FileTransferResult(
+          file.upscanReference,
+          file.checksum,
+          file.fileName,
+          file.fileMimeType,
+          success = false,
+          0,
+          timeStamp,
+          conversationId,
+          0,
+          Some(errorMessage)
+        )
       )
     )
   }

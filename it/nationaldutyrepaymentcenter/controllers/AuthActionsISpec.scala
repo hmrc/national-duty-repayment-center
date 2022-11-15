@@ -21,7 +21,7 @@ class AuthActionsISpec extends AppBaseISpec {
 
     override val appConfig: AppConfig = app.injector.instanceOf[AppConfigImpl]
 
-    implicit val request = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
+    implicit val request           = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     import scala.concurrent.ExecutionContext.Implicits.global

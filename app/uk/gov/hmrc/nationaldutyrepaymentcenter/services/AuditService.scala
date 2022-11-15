@@ -173,7 +173,7 @@ object AuditService {
 
       if (createResponse.isSuccess) requestDetails
       else
-        (requestDetails ++ pegaResponseToDetails(createResponse))
+        requestDetails ++ pegaResponseToDetails(createResponse)
     }
 
     implicit val formats: Format[CreateCaseAuditEventDetails] =
@@ -212,7 +212,7 @@ object AuditService {
 
       if (updateResponse.isSuccess) requestDetails
       else
-        (requestDetails ++ pegaResponseToDetails(updateResponse))
+        requestDetails ++ pegaResponseToDetails(updateResponse)
     }
 
     implicit val formats: Format[UpdateCaseAuditEventDetails] =

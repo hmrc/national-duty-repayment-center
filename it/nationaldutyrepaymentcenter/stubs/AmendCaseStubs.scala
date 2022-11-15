@@ -33,7 +33,9 @@ trait AmendCaseStubs {
     )
 
   def givenPegaAmendCaseRequestSucceeds(correlationId: String, caseRef: String = "Risk-2507"): Unit =
-    stubForPostWithResponse(200, s"""{
+    stubForPostWithResponse(
+      200,
+      s"""{
         |"AcknowledgementReference" : "${correlationId.replace("-", "")}",
         |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
@@ -41,12 +43,14 @@ trait AmendCaseStubs {
         |       "CaseID":"$caseRef",
         |       "Description":"update request for Risk-2507: Value £199.99"
         |    }
-        |}""".stripMargin, s"""{
+        |}""".stripMargin,
+      s"""{
         |    "Status": "Success",
         |    "StatusText": "Case Updated successfully",
         |    "CaseID": "$caseRef",
         |    "ProcessingDate": "2020-09-24T10:15:43.995Z"
-        |}""".stripMargin)
+        |}""".stripMargin
+    )
 
   def givenPegaAmendCaseRequestFails(
     status: Int,
@@ -54,16 +58,20 @@ trait AmendCaseStubs {
     errorMessage: String = "",
     correlationId: String = "324244343"
   ): Unit =
-    stubForPostWithResponse(status, """{
+    stubForPostWithResponse(
+      status,
+      """{
         |  "ApplicationType" : "NDRC",
         |  "OriginatingSystem" : "Digital",
         |  "Content": {}
-        |}""".stripMargin, s"""{"errorDetail":{
+        |}""".stripMargin,
+      s"""{"errorDetail":{
          |   "timestamp": "2020-09-19T12:12:23.000Z",
          |   "correlationId": "$correlationId",
          |   "errorCode": "$errorCode"
          |   ${if (errorMessage.nonEmpty) s""","errorMessage": "$errorMessage"""" else ""}
-         |}}""".stripMargin)
+         |}}""".stripMargin
+    )
 
   def givenPegaAmendCaseRequestSucceedsAfterTwoRetryResponses(caseRef: String): Unit = {
 

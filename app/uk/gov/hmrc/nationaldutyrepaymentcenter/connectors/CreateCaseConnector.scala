@@ -29,17 +29,15 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CreateCaseConnector @Inject()(
+class CreateCaseConnector @Inject() (
   val config: AppConfig,
   val http: HttpPost,
   val actorSystem: ActorSystem,
   metrics: Metrics
 )(implicit ec: ExecutionContext)
-  extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
-    EISCreateCaseError.fromStatusAndMessage
-  ) with EISConnector
-    with HttpAPIMonitor
-    with Retry {
+    extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
+      EISCreateCaseError.fromStatusAndMessage
+    ) with EISConnector with HttpAPIMonitor with Retry {
 
   lazy private val logger = Logger(getClass)
 

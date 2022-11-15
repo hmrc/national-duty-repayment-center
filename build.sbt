@@ -5,14 +5,14 @@ import uk.gov.hmrc.SbtAutoBuildPlugin
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "7.8.0",
+  "uk.gov.hmrc"        %% "bootstrap-backend-play-28" % "7.11.0",
   "com.kenshoo"        %% "metrics-play"              % "2.7.3_0.8.2",
   ws
 )
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "7.8.0"     % scope,
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"  % "7.11.0"     % scope,
     "org.scalatest"          %% "scalatest"               % "3.2.14"    % scope,
     "org.scalatestplus"      %% "mockito-3-4"             % "3.2.10.0"  % scope,
     "com.vladsch.flexmark"    % "flexmark-all"            % "0.62.2"    % scope,
@@ -51,6 +51,7 @@ lazy val root = (project in file("."))
     majorVersion := 0
   )
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .settings(scalafmtOnCompile := true)
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
   tests.map { test =>

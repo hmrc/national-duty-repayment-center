@@ -23,8 +23,9 @@ import uk.gov.hmrc.http.{HttpReads, HttpResponse, JsValidationException, TooMany
 
 import scala.util.Try
 
-abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (Int, String) => A)
-  (implicit mf: Manifest[A]) {
+abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (Int, String) => A)(implicit
+  mf: Manifest[A]
+) {
 
   implicit val readFromJsonSuccessOrFailure: HttpReads[A] =
     HttpReads[HttpResponse].flatMap {
@@ -67,12 +68,12 @@ abstract class ReadSuccessOrFailure[A, S <: A: Reads, F <: A: Reads](fallback: (
                 case other =>
                   throw UpstreamErrorResponse(
                     s"Unexpected response type of status $status, expected application/json but got ${other
-                      .getOrElse("none")} with body:\n${response.body}",
+                        .getOrElse("none")} with body:\n${response.body}",
                     500
                   )
               }
         }
 
-      }
+    }
 
 }

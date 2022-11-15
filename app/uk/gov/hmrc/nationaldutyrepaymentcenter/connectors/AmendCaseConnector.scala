@@ -29,17 +29,15 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmendCaseConnector @Inject()(
+class AmendCaseConnector @Inject() (
   val config: AppConfig,
   val http: HttpPost,
   val actorSystem: ActorSystem,
   metrics: Metrics
 )(implicit ec: ExecutionContext)
-  extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
-    EISAmendCaseError.fromStatusAndMessage
-  ) with EISConnector
-    with HttpAPIMonitor
-    with Retry {
+    extends ReadSuccessOrFailure[EISAmendCaseResponse, EISAmendCaseSuccess, EISAmendCaseError](
+      EISAmendCaseError.fromStatusAndMessage
+    ) with EISConnector with HttpAPIMonitor with Retry {
 
   lazy private val logger = Logger(getClass)
 
