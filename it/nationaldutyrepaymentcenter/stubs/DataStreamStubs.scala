@@ -38,21 +38,27 @@ trait DataStreamStubs extends Eventually {
   }
 
   def verifyFilesTransferredAudit(times: Int) =
-    eventually(verify(times, postRequestedFor(urlPathMatching(auditUrl))
-      .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
+    eventually(verify(
+      times,
+      postRequestedFor(urlPathMatching(auditUrl))
+        .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
     ))
 
   def verifyFilesTransferSucceededAudit(times: Int) =
-    eventually(verify(times, postRequestedFor(urlPathMatching(auditUrl))
-      .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
-      .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].success", containing("true")))
+    eventually(verify(
+      times,
+      postRequestedFor(urlPathMatching(auditUrl))
+        .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
+        .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].success", containing("true")))
     ))
 
   def verifyFilesTransferFailedAudit(times: Int, containingError: String) =
-    eventually(verify(times, postRequestedFor(urlPathMatching(auditUrl))
-      .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
-      .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].success", containing("false")))
-      .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].error", containing(containingError)))
+    eventually(verify(
+      times,
+      postRequestedFor(urlPathMatching(auditUrl))
+        .withRequestBody(matchingJsonPath("$.auditType", containing("FilesTransferred")))
+        .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].success", containing("false")))
+        .withRequestBody(matchingJsonPath("$.detail.fileTransferResults[*].error", containing(containingError)))
     ))
 
   def verifyAuditRequestNotSent(event: NDRCAuditEvent): Unit =
@@ -74,8 +80,7 @@ trait DataStreamStubs extends Eventually {
 
   private def auditUrl = "/write/audit"
 
-  private def similarToJson(value: String) = {
+  private def similarToJson(value: String) =
     equalToJson(value.stripMargin, true, true)
-  }
 
 }

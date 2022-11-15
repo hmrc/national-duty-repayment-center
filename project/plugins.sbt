@@ -8,10 +8,10 @@ ThisBuild / libraryDependencySchemes ++= Seq(
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "3.8.0")
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.16")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.18")
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "2.1.0")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.5")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")

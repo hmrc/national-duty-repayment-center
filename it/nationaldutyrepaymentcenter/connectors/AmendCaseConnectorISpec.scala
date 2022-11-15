@@ -52,7 +52,10 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
         implicit val defaultTimeout: FiniteDuration = 25 seconds
 
         val ex: GatewayTimeoutException =
-          await(recoverToExceptionIf[GatewayTimeoutException](connector.submitAmendClaim(eisAmendCaseRequest, correlationId)))
+          await(recoverToExceptionIf[GatewayTimeoutException](connector.submitAmendClaim(
+            eisAmendCaseRequest,
+            correlationId
+          )))
 
         ex mustBe an[GatewayTimeoutException]
         ex.responseCode mustBe 504

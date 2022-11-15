@@ -3,7 +3,6 @@ package nationaldutyrepaymentcenter.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import nationaldutyrepaymentcenter.support.WireMockSupport
 
-
 trait AuthStubs {
   me: WireMockSupport =>
 
@@ -32,7 +31,6 @@ trait AuthStubs {
          |}
           """.stripMargin
     )
-
 
   def givenUnauthorisedWith(mdtpDetail: String): Unit =
     stubFor(

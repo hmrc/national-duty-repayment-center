@@ -19,13 +19,16 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests
 import play.api.libs.json.{Format, Json}
 
 /**
-  * Create specified case in the PEGA system.
-  * Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
-  *
- * @param AcknowledgementReference Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data records, may be passed to Decision Service, CSG records can be searched using this field etc.
-  * @param ApplicationType          Its key value to create the case for respective process.
-  * @param OriginatingSystem        “Digital” for all requests originating in Digital
-  */
+ * Create specified case in the PEGA system. Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
+ *
+ * @param AcknowledgementReference
+ *   Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data
+ *   records, may be passed to Decision Service, CSG records can be searched using this field etc.
+ * @param ApplicationType
+ *   Its key value to create the case for respective process.
+ * @param OriginatingSystem
+ *   “Digital” for all requests originating in Digital
+ */
 case class EISAmendCaseRequest(
   AcknowledgementReference: String,
   ApplicationType: String,

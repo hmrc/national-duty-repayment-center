@@ -143,7 +143,12 @@ trait CreateCaseStubs {
         |}""".stripMargin
     )
 
-  def givenPegaCreateCaseRequestFails(status: Int, errorCode: String, errorMessage: String = "", correlationId: String = "123123123"): Unit =
+  def givenPegaCreateCaseRequestFails(
+    status: Int,
+    errorCode: String,
+    errorMessage: String = "",
+    correlationId: String = "123123123"
+  ): Unit =
     stubForPostWithResponse(
       status = status,
       payload =
@@ -189,7 +194,10 @@ trait CreateCaseStubs {
                                                             |    "StatusText": "Case created successfully",
                                                             |    "CaseID": "$caseRef",
                                                             |    "ProcessingDate": "2020-11-03T15:29:28.601Z"
-                                                            |}""".stripMargin).withHeader("Content-Type", MimeTypes.JSON))
+                                                            |}""".stripMargin).withHeader(
+          "Content-Type",
+          MimeTypes.JSON
+        ))
     )
   }
 

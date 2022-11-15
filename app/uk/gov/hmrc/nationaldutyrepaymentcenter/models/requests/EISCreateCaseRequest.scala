@@ -20,13 +20,16 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 
 /**
-  * Create specified case in the PEGA system.
-  * Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
-  *
- * @param AcknowledgementReference Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data records, may be passed to Decision Service, CSG records can be searched using this field etc.
-  * @param ApplicationType          Its key value to create the case for respective process.
-  * @param OriginatingSystem        “Digital” for all requests originating in Digital
-  */
+ * Create specified case in the PEGA system. Based on spec "CPR01-1.0.0-EIS API Specification-Create Case from MDTP"
+ *
+ * @param AcknowledgementReference
+ *   Unique id created at source after a form is saved Unique ID throughout the journey of a message-stored in CSG data
+ *   records, may be passed to Decision Service, CSG records can be searched using this field etc.
+ * @param ApplicationType
+ *   Its key value to create the case for respective process.
+ * @param OriginatingSystem
+ *   “Digital” for all requests originating in Digital
+ */
 case class EISCreateCaseRequest(
   AcknowledgementReference: String,
   ApplicationType: String,
@@ -38,13 +41,19 @@ object EISCreateCaseRequest {
   implicit val formats: Format[EISCreateCaseRequest] = Json.format[EISCreateCaseRequest]
 
   /**
-    * @param ClaimDetails       see ClaimDetails structure.
-    * @param AgentDetails       Agent/Representative of the importer Information (see UserDetails structure).
-    * @param ImporterDetails    see UserDetails structure.
-    * @param BankDetails        bank details of the payee required for BACS payments.
-    * @param DutyTypeTaxDetails XXX.
-    * @param DocumentList       CHIEF entry date in YYYYMMDD format.
-    */
+   * @param ClaimDetails
+   *   see ClaimDetails structure.
+   * @param AgentDetails
+   *   Agent/Representative of the importer Information (see UserDetails structure).
+   * @param ImporterDetails
+   *   see UserDetails structure.
+   * @param BankDetails
+   *   bank details of the payee required for BACS payments.
+   * @param DutyTypeTaxDetails
+   *   XXX.
+   * @param DocumentList
+   *   CHIEF entry date in YYYYMMDD format.
+   */
 
   case class Content(
     ClaimDetails: EISClaimDetails,

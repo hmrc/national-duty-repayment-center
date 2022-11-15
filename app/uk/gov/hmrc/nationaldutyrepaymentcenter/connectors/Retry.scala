@@ -38,16 +38,15 @@ trait Retry {
       // scheduling will loose MDC data. Here we explicitly ensure it is available on block.
       Mdc
         .withMdc(block, mdcData)
-        .flatMap(
-          result =>
-            if (remainingIntervals.nonEmpty && shouldRetry(Success(result))) {
-              val defaultDelay = remainingIntervals.head
-              val delay        = delayInterval(Success(result)).getOrElse(defaultDelay)
+        .flatMap(result =>
+          if (remainingIntervals.nonEmpty && shouldRetry(Success(result))) {
+            val defaultDelay = remainingIntervals.head
+            val delay        = delayInterval(Success(result)).getOrElse(defaultDelay)
 
-              Logger(getClass).warn(s"Retrying in $delay due to ${retryReason(Success(result))}")
-              after(delay, actorSystem.scheduler)(loop(remainingIntervals.tail)(mdcData)(block))
-            } else
-              Future.successful(result)
+            Logger(getClass).warn(s"Retrying in $delay due to ${retryReason(Success(result))}")
+            after(delay, actorSystem.scheduler)(loop(remainingIntervals.tail)(mdcData)(block))
+          } else
+            Future.successful(result)
         )
         .recoverWith {
           case e: Throwable =>

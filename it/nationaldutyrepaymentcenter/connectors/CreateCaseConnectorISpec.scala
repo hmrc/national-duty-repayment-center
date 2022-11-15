@@ -57,7 +57,10 @@ class CreateCaseConnectorISpec extends CreateCaseConnectorISpecSetup with Create
         implicit val defaultTimeout: FiniteDuration = 25 seconds
 
         val ex: GatewayTimeoutException =
-          await(recoverToExceptionIf[GatewayTimeoutException](connector.submitClaim(eisCreateCaseRequest, correlationId)))
+          await(recoverToExceptionIf[GatewayTimeoutException](connector.submitClaim(
+            eisCreateCaseRequest,
+            correlationId
+          )))
 
         ex mustBe an[GatewayTimeoutException]
         ex.responseCode mustBe 504
@@ -119,4 +122,5 @@ trait CreateCaseConnectorISpecSetup extends AppBaseISpec {
     OriginatingSystem = "Digital",
     Content = EISCreateCaseRequest.Content.from(createClaimRequest)
   )
+
 }

@@ -20,36 +20,37 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.{Address, BankDetails, Doc
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGenerator}
 
 class NDRCCreateCaseISpec
-  extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers with FileTransferStubs with DataStreamStubs {
+    extends ServerBaseISpec with AuthStubs with CreateCaseStubs with JsonMatchers with FileTransferStubs
+    with DataStreamStubs {
 
   this: Suite with ServerProvider =>
 
   val url = s"http://localhost:$port"
 
-  override def appBuilder: GuiceApplicationBuilder = {
+  override def appBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(
-        "microservice.services.auth.port" -> wireMockPort,
-        "microservice.services.eis.createcaseapi.host" -> wireMockHost,
-        "microservice.services.eis.createcaseapi.port" -> wireMockPort,
-        "microservice.services.eis.createcaseapi.token" -> "dummy-it-token",
+        "microservice.services.auth.port"                     -> wireMockPort,
+        "microservice.services.eis.createcaseapi.host"        -> wireMockHost,
+        "microservice.services.eis.createcaseapi.port"        -> wireMockPort,
+        "microservice.services.eis.createcaseapi.token"       -> "dummy-it-token",
         "microservice.services.eis.createcaseapi.environment" -> "it",
-        "metrics.enabled" -> true,
-        "auditing.enabled" -> true,
-        "auditing.consumer.baseUri.host" -> wireMockHost,
-        "auditing.consumer.baseUri.port" -> wireMockPort,
-        "microservice.services.file-transfer.host" -> wireMockHost,
-        "microservice.services.file-transfer.port" -> wireMockPort,
+        "metrics.enabled"                                     -> true,
+        "auditing.enabled"                                    -> true,
+        "auditing.consumer.baseUri.host"                      -> wireMockHost,
+        "auditing.consumer.baseUri.port"                      -> wireMockPort,
+        "microservice.services.file-transfer.host"            -> wireMockHost,
+        "microservice.services.file-transfer.port"            -> wireMockPort
       ).overrides(
-      bind[Clock].toInstance(clock),
-      bind[UUIDGenerator].toInstance(uuidGeneratorMock))
-  }
+        bind[Clock].toInstance(clock),
+        bind[UUIDGenerator].toInstance(uuidGeneratorMock)
+      )
 
   override lazy val app = appBuilder.build()
 
   val dateTime = LocalDateTime.now()
 
-  val wsClient = app.injector.instanceOf[WSClient]
+  val wsClient                     = app.injector.instanceOf[WSClient]
   val uuidGenerator: UUIDGenerator = app.injector.instanceOf[UUIDGenerator]
 
   private val bearerToken = "Bearer XYZ"
@@ -92,8 +93,8 @@ class NDRCCreateCaseISpec
           1,
           NDRCAuditEvent.CreateCase,
           Json.obj(
-            "success" -> true,
-            "claimantEORI" -> "GB345356852357",
+            "success"             -> true,
+            "claimantEORI"        -> "GB345356852357",
             "caseReferenceNumber" -> "NDRC000A00AB0ABCABC0AB0"
           ) ++ TestData.createRequestDetails(wireMockBaseUrlAsString)
         )
@@ -167,7 +168,7 @@ class NDRCCreateCaseISpec
           1,
           NDRCAuditEvent.CreateCase,
           Json.obj(
-            "success" -> true,
+            "success"             -> true,
             "caseReferenceNumber" -> "PCE201103470D2CC8K0NH3"
           ) ++ TestData.createRequestDetailsWithFileTransferFailures(wireMockBaseUrlAsString)
         )
@@ -292,7 +293,6 @@ object TestData {
     )
   )
 
-
   val dutyTypeTaxDetails = DutyTypeTaxDetails(dutyTypeTaxList)
 
   def testCreateCaseRequest(wireMockBaseUrlAsString: String) =
@@ -303,7 +303,8 @@ object TestData {
         ImporterDetails = userDetails,
         BankDetails = Some(bankDetails),
         DutyTypeTaxDetails = dutyTypeTaxDetails,
-        DocumentList = documentList),
+        DocumentList = documentList
+      ),
       uploadedFiles(wireMockBaseUrlAsString)
     )
 
@@ -315,116 +316,115 @@ object TestData {
         ImporterDetails = userDetails,
         BankDetails = Some(bankDetails),
         DutyTypeTaxDetails = dutyTypeTaxDetails,
-        DocumentList = documentList),
+        DocumentList = documentList
+      ),
       uploadedFiles(wireMockBaseUrlAsString)
     )
 
   def createRequestDetails(baseUrl: String): JsObject = {
     Json.obj(
-
       "claimDetails" -> Json.obj(
-        "FormType" -> "01",
-        "CustomRegulationType" -> "02",
+        "FormType"               -> "01",
+        "CustomRegulationType"   -> "02",
         "ClaimedUnderRegulation" -> "051",
-        "Claimant" -> "02",
-        "NoOfEntries" -> "10",
-        "ClaimType" -> "02",
+        "Claimant"               -> "02",
+        "NoOfEntries"            -> "10",
+        "ClaimType"              -> "02",
         "EntryDetails" -> Json.obj(
-          "EPU" -> "777",
+          "EPU"         -> "777",
           "EntryNumber" -> "123456A",
-          "EntryDate" -> "20200101"
+          "EntryDate"   -> "20200101"
         ),
-        "ClaimReason" -> "06",
-        "ClaimDescription" -> "this is a claim description for £123",
-        "DateReceived" -> "20200805",
-        "ClaimDate" -> "20200805",
-        "PayeeIndicator" -> "01",
-        "PaymentMethod" -> "02",
+        "ClaimReason"        -> "06",
+        "ClaimDescription"   -> "this is a claim description for £123",
+        "DateReceived"       -> "20200805",
+        "ClaimDate"          -> "20200805",
+        "PayeeIndicator"     -> "01",
+        "PaymentMethod"      -> "02",
         "DeclarantRefNumber" -> "NA",
-        "DeclarantName" -> "DummyData"
+        "DeclarantName"      -> "DummyData"
       ),
       "agentDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
-        "EORI" -> "GB123456789123456",
-        "Name" -> "Joe Bloggs",
+        "EORI"            -> "GB123456789123456",
+        "Name"            -> "Joe Bloggs",
         "Address" -> Json.obj(
           "AddressLine1" -> "line 1",
           "AddressLine2" -> "line 2",
-          "City" -> "city",
-          "Region" -> "region",
-          "CountryCode" -> "GB",
-          "PostalCode" -> "ZZ111ZZ"
+          "City"         -> "city",
+          "Region"       -> "region",
+          "CountryCode"  -> "GB",
+          "PostalCode"   -> "ZZ111ZZ"
         ),
         "TelephoneNumber" -> "12345678",
-        "EmailAddress" -> "example@example.com"
+        "EmailAddress"    -> "example@example.com"
       ),
       "importerDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
-        "EORI" -> "GB123456789123456",
-        "Name" -> "Joe Bloggs",
+        "EORI"            -> "GB123456789123456",
+        "Name"            -> "Joe Bloggs",
         "Address" -> Json.obj(
           "AddressLine1" -> "line 1",
           "AddressLine2" -> "line 2",
-          "City" -> "city",
-          "Region" -> "region",
-          "CountryCode" -> "GB",
-          "PostalCode" -> "ZZ111ZZ"
+          "City"         -> "city",
+          "Region"       -> "region",
+          "CountryCode"  -> "GB",
+          "PostalCode"   -> "ZZ111ZZ"
         ),
         "TelephoneNumber" -> "12345678",
-        "EmailAddress" -> "example@example.com"
+        "EmailAddress"    -> "example@example.com"
       ),
-
       "bankDetails" -> Json.obj(
         "ImporterBankDetails" -> Json.obj(
-          "AccountName" -> "account name",
-          "SortCode" -> "123456",
+          "AccountName"   -> "account name",
+          "SortCode"      -> "123456",
           "AccountNumber" -> "12345678"
         ),
         "AgentBankDetails" -> Json.obj(
-          "AccountName" -> "account name",
-          "SortCode" -> "123456",
+          "AccountName"   -> "account name",
+          "SortCode"      -> "123456",
           "AccountNumber" -> "12345678"
         )
       ),
       "documentTypeTaxDetails" -> Json.obj(
         "DutyTypeTaxList" -> Json.arr(
           Json.obj(
-            "Type" -> "01",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
+            "Type"        -> "01",
+            "PaidAmount"  -> "100.00",
+            "DueAmount"   -> "50.00",
             "ClaimAmount" -> "50.00"
           ),
-          Json.obj("Type" -> "02",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
-            "ClaimAmount" -> "50.00"
-          ),
+          Json.obj("Type" -> "02", "PaidAmount" -> "100.00", "DueAmount" -> "50.00", "ClaimAmount" -> "50.00"),
           Json.obj(
-            "Type" -> "03",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
+            "Type"        -> "03",
+            "PaidAmount"  -> "100.00",
+            "DueAmount"   -> "50.00",
             "ClaimAmount" -> "50.00"
-          ))
+          )
+        )
       ),
       "documentList" -> Json.arr(
         Json.obj(
-          "Type" -> "03",
-          "Description" -> "this is a copy of c88"),
+          "Type"        -> "03",
+          "Description" -> "this is a copy of c88"
+        ),
         Json.obj(
-          "Type" -> "01",
-          "Description" -> "this is an invoice"),
+          "Type"        -> "01",
+          "Description" -> "this is an invoice"
+        ),
         Json.obj(
-          "Type" -> "04",
-          "Description" -> "this is a packing list")
+          "Type"        -> "04",
+          "Description" -> "this is a packing list"
+        )
       ),
       "uploadedFiles" -> Json.arr(
         Json.obj(
           "upscanReference" -> "ref-123",
-          "fileName" -> "test1.jpeg",
-          "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
-          "fileMimeType" -> "image/jpeg",
+          "fileName"        -> "test1.jpeg",
+          "checksum"        -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
+          "fileMimeType"    -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
+          "downloadUrl"     -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1
@@ -433,110 +433,108 @@ object TestData {
 
   def createRequestDetailsWithFileTransferFailures(baseUrl: String): JsObject = {
     Json.obj(
-
       "claimDetails" -> Json.obj(
-        "FormType" -> "01",
-        "CustomRegulationType" -> "02",
+        "FormType"               -> "01",
+        "CustomRegulationType"   -> "02",
         "ClaimedUnderRegulation" -> "051",
-        "Claimant" -> "02",
-        "NoOfEntries" -> "10",
-        "ClaimType" -> "02",
+        "Claimant"               -> "02",
+        "NoOfEntries"            -> "10",
+        "ClaimType"              -> "02",
         "EntryDetails" -> Json.obj(
-          "EPU" -> "777",
+          "EPU"         -> "777",
           "EntryNumber" -> "123456A",
-          "EntryDate" -> "20200101"
+          "EntryDate"   -> "20200101"
         ),
-        "ClaimReason" -> "06",
-        "ClaimDescription" -> "this is a claim description for £123",
-        "DateReceived" -> "20200805",
-        "ClaimDate" -> "20200805",
-        "PayeeIndicator" -> "01",
-        "PaymentMethod" -> "02",
+        "ClaimReason"        -> "06",
+        "ClaimDescription"   -> "this is a claim description for £123",
+        "DateReceived"       -> "20200805",
+        "ClaimDate"          -> "20200805",
+        "PayeeIndicator"     -> "01",
+        "PaymentMethod"      -> "02",
         "DeclarantRefNumber" -> "NA",
-        "DeclarantName" -> "DummyData"
+        "DeclarantName"      -> "DummyData"
       ),
       "agentDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
-        "EORI" -> "GB123456789123456",
-        "Name" -> "Joe Bloggs",
+        "EORI"            -> "GB123456789123456",
+        "Name"            -> "Joe Bloggs",
         "Address" -> Json.obj(
           "AddressLine1" -> "line 1",
           "AddressLine2" -> "line 2",
-          "City" -> "city",
-          "Region" -> "region",
-          "CountryCode" -> "GB",
-          "PostalCode" -> "ZZ111ZZ"
+          "City"         -> "city",
+          "Region"       -> "region",
+          "CountryCode"  -> "GB",
+          "PostalCode"   -> "ZZ111ZZ"
         ),
         "TelephoneNumber" -> "12345678",
-        "EmailAddress" -> "example@example.com"
+        "EmailAddress"    -> "example@example.com"
       ),
       "importerDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
-        "EORI" -> "GB123456789123456",
-        "Name" -> "Joe Bloggs",
+        "EORI"            -> "GB123456789123456",
+        "Name"            -> "Joe Bloggs",
         "Address" -> Json.obj(
           "AddressLine1" -> "line 1",
           "AddressLine2" -> "line 2",
-          "City" -> "city",
-          "Region" -> "region",
-          "CountryCode" -> "GB",
-          "PostalCode" -> "ZZ111ZZ"
+          "City"         -> "city",
+          "Region"       -> "region",
+          "CountryCode"  -> "GB",
+          "PostalCode"   -> "ZZ111ZZ"
         ),
         "TelephoneNumber" -> "12345678",
-        "EmailAddress" -> "example@example.com"
+        "EmailAddress"    -> "example@example.com"
       ),
-
       "bankDetails" -> Json.obj(
         "ImporterBankDetails" -> Json.obj(
-          "AccountName" -> "account name",
-          "SortCode" -> "123456",
+          "AccountName"   -> "account name",
+          "SortCode"      -> "123456",
           "AccountNumber" -> "12345678"
         ),
         "AgentBankDetails" -> Json.obj(
-          "AccountName" -> "account name",
-          "SortCode" -> "123456",
+          "AccountName"   -> "account name",
+          "SortCode"      -> "123456",
           "AccountNumber" -> "12345678"
         )
       ),
       "documentTypeTaxDetails" -> Json.obj(
         "DutyTypeTaxList" -> Json.arr(
           Json.obj(
-            "Type" -> "01",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
+            "Type"        -> "01",
+            "PaidAmount"  -> "100.00",
+            "DueAmount"   -> "50.00",
             "ClaimAmount" -> "50.00"
           ),
-          Json.obj("Type" -> "02",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
-            "ClaimAmount" -> "50.00"
-          ),
+          Json.obj("Type" -> "02", "PaidAmount" -> "100.00", "DueAmount" -> "50.00", "ClaimAmount" -> "50.00"),
           Json.obj(
-            "Type" -> "03",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
+            "Type"        -> "03",
+            "PaidAmount"  -> "100.00",
+            "DueAmount"   -> "50.00",
             "ClaimAmount" -> "50.00"
-          ))
+          )
+        )
       ),
       "documentList" -> Json.arr(
         Json.obj(
-          "Type" -> "03",
-          "Description" -> "this is a copy of c88"),
+          "Type"        -> "03",
+          "Description" -> "this is a copy of c88"
+        ),
         Json.obj(
-          "Type" -> "01",
-          "Description" -> "this is an invoice"),
+          "Type"        -> "01",
+          "Description" -> "this is an invoice"
+        ),
         Json.obj(
-          "Type" -> "04",
-          "Description" -> "this is a packing list")
+          "Type"        -> "04",
+          "Description" -> "this is a packing list"
+        )
       ),
       "uploadedFiles" -> Json.arr(
         Json.obj(
           "upscanReference" -> "ref-123",
-          "fileName" -> "test1.jpeg",
-          "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
-          "fileMimeType" -> "image/jpeg",
+          "fileName"        -> "test1.jpeg",
+          "checksum"        -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
+          "fileMimeType"    -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
+          "downloadUrl"     -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1
@@ -546,122 +544,118 @@ object TestData {
   def createAuditEventWhenError(baseUrl: String): JsObject = {
     Json.obj(
       "claimDetails" -> Json.obj(
-        "FormType" -> "01",
-        "CustomRegulationType" -> "02",
+        "FormType"               -> "01",
+        "CustomRegulationType"   -> "02",
         "ClaimedUnderRegulation" -> "051",
-        "Claimant" -> "02",
-        "NoOfEntries" -> "10",
-        "ClaimType" -> "02",
+        "Claimant"               -> "02",
+        "NoOfEntries"            -> "10",
+        "ClaimType"              -> "02",
         "EntryDetails" -> Json.obj(
-          "EPU" -> "777",
+          "EPU"         -> "777",
           "EntryNumber" -> "123456A",
-          "EntryDate" -> "20200101"
+          "EntryDate"   -> "20200101"
         ),
-        "ClaimReason" -> "06",
-        "ClaimDescription" -> "this is a claim description for £123",
-        "DateReceived" -> "20200805",
-        "ClaimDate" -> "20200805",
-        "PayeeIndicator" -> "01",
-        "PaymentMethod" -> "02",
+        "ClaimReason"        -> "06",
+        "ClaimDescription"   -> "this is a claim description for £123",
+        "DateReceived"       -> "20200805",
+        "ClaimDate"          -> "20200805",
+        "PayeeIndicator"     -> "01",
+        "PaymentMethod"      -> "02",
         "DeclarantRefNumber" -> "NA",
-        "DeclarantName" -> "DummyData"
+        "DeclarantName"      -> "DummyData"
       ),
       "agentDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
-        "EORI" -> "GB123456789123456",
-        "Name" -> "Joe Bloggs",
+        "EORI"            -> "GB123456789123456",
+        "Name"            -> "Joe Bloggs",
         "Address" -> Json.obj(
           "AddressLine1" -> "line 1",
           "AddressLine2" -> "line 2",
-          "City" -> "city",
-          "Region" -> "region",
-          "CountryCode" -> "GB",
-          "PostalCode" -> "ZZ111ZZ"
+          "City"         -> "city",
+          "Region"       -> "region",
+          "CountryCode"  -> "GB",
+          "PostalCode"   -> "ZZ111ZZ"
         ),
         "TelephoneNumber" -> "12345678",
-        "EmailAddress" -> "example@example.com"
+        "EmailAddress"    -> "example@example.com"
       ),
       "importerDetails" -> Json.obj(
         "IsVATRegistered" -> "true",
-        "EORI" -> "GB123456789123456",
-        "Name" -> "Joe Bloggs",
+        "EORI"            -> "GB123456789123456",
+        "Name"            -> "Joe Bloggs",
         "Address" -> Json.obj(
           "AddressLine1" -> "line 1",
           "AddressLine2" -> "line 2",
-          "City" -> "city",
-          "Region" -> "region",
-          "CountryCode" -> "GB",
-          "PostalCode" -> "ZZ111ZZ"
+          "City"         -> "city",
+          "Region"       -> "region",
+          "CountryCode"  -> "GB",
+          "PostalCode"   -> "ZZ111ZZ"
         ),
         "TelephoneNumber" -> "12345678",
-        "EmailAddress" -> "example@example.com"
+        "EmailAddress"    -> "example@example.com"
       ),
-
       "bankDetails" -> Json.obj(
         "ImporterBankDetails" -> Json.obj(
-          "AccountName" -> "account name",
-          "SortCode" -> "123456",
+          "AccountName"   -> "account name",
+          "SortCode"      -> "123456",
           "AccountNumber" -> "12345678"
         ),
         "AgentBankDetails" -> Json.obj(
-          "AccountName" -> "account name",
-          "SortCode" -> "123456",
+          "AccountName"   -> "account name",
+          "SortCode"      -> "123456",
           "AccountNumber" -> "12345678"
         )
       ),
       "documentTypeTaxDetails" -> Json.obj(
         "DutyTypeTaxList" -> Json.arr(
           Json.obj(
-            "Type" -> "01",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
+            "Type"        -> "01",
+            "PaidAmount"  -> "100.00",
+            "DueAmount"   -> "50.00",
             "ClaimAmount" -> "50.00"
           ),
-          Json.obj("Type" -> "02",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
-            "ClaimAmount" -> "50.00"
-          ),
+          Json.obj("Type" -> "02", "PaidAmount" -> "100.00", "DueAmount" -> "50.00", "ClaimAmount" -> "50.00"),
           Json.obj(
-            "Type" -> "03",
-            "PaidAmount" -> "100.00",
-            "DueAmount" -> "50.00",
+            "Type"        -> "03",
+            "PaidAmount"  -> "100.00",
+            "DueAmount"   -> "50.00",
             "ClaimAmount" -> "50.00"
-          ))
+          )
+        )
       ),
       "documentList" -> Json.arr(
         Json.obj(
-          "Type" -> "03",
-          "Description" -> "this is a copy of c88"),
+          "Type"        -> "03",
+          "Description" -> "this is a copy of c88"
+        ),
         Json.obj(
-          "Type" -> "01",
-          "Description" -> "this is an invoice"),
+          "Type"        -> "01",
+          "Description" -> "this is an invoice"
+        ),
         Json.obj(
-          "Type" -> "04",
-          "Description" -> "this is a packing list")
+          "Type"        -> "04",
+          "Description" -> "this is a packing list"
+        )
       ),
       "uploadedFiles" -> Json.arr(
         Json.obj(
           "upscanReference" -> "ref-123",
-          "fileName" -> "test1.jpeg",
-          "checksum" -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
-          "fileMimeType" -> "image/jpeg",
+          "fileName"        -> "test1.jpeg",
+          "checksum"        -> "f55a741917d512ab4c547ea97bdfdd8df72bed5fe51b6a248e0a5a0ae58061c8",
+          "fileMimeType"    -> "image/jpeg",
           "uploadTimestamp" -> "2020-10-10T10:10:10Z[UTC]",
-          "downloadUrl" -> (baseUrl + "/bucket/test1.jpeg")
+          "downloadUrl"     -> (baseUrl + "/bucket/test1.jpeg")
         )
       ),
       "numberOfFilesUploaded" -> 1,
-      "errorCode" -> "400",
-      "errorMessage" -> "Something went wrong",
+      "errorCode"             -> "400",
+      "errorMessage"          -> "Something went wrong"
     )
   }
-
 
   def verifyAuthorisationHasHappened(): Unit = {
     import com.github.tomakehurst.wiremock.client.WireMock.verify
     verify(moreThanOrExactly(1), postRequestedFor(urlEqualTo("/auth/authorise")))
   }
+
 }
-
-
-

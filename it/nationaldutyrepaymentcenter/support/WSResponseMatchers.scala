@@ -11,6 +11,7 @@ trait WSResponseMatchers {
 
   def haveStatus(status: Int): Matcher[WSResponse] =
     new Matcher[WSResponse] {
+
       override def apply(left: WSResponse): MatchResult =
         MatchResult(
           left.status == status,
@@ -33,10 +34,12 @@ trait WSResponseMatchers {
         else if (status >= 400 && status < 500) s"${response.body}"
         else ""
       }
+
     }
 
   def haveValidJsonBody(matchers: Matcher[JsObject]*): Matcher[WSResponse] =
     new Matcher[WSResponse] {
+
       override def apply(left: WSResponse): MatchResult =
         Try(left.json) match {
           case Success(o: JsObject) =>
@@ -45,10 +48,12 @@ trait WSResponseMatchers {
           case Failure(e) =>
             MatchResult(false, s"Could not parse.tolerantJson body because of $e", "")
         }
+
     }
 
   def haveValidJsonArrayBody(matchers: Matcher[JsArray]*): Matcher[WSResponse] =
     new Matcher[WSResponse] {
+
       override def apply(left: WSResponse): MatchResult =
         Try(left.json) match {
           case Success(o: JsArray) =>
@@ -57,6 +62,7 @@ trait WSResponseMatchers {
           case Failure(e) =>
             MatchResult(false, s"Could not parse.tolerantJson body because of $e", "")
         }
+
     }
 
 }
