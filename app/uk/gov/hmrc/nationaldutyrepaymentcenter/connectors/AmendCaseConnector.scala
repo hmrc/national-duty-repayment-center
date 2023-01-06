@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import com.kenshoo.play.metrics.Metrics
 import play.api.Logger
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISAmendCaseRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
@@ -56,6 +56,7 @@ class AmendCaseConnector @Inject() (
       EISAmendCaseResponse.delayInterval
     ) {
       monitor(serviceName) {
+        logger.warn(Json.toJson(request).toString)
         http.POST[EISAmendCaseRequest, EISAmendCaseResponse](
           url,
           request,
