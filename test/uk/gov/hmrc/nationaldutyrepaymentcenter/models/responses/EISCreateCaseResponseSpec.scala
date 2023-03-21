@@ -71,7 +71,7 @@ class EISCreateCaseResponseSpec extends SpecBase {
 
     }
 
-    "return empty error response when EISAmendCaseResponse is successful" in {
+    "return empty error response when EISCreateCaseResponse is successful" in {
       val result = EISCreateCaseResponse.errorMessage(Success(EISCreateCaseSuccess(
         "Risk-2507",
         "2020-09-24T10:15:43.995Z",
@@ -81,7 +81,7 @@ class EISCreateCaseResponseSpec extends SpecBase {
       result mustBe ""
     }
 
-    "delayInterval must return None when EIS response is successful" in {
+    "delayInterval must return None when EISCreateCaseResponse is successful" in {
       val result = EISCreateCaseResponse.delayInterval(Success(EISCreateCaseSuccess(
         "Risk-2507",
         "2020-09-24T10:15:43.995Z",

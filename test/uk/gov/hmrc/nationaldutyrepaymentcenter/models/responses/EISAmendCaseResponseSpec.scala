@@ -81,7 +81,7 @@ class EISAmendCaseResponseSpec extends SpecBase {
       result mustBe ""
     }
 
-    "delayInterval must return None when EIS response is successful" in {
+    "delayInterval must return None when EISAmendCaseResponse is successful" in {
       val result = EISAmendCaseResponse.delayInterval(Success(EISAmendCaseSuccess(
         "Risk-2507",
         "2020-09-24T10:15:43.995Z",
