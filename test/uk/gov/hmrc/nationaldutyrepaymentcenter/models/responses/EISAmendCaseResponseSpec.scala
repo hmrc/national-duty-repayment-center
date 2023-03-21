@@ -19,6 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses
 import base.SpecBase
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.EISAmendCaseError.ErrorDetail
+import scala.util.Success
 
 class EISAmendCaseResponseSpec extends SpecBase {
 
@@ -68,6 +69,26 @@ class EISAmendCaseResponseSpec extends SpecBase {
       readResponse mustBe error
       Json.toJson(error) mustBe Json.parse(errorJson)
 
+    }
+
+    "return empty error response when EISAmendCaseResponse is successful" in {
+      val result = EISAmendCaseResponse.errorMessage(Success(EISAmendCaseSuccess(
+        "Risk-2507",
+        "2020-09-24T10:15:43.995Z",
+        "Success",
+        "Case Updated successfully"
+      )))
+      result mustBe ""
+    }
+
+    "delayInterval must return None when EIS response is successful" in {
+      val result = EISAmendCaseResponse.delayInterval(Success(EISAmendCaseSuccess(
+        "Risk-2507",
+        "2020-09-24T10:15:43.995Z",
+        "Success",
+        "Case Updated successfully"
+      )))
+      result mustBe None
     }
   }
 }
