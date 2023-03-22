@@ -89,6 +89,16 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
       }
     }
   }
+
+  "mdtpTracingHeaders" should {
+
+    "return updated headers" in {
+      connector.mdtpTracingHeaders(HeaderCarrier(
+        requestId = Some(RequestId("test1")),
+        sessionId = Some(SessionId("session"))
+      )) mustBe List((HeaderNames.xRequestId, "test1"), (HeaderNames.xSessionId, "session"))
+    }
+  }
 }
 
 trait AmendCaseConnectorISpecSetup extends AppBaseISpec {
