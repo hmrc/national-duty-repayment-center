@@ -3,16 +3,18 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.SbtAutoBuildPlugin
 
+val bootstrapVersion = "8.4.0"
+
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % "7.11.0",
+  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % bootstrapVersion,
   "com.kenshoo" %% "metrics-play"              % "2.7.3_0.8.2",
   ws
 )
 
 def testDeps(scope: String) =
   Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28" % "7.11.0"   % scope,
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28" % bootstrapVersion   % scope,
     "org.scalatest"          %% "scalatest"              % "3.2.14"   % scope,
     "org.scalatestplus"      %% "mockito-3-4"            % "3.2.10.0" % scope,
     "com.vladsch.flexmark"    % "flexmark-all"           % "0.62.2"   % scope,
@@ -24,7 +26,7 @@ lazy val root = (project in file("."))
   .settings(
     name                     := "national-duty-repayment-center",
     organization             := "uk.gov.hmrc",
-    scalaVersion             := "2.13.10",
+    scalaVersion             := "2.13.12",
     PlayKeys.playDefaultPort := 8451,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*Routes.*;.*GuiceInjector;" +

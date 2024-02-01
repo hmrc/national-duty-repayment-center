@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 import akka.actor.ActorSystem
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
-import com.kenshoo.play.metrics.Metrics
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
@@ -41,7 +41,7 @@ class AmendCaseConnector @Inject() (
 
   lazy private val logger = Logger(getClass)
 
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+  override val metricRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url: String = config.eisBaseUrl + config.eisAmendCaseApiPath
 
