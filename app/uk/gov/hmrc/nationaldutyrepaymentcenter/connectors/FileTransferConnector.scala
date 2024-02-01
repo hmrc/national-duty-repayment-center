@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 import java.time.Clock
 
 import com.codahale.metrics.MetricRegistry
-import com.kenshoo.play.metrics.Metrics
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class FileTransferConnector @Inject() (val config: AppConfig, val http: HttpPost, val clock: Clock, metrics: Metrics)
     extends HttpAPIMonitor {
 
-  override val kenshooRegistry: MetricRegistry = metrics.defaultRegistry
+  override val metricRegistry: MetricRegistry = metrics.defaultRegistry
 
   val url: String = config.fileBaseUrl + config.fileBasePath
 

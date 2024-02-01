@@ -1,6 +1,6 @@
 package nationaldutyrepaymentcenter.support
 
-import com.kenshoo.play.metrics.Metrics
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import org.scalatest.Suite
 import org.scalatest.matchers.must.Matchers
 import play.api.Application

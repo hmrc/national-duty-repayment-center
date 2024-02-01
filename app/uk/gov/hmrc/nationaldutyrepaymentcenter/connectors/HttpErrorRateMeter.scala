@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import scala.util.{Failure, Success}
 
 trait HttpErrorRateMeter {
   lazy private val logger = Logger(getClass)
-  val kenshooRegistry: MetricRegistry
+  val metricRegistry: MetricRegistry
 
   def meterName[T](serviceName: String, statusCode: Int): String =
     if (statusCode >= 500) s"Http5xxErrorCount-$serviceName" else s"Http4xxErrorCount-$serviceName"
@@ -39,7 +39,7 @@ trait HttpErrorRateMeter {
     }
 
   private def record[T](name: String): Unit = {
-    kenshooRegistry.getMeters.getOrDefault(name, kenshooRegistry.meter(name)).mark()
+    metricRegistry.getMeters.getOrDefault(name, metricRegistry.meter(name)).mark()
     logger.debug(s"kenshoo-event::meter::$name::recorded")
   }
 

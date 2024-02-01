@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 trait AverageResponseTimer {
-  val kenshooRegistry: MetricRegistry
+  val metricRegistry: MetricRegistry
 
   lazy private val logger = Logger(getClass)
 
@@ -32,8 +32,8 @@ trait AverageResponseTimer {
     function.andThen {
       case _ =>
         val duration = Duration(System.nanoTime() - start, NANOSECONDS)
-        kenshooRegistry.getTimers
-          .getOrDefault(timerName(serviceName), kenshooRegistry.timer(timerName(serviceName)))
+        metricRegistry.getTimers
+          .getOrDefault(timerName(serviceName), metricRegistry.timer(timerName(serviceName)))
           .update(duration.length, duration.unit)
         logger.debug(
           s"kenshoo-event::timer::${timerName(serviceName)}::duration:{'length':${duration.length}, 'unit':${duration.unit}}"
