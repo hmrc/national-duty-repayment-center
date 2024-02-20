@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import akka.actor.ActorSystem
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Inject, Singleton}
 import com.typesafe.config.Config
+import org.apache.pekko.actor.ActorSystem
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Environment, Logger}
 import uk.gov.hmrc.auth.core.AuthConnector
