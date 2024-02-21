@@ -1,6 +1,7 @@
 import sbt.Tests.{Group, SubProcess}
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.SbtAutoBuildPlugin
+import uk.gov.hmrc.DefaultBuildSettings
 
 val bootstrapVersion = "8.4.0"
 val playVersion      = 30
