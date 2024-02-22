@@ -21,6 +21,7 @@ import nationaldutyrepaymentcenter.stubs.AmendCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import play.api.Application
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.AmendCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, EISAmendCaseRequest}
@@ -94,6 +95,25 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
 
         val result = await(connector.submitAmendClaim(eisAmendCaseRequest, correlationId))
         result mustBe EISAmendCaseError(ErrorDetail(None, None, Some("403"), Some("Error: empty response"), None, None))
+      }
+
+      "throw an UpstreamErrorResponse when status is 500 and content type is 'None' in response" in {
+
+        stubForPostWithResponse(
+          500,
+          """{
+            |  "ApplicationType" : "NDRC",
+            |  "OriginatingSystem" : "Digital",
+            |  "Content": {}
+            |}""".stripMargin,
+          "string",
+          ""
+        )
+
+        val result = intercept[Exception](
+          await(connector.submitAmendClaim(eisAmendCaseRequest, correlationId))
+        )
+        result.getMessage mustBe "Unexpected response type of status 500, expected application/json but got  with body:\nstring"
       }
 
       "retry if response is 429 (Too Many Requests)" in {

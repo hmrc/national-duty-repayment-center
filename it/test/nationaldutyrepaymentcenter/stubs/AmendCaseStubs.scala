@@ -126,7 +126,12 @@ trait AmendCaseStubs {
     )
   }
 
-  def stubForPostWithResponse(status: Int, payload: String, responseBody: String): Unit =
+  def stubForPostWithResponse(
+    status: Int,
+    payload: String,
+    responseBody: String,
+    contentType: String = "application/json"
+  ): Unit =
     stubFor(
       post(urlEqualTo(UPDATE_CASE_URL))
         .withHeader("x-correlation-id", matching("[A-Za-z0-9-]{36}"))
@@ -140,7 +145,7 @@ trait AmendCaseStubs {
         .willReturn(
           aResponse()
             .withStatus(status)
-            .withHeader("Content-Type", "application/json")
+            .withHeader("Content-Type", contentType)
             .withBody(responseBody)
         )
     )

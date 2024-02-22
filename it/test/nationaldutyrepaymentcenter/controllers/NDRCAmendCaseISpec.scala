@@ -210,6 +210,25 @@ class NDRCAmendCaseISpec
         verifyFilesTransferredAudit(0)
       }
 
+      "UpdateCaseEvent failed with internal server error" in {
+
+        val correlationId = uuidGenerator.uuid
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        givenAuthorised()
+        givenAuditConnector()
+
+        val result = wsClient
+          .url(s"$url/amend-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
+          .post(Json.toJson(AmendTestData.testAmendCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status mustBe 500
+
+        verifyFilesTransferredAudit(0)
+      }
+
     }
   }
 }

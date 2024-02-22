@@ -219,6 +219,25 @@ class NDRCCreateCaseISpec
         verifyFilesTransferredAudit(0)
       }
 
+      "CreateCaseEvent failed with internal server error" in {
+
+        val correlationId = ju.UUID.randomUUID().toString()
+        when(uuidGenerator.uuid).thenReturn(correlationId)
+
+        givenAuthorised()
+        givenAuditConnector()
+
+        val result = wsClient
+          .url(s"$url/create-case")
+          .withHttpHeaders("X-Correlation-ID" -> correlationId, "Authorization" -> bearerToken)
+          .post(Json.toJson(TestData.testCreateCaseRequest(wireMockBaseUrlAsString)))
+          .futureValue
+
+        result.status mustBe 500
+
+        verifyFilesTransferredAudit(0)
+      }
+
     }
   }
 }
