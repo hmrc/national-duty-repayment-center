@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
-import akka.actor.ActorSystem
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
+import org.apache.pekko.actor.ActorSystem
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import play.api.Logger
 import play.api.libs.json.Writes

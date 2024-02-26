@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package nationaldutyrepaymentcenter.connectors
 
 import nationaldutyrepaymentcenter.controllers.AmendTestData
@@ -5,6 +21,7 @@ import nationaldutyrepaymentcenter.stubs.AmendCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import play.api.Application
+import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.AmendCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, EISAmendCaseRequest}
@@ -78,6 +95,25 @@ class AmendCaseConnectorISpec extends AmendCaseConnectorISpecSetup with AmendCas
 
         val result = await(connector.submitAmendClaim(eisAmendCaseRequest, correlationId))
         result mustBe EISAmendCaseError(ErrorDetail(None, None, Some("403"), Some("Error: empty response"), None, None))
+      }
+
+      "throw an UpstreamErrorResponse when status is 500 and content type is 'None' in response" in {
+
+        stubForPostWithResponse(
+          500,
+          """{
+            |  "ApplicationType" : "NDRC",
+            |  "OriginatingSystem" : "Digital",
+            |  "Content": {}
+            |}""".stripMargin,
+          "string",
+          ""
+        )
+
+        val result = intercept[Exception](
+          await(connector.submitAmendClaim(eisAmendCaseRequest, correlationId))
+        )
+        result.getMessage mustBe "Unexpected response type of status 500, expected application/json but got  with body:\nstring"
       }
 
       "retry if response is 429 (Too Many Requests)" in {

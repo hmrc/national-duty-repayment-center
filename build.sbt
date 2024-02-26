@@ -1,32 +1,32 @@
 import sbt.Tests.{Group, SubProcess}
 import scoverage.ScoverageKeys
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.SbtAutoBuildPlugin
+import uk.gov.hmrc.DefaultBuildSettings
 
 val bootstrapVersion = "8.4.0"
+val playVersion      = 30
 
 lazy val compileDeps = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-backend-play-28" % bootstrapVersion,
-  "com.kenshoo" %% "metrics-play"              % "2.7.3_0.8.2",
-  ws
+  "uk.gov.hmrc" %% s"bootstrap-backend-play-$playVersion" % bootstrapVersion
 )
 
-def testDeps(scope: String) =
+def testDeps: Seq[ModuleID] =
   Seq(
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28" % bootstrapVersion   % scope,
-    "org.scalatest"          %% "scalatest"              % "3.2.14"   % scope,
-    "org.scalatestplus"      %% "mockito-3-4"            % "3.2.10.0" % scope,
-    "com.vladsch.flexmark"    % "flexmark-all"           % "0.62.2"   % scope,
-    "org.scalatestplus.play" %% "scalatestplus-play"     % "5.1.0"    % scope,
-    "com.github.tomakehurst"  % "wiremock"               % "2.27.2"   % scope
-  )
+    "uk.gov.hmrc"            %% s"bootstrap-test-play-$playVersion" % bootstrapVersion,
+    "org.scalatest"          %% "scalatest"                         % "3.2.15",
+    "org.scalatestplus"      %% "mockito-3-4"                       % "3.2.10.0",
+    "com.vladsch.flexmark"    % "flexmark-all"                      % "0.64.6",
+    "org.scalatestplus.play" %% "scalatestplus-play"                % "5.1.0"
+  ).map(_ % Test)
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.12"
 
 lazy val root = (project in file("."))
   .settings(
     name                     := "national-duty-repayment-center",
     organization             := "uk.gov.hmrc",
-    scalaVersion             := "2.13.12",
     PlayKeys.playDefaultPort := 8451,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*repositories.*;" +
       ".*BuildInfo.*;.*javascript.*;.*Routes.*;.*GuiceInjector;" +
@@ -34,23 +34,9 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum    := true,
     ScoverageKeys.coverageHighlighting     := true,
-    libraryDependencies ++= compileDeps ++ testDeps("test") ++ testDeps("it"),
-    publishingSettings,
+    libraryDependencies ++= compileDeps ++ testDeps,
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     scalacOptions += "-Wconf:src=routes/.*:s"
-  )
-  .configs(IntegrationTest)
-  .settings(
-    // To resolve a bug with version 2.x.x of the scoverage plugin - https://github.com/sbt/sbt/issues/6997
-    libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always)
-  )
-  .settings(
-    IntegrationTest / Keys.fork := false,
-    Defaults.itSettings,
-    IntegrationTest / unmanagedSourceDirectories += baseDirectory(_ / "it").value,
-    IntegrationTest / parallelExecution := false,
-    IntegrationTest / testGrouping      := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
-    majorVersion                        := 0
   )
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .settings(scalafmtOnCompile := true)
@@ -59,3 +45,11 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
   tests.map { test =>
     new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
   }
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(
+    root % "test->test"
+  ) // the "test->test" allows reusing test code and test dependencies
+  .settings(DefaultBuildSettings.itSettings())
+  .settings(libraryDependencies ++= testDeps)

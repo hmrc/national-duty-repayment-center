@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
-import akka.actor.ActorSystem
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
-import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+import org.apache.pekko.actor.ActorSystem
 import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import scala.concurrent.{ExecutionContext, Future}
 
