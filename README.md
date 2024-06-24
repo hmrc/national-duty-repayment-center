@@ -2,11 +2,15 @@
 
 Backend microservice supporting the submission of NDRC claims from the [national-duty-repayment-center-frontend](https://github.com/hmrc/national-duty-repayment-center-frontend) microservice
 
+Other related NDRC services:
+- Frontend service: [National-Duty-Repayment-Center-Frontend](https://github.com/hmrc/national-duty-repayment-center-frontend)
+- Stubs: [National-Duty-Repayment-Center-Stubs](https://github.com/hmrc/national-duty-repayment-center-stubs)
+
 ## Local Setup
 
 1. Checkout this repo
-1. Start dependent services with [service-manager](https://github.com/hmrc/service-manager): `sm --start NDRC_ALL -r`
-1. Stop the `service-manager` owned version of the service: `sm --stop NATIONAL_DUTY_REPAYMENT_CENTER`
+1. Start dependent services with [service-manager](https://github.com/hmrc/service-manager): `sm2 --start NDRC_ALL`
+1. Stop the `service-manager` owned version of the service: `sm2 --stop NATIONAL_DUTY_REPAYMENT_CENTER`
 1. Start the service: `sbt run`
 
 Ensure you get a JSON response from `curl -i http://localhost:8451/`
