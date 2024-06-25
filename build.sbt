@@ -38,13 +38,8 @@ lazy val root = (project in file("."))
     Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
     scalacOptions += "-Wconf:src=routes/.*:s"
   )
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala,SbtDistributablesPlugin)
   .settings(scalafmtOnCompile := true)
-
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
-  tests.map { test =>
-    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
 
 lazy val it = project
   .enablePlugins(PlayScala)
