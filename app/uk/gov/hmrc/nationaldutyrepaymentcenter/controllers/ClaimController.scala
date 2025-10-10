@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
-import play.api.Logger
-
-import javax.inject.{Inject, Singleton}
+import play.api.Logging
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.http.TooManyRequestException
@@ -29,6 +27,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{AuditService, ClaimServ
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -41,9 +40,7 @@ class ClaimController @Inject() (
   val claimService: ClaimService,
   val auditService: AuditService
 )(implicit ec: ExecutionContext)
-    extends BackendController(cc) with AuthActions with WithCorrelationId with WithEORINumber {
-
-  lazy private val logger = Logger(getClass)
+    extends BackendController(cc) with AuthActions with WithCorrelationId with WithEORINumber with Logging {
 
   private def acknowledgementReferenceFrom(correlationId: String): String =
     correlationId.replace("-", "").takeRight(32)
@@ -99,7 +96,7 @@ class ClaimController @Inject() (
           // last resort fallback when request processing fails
           case e =>
             val response = responseForError(e, correlationId)
-            logger.error(
+            logger.warn(
               s"CreateCaseEvent failed with internal server error, caseReferenceNumber:[] correlationId:[$correlationId]"
             )
             auditService
@@ -156,7 +153,7 @@ class ClaimController @Inject() (
           // last resort fallback when request processing fails
           case e =>
             val response = responseForError(e, correlationId)
-            logger.error(
+            logger.warn(
               s"UpdateCaseEvent failed with internal server error, caseReferenceNumber:[] correlationId:[$correlationId]"
             )
             auditService

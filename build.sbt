@@ -3,7 +3,7 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.DefaultBuildSettings
 
-val bootstrapVersion = "10.1.0"
+val bootstrapVersion = "10.2.0"
 val playVersion      = 30
 
 lazy val compileDeps = Seq(

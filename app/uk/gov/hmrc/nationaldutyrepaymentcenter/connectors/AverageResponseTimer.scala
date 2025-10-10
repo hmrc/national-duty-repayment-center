@@ -17,15 +17,13 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
 import com.codahale.metrics.MetricRegistry
-import play.api.Logger
+import play.api.Logging
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AverageResponseTimer {
+trait AverageResponseTimer extends Logging {
   val metricRegistry: MetricRegistry
-
-  lazy private val logger = Logger(getClass)
 
   def timer[T](serviceName: String)(function: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     val start = System.nanoTime()

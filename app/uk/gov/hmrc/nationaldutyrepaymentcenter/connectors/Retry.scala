@@ -18,14 +18,14 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.pattern.after
-import play.api.Logger
-import uk.gov.hmrc.play.http.logging.Mdc
+import play.api.Logging
+import uk.gov.hmrc.mdc.Mdc
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-trait Retry {
+trait Retry extends Logging {
 
   protected def actorSystem: ActorSystem
 
@@ -43,7 +43,7 @@ trait Retry {
             val defaultDelay = remainingIntervals.head
             val delay        = delayInterval(Success(result)).getOrElse(defaultDelay)
 
-            Logger(getClass).warn(s"Retrying in $delay due to ${retryReason(Success(result))}")
+            logger.warn(s"Retrying in $delay due to ${retryReason(Success(result))}")
             after(delay, actorSystem.scheduler)(loop(remainingIntervals.tail)(mdcData)(block))
           } else
             Future.successful(result)
@@ -54,7 +54,7 @@ trait Retry {
               val defaultDelay = remainingIntervals.head
               val delay        = delayInterval(Failure(e)).getOrElse(defaultDelay)
 
-              Logger(getClass).warn(s"Retrying in $delay due to ${retryReason(Failure(e))}")
+              logger.warn(s"Retrying in $delay due to ${retryReason(Failure(e))}")
               after(delay, actorSystem.scheduler)(loop(remainingIntervals.tail)(mdcData)(block))
             } else
               Future.failed(e)

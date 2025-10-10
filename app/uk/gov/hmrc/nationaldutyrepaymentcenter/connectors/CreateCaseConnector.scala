@@ -19,7 +19,6 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import org.apache.pekko.actor.ActorSystem
-import play.api.Logger
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
@@ -38,8 +37,6 @@ class CreateCaseConnector @Inject() (
     extends ReadSuccessOrFailure[EISCreateCaseResponse, EISCreateCaseSuccess, EISCreateCaseError](
       EISCreateCaseError.fromStatusAndMessage
     ) with EISConnector with HttpAPIMonitor with Retry {
-
-  lazy private val logger = Logger(getClass)
 
   override val metricRegistry: MetricRegistry = metrics.defaultRegistry
 
@@ -69,10 +66,10 @@ class CreateCaseConnector @Inject() (
       }
     } recoverWith {
       case e: GatewayTimeoutException =>
-        logger.error(s"$serviceName to $url failed with status: ${e.responseCode}")
+        logger.warn(s"$serviceName to $url failed with status: ${e.responseCode}")
         throw new GatewayTimeoutException(e.getMessage)
       case e =>
-        logger.error(s"$serviceName to $url failed with unexpected response")
+        logger.warn(s"$serviceName to $url failed with unexpected response")
         throw new Exception(e.getMessage)
     }
 

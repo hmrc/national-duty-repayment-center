@@ -19,7 +19,7 @@ import com.google.inject.{AbstractModule, Inject, Singleton}
 import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import play.api.libs.ws.WSClient
-import play.api.{Configuration, Environment, Logger}
+import play.api.{Configuration, Environment, Logging}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.hooks.HttpHook
@@ -31,11 +31,12 @@ import uk.gov.hmrc.play.http.ws.WSHttp
 import java.time.Clock
 import scala.util.matching.Regex
 
-class MicroserviceModule(val environment: Environment, val configuration: Configuration) extends AbstractModule {
+class MicroserviceModule(val environment: Environment, val configuration: Configuration)
+    extends AbstractModule with Logging {
 
   override def configure(): Unit = {
     val appName = "national-duty-repayment-center"
-    Logger(getClass).info(s"Starting microservice : $appName : in mode : ${environment.mode}")
+    logger.info(s"Starting microservice : $appName : in mode : ${environment.mode}")
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
 
     bind(classOf[HttpGet]).to(classOf[CustomHttpClient])
