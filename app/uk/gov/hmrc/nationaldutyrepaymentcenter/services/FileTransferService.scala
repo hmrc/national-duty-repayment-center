@@ -16,25 +16,22 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.services
 
-import java.time.LocalDateTime
-
-import javax.inject.Inject
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.FileTransferConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.controllers.routes
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 
+import java.time.LocalDateTime
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class FileTransferService @Inject() (
   fileTransferConnector: FileTransferConnector,
   appConfig: AppConfig,
   auditService: AuditService
-) {
-
-  lazy private val logger = Logger(getClass)
+) extends Logging {
 
   def transferMultipleFiles(
     caseReferenceNumber: String,
@@ -59,7 +56,7 @@ class FileTransferService @Inject() (
           if (result.status != 202) {
             val errorMessage =
               s"TransferMultipleFiles failed caseReferenceNumber:[${caseReferenceNumber}] for ${conversationId} [${result.status}] ${result.body} "
-            logger.error(s"$errorMessage [$conversationId]")
+            logger.warn(s"$errorMessage [$conversationId]")
             auditService.auditFileTransferResults(buildErrorResult(request, errorMessage, conversationId))
           }
         }

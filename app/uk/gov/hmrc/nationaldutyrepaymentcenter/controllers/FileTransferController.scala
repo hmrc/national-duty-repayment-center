@@ -16,22 +16,20 @@
 
 package uk.gov.hmrc.nationaldutyrepaymentcenter.controllers
 
-import javax.inject.{Inject, Singleton}
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.MultiFileTransferResult
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.AuditService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileTransferController @Inject() (val cc: ControllerComponents, auditService: AuditService)(implicit
   ec: ExecutionContext
-) extends BackendController(cc) {
-
-  lazy private val logger = Logger(getClass)
+) extends BackendController(cc) with Logging {
 
   def callback(): Action[JsValue] = Action(parse.json).async { implicit request =>
     withJsonBody[MultiFileTransferResult] { result =>

@@ -17,14 +17,13 @@
 package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 
 import com.codahale.metrics.MetricRegistry
-import play.api.Logger
+import play.api.Logging
 import uk.gov.hmrc.http._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-trait HttpErrorRateMeter {
-  lazy private val logger = Logger(getClass)
+trait HttpErrorRateMeter extends Logging {
   val metricRegistry: MetricRegistry
 
   def meterName[T](serviceName: String, statusCode: Int): String =
