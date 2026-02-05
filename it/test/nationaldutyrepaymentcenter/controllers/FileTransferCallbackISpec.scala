@@ -29,6 +29,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.UUIDGenerator
+import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
 
 class FileTransferCallbackISpec
     extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers with FileTransferStubs

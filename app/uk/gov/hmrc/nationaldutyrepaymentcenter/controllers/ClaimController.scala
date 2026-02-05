@@ -46,7 +46,7 @@ class ClaimController @Inject() (
     correlationId.replace("-", "").takeRight(32)
 
   def submitClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
-    withCorrelationId { correlationId: String =>
+    withCorrelationId { (correlationId: String) =>
       withAuthorised {
         withEORINumber { maybeEORI =>
           withJsonBody[CreateClaimRequest] { createCaseRequest =>
@@ -108,7 +108,7 @@ class ClaimController @Inject() (
   }
 
   def submitAmendClaim(): Action[JsValue] = Action(parse.json).async { implicit request =>
-    withCorrelationId { correlationId: String =>
+    withCorrelationId { (correlationId: String) =>
       withAuthorised {
         withEORINumber { maybeEORI =>
           withJsonBody[AmendClaimRequest] { amendCaseRequest =>

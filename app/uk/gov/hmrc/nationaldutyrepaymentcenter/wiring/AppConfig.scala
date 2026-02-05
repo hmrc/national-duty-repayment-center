@@ -61,7 +61,7 @@ class AppConfigImpl @Inject() (config: ServicesConfig) extends AppConfig {
 
   override val fileBaseUrl: String = config.baseUrl("file-transfer")
 
-  override lazy val fileBasePath: String =
+  override val fileBasePath: String =
     config.getString("microservice.services.file-transfer.path-multiple")
 
   override val eisCreateCaseApiPath: String =

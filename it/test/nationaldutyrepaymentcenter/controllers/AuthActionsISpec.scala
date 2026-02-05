@@ -18,6 +18,7 @@ package nationaldutyrepaymentcenter.controllers
 
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import play.api.mvc.Result
+import play.api.mvc.AnyContent
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -37,7 +38,8 @@ class AuthActionsISpec extends AppBaseISpec {
 
     override val appConfig: AppConfig = app.injector.instanceOf[AppConfigImpl]
 
-    implicit val request           = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
+    implicit val request: FakeRequest[AnyContent] = FakeRequest().withSession(SessionKeys.authToken -> "Bearer XYZ")
+    println(request)
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     import scala.concurrent.ExecutionContext.Implicits.global
