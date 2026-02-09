@@ -21,7 +21,6 @@ import nationaldutyrepaymentcenter.stubs.AmendCaseStubs
 import nationaldutyrepaymentcenter.support.AppBaseISpec
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import play.api.Application
-import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.AmendCaseConnector
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.{AmendClaimRequest, EISAmendCaseRequest}
