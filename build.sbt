@@ -39,7 +39,7 @@ lazy val root = (project in file("."))
     scalacOptions += "-Wconf:src=routes/.*:s"
   )
   .enablePlugins(PlayScala,SbtDistributablesPlugin)
-  .disablePlugins(JUnitXmlReportPlugin)
+  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(scalafmtOnCompile := true)
 
 lazy val it = project
