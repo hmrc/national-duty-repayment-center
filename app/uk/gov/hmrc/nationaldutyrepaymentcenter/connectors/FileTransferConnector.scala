@@ -22,15 +22,23 @@ import com.codahale.metrics.MetricRegistry
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.MultiFileTransferRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
+import java.net.URL
+import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileTransferConnector @Inject() (val config: AppConfig, val http: HttpPost, val clock: Clock, metrics: Metrics)
-    extends HttpAPIMonitor {
+class FileTransferConnector @Inject() (
+  val config: AppConfig,
+  val http: HttpClientV2,
+  val clock: Clock,
+  metrics: Metrics
+) extends HttpAPIMonitor {
 
   override val metricRegistry: MetricRegistry = metrics.defaultRegistry
 
@@ -41,11 +49,14 @@ class FileTransferConnector @Inject() (val config: AppConfig, val http: HttpPost
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
     monitor(s"ConsumedAPI-trader-services-transfer-file-api-POST") {
       http
-        .POST[MultiFileTransferRequest, HttpResponse](url, multiFileTransferRequest)
+        .post(URL(url))
+        .withBody(Json.toJson(multiFileTransferRequest))
+        .execute[HttpResponse]
         .recover {
           case error =>
             HttpResponse.apply(500, error.getMessage)
         }
+
     }
 
 }

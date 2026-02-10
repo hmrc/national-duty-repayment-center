@@ -25,6 +25,10 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequ
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+import uk.gov.hmrc.http.client.HttpClientV2
+import java.net.URL
+import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -63,6 +67,7 @@ class CreateCaseConnector @Inject() (
           hc.copy(authorization = None),
           implicitly[ExecutionContext]
         )
+
       }
     } recoverWith {
       case e: GatewayTimeoutException =>

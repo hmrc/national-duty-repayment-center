@@ -25,8 +25,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.UUIDGenerator
 
 trait TestApplication {
-  _: BaseISpec =>
-
+  self: BaseISpec =>
+    
   override implicit lazy val app: Application = appBuilder.build()
   val uuidGeneratorMock: UUIDGenerator        = mock[UUIDGenerator]
   val clock: Clock                            = Clock.fixed(Instant.parse("2020-09-09T10:15:30.00Z"), ZoneId.of("UTC"))
@@ -48,6 +48,4 @@ trait TestApplication {
       ).overrides(
         bind[Clock].toInstance(clock),
         bind[UUIDGenerator].toInstance(uuidGeneratorMock)
-      )
-
-}
+      )}

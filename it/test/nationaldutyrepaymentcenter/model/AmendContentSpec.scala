@@ -16,7 +16,7 @@
 
 package nationaldutyrepaymentcenter.model
 
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.matchers.must.Matchers.mustBe
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendCaseResponseType.{FurtherInformation, SupportingDocuments}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.AmendContent

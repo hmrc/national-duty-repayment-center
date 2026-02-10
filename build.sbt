@@ -3,7 +3,7 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.DefaultBuildSettings
 
-val bootstrapVersion = "10.2.0"
+val bootstrapVersion = "10.5.0"
 val playVersion      = 30
 
 lazy val compileDeps = Seq(
@@ -14,14 +14,14 @@ lazy val compileDeps = Seq(
 def testDeps: Seq[ModuleID] =
   Seq(
     "uk.gov.hmrc"            %% s"bootstrap-test-play-$playVersion" % bootstrapVersion,
-    "org.scalatest"          %% "scalatest"                         % "3.2.15",
-    "org.scalatestplus"      %% "mockito-3-4"                       % "3.2.10.0",
+    "org.scalatest"          %% "scalatest"                         % "3.2.19",
+    "org.scalatestplus"      %% "mockito-4-11"                      % "3.2.17.0",
     "com.vladsch.flexmark"    % "flexmark-all"                      % "0.64.6",
-    "org.scalatestplus.play" %% "scalatestplus-play"                % "5.1.0"
+    "org.scalatestplus.play" %% "scalatestplus-play"                % "7.0.2"
   ).map(_ % Test)
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.7"
 
 lazy val root = (project in file("."))
   .settings(

@@ -32,6 +32,7 @@ import uk.gov.hmrc.nationaldutyrepaymentcenter.models._
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.AmendClaimRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.NDRCCaseResponse
 import uk.gov.hmrc.nationaldutyrepaymentcenter.services.{NDRCAuditEvent, UUIDGenerator}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 
 class NDRCAmendCaseISpec
     extends ServerBaseISpec with AuthStubs with AmendCaseStubs with JsonMatchers with FileTransferStubs
