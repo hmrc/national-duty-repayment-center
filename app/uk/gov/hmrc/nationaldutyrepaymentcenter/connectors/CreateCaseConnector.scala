@@ -19,6 +19,7 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import org.apache.pekko.actor.ActorSystem
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.{HeaderCarrier, _}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
@@ -33,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CreateCaseConnector @Inject() (
   val config: AppConfig,
-  val http: HttpClientV2,
+  val http: HttpPost,
   val actorSystem: ActorSystem,
   metrics: Metrics
 )(implicit ec: ExecutionContext)
@@ -56,11 +57,16 @@ class CreateCaseConnector @Inject() (
       EISCreateCaseResponse.delayInterval
     ) {
       monitor(serviceName) {
-        http.post(URL(url)).withBody(Json.toJson(request)).setHeader(
-          (eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(
-            hc
-          )): _*
-        ).execute[EISCreateCaseResponse]
+        http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
+          url,
+          request,
+          eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
+        )(
+          implicitly[Writes[EISCreateCaseRequest]],
+          readFromJsonSuccessOrFailure,
+          hc.copy(authorization = None),
+          implicitly[ExecutionContext]
+        )
 
       }
     } recoverWith {
