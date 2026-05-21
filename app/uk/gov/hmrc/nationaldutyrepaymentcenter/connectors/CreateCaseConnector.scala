@@ -69,9 +69,6 @@ class CreateCaseConnector @Inject() (
         case e: GatewayTimeoutException =>
           logger.warn(s"$serviceName to $url failed with status: ${e.responseCode}")
           throw new GatewayTimeoutException(e.getMessage)
-        case e =>
-          logger.warn(s"$serviceName to $url failed with unexpected response")
-          throw new Exception(e.getMessage)
       }
     }
 
