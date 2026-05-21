@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-import com.google.inject.name.Named
-import com.google.inject.{AbstractModule, Inject, Singleton}
-import com.typesafe.config.Config
-import org.apache.pekko.actor.ActorSystem
-import play.api.libs.ws.WSClient
+import com.google.inject.AbstractModule
 import play.api.{Configuration, Environment, Logging}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.nationaldutyrepaymentcenter.connectors.MicroserviceAuthConnector
-import uk.gov.hmrc.play.audit.http.HttpAuditing
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.http.ws.WSHttp
 
 import java.time.Clock
-import scala.util.matching.Regex
 
 class MicroserviceModule(val environment: Environment, val configuration: Configuration)
     extends AbstractModule with Logging {
@@ -38,32 +28,7 @@ class MicroserviceModule(val environment: Environment, val configuration: Config
     val appName = "national-duty-repayment-center"
     logger.info(s"Starting microservice : $appName : in mode : ${environment.mode}")
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
-
-    bind(classOf[HttpGet]).to(classOf[CustomHttpClient])
-    bind(classOf[HttpPost]).to(classOf[CustomHttpClient])
     bind(classOf[AuthConnector]).to(classOf[MicroserviceAuthConnector])
   }
 
-}
-
-@Singleton
-class CustomHttpAuditing @Inject() (val auditConnector: AuditConnector, @Named("appName") val appName: String)
-    extends HttpAuditing {
-
-  override val auditDisabledForPattern: Regex =
-    """none""".r
-
-}
-
-@Singleton
-class CustomHttpClient @Inject() (
-  config: Configuration,
-  val httpAuditing: CustomHttpAuditing,
-  override val wsClient: WSClient,
-  override protected val actorSystem: ActorSystem
-) extends uk.gov.hmrc.http.HttpClient with WSHttp {
-
-  override lazy val configuration: Config = config.underlying
-
-  override val hooks: Seq[HttpHook] = Seq(httpAuditing.AuditingHook)
 }

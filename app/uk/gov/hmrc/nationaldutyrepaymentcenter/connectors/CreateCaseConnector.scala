@@ -19,22 +19,21 @@ package uk.gov.hmrc.nationaldutyrepaymentcenter.connectors
 import com.codahale.metrics.MetricRegistry
 import com.google.inject.Inject
 import org.apache.pekko.actor.ActorSystem
-import play.api.libs.json.Writes
-import uk.gov.hmrc.http.{HeaderCarrier, _}
+import play.api.libs.json.Json
+import play.api.libs.ws.writeableOf_JsValue
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, *}
 import uk.gov.hmrc.nationaldutyrepaymentcenter.models.requests.EISCreateCaseRequest
-import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses._
+import uk.gov.hmrc.nationaldutyrepaymentcenter.models.responses.*
 import uk.gov.hmrc.nationaldutyrepaymentcenter.wiring.AppConfig
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
-import uk.gov.hmrc.http.client.HttpClientV2
-import java.net.URL
-import play.api.libs.ws.writeableOf_JsValue
-import play.api.libs.json.Json
 
+import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}
 
 class CreateCaseConnector @Inject() (
   val config: AppConfig,
-  val http: HttpPost,
+  val httpClient: HttpClientV2,
   val actorSystem: ActorSystem,
   metrics: Metrics
 )(implicit ec: ExecutionContext)
@@ -57,25 +56,23 @@ class CreateCaseConnector @Inject() (
       EISCreateCaseResponse.delayInterval
     ) {
       monitor(serviceName) {
-        http.POST[EISCreateCaseRequest, EISCreateCaseResponse](
-          url,
-          request,
-          eisApiHeaders(correlationId, config.eisEnvironment, config.eisAuthorizationToken) ++ mdtpTracingHeaders(hc)
-        )(
-          implicitly[Writes[EISCreateCaseRequest]],
-          readFromJsonSuccessOrFailure,
-          hc.copy(authorization = None),
-          implicitly[ExecutionContext]
-        )
-
+        httpClient
+          .post(new URI(url).toURL)
+          .setHeader(eisApiHeaders(
+            correlationId,
+            config.eisEnvironment,
+            config.eisAuthorizationToken
+          ) ++ mdtpTracingHeaders(hc): _*)
+          .withBody(Json.toJson(request))
+          .execute[EISCreateCaseResponse](readFromJsonSuccessOrFailure, actorSystem.getDispatcher)
+      } recoverWith {
+        case e: GatewayTimeoutException =>
+          logger.warn(s"$serviceName to $url failed with status: ${e.responseCode}")
+          throw new GatewayTimeoutException(e.getMessage)
+        case e =>
+          logger.warn(s"$serviceName to $url failed with unexpected response")
+          throw new Exception(e.getMessage)
       }
-    } recoverWith {
-      case e: GatewayTimeoutException =>
-        logger.warn(s"$serviceName to $url failed with status: ${e.responseCode}")
-        throw new GatewayTimeoutException(e.getMessage)
-      case e =>
-        logger.warn(s"$serviceName to $url failed with unexpected response")
-        throw new Exception(e.getMessage)
     }
 
 }
